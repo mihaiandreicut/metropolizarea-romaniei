@@ -1,0 +1,81 @@
+{
+ "generat": "2026-10-02T18:32:50.958Z",
+ "secunde": 1.2,
+ "status": {
+  "stare": "activ",
+  "progres": 65,
+  "urmeaza": "Calibrare cu specialisti locali (praguri pe relief, liste tematice); dotari oficiale CNAS/ANMDMR/Posta/IGPR; finante locale MF; navetism INS; evaluarea impactului bugetar",
+  "ultima": "2026-10-02 — districtul rural asimilat zonei metropolitane (statut, fonduri mari), treptele functionale se pot schimba in timp: raport, principii.html, harta"
+ },
+ "date": {
+  "harta UAT": {
+   "octeti": 1552834,
+   "actualizat": "2026-09-22"
+  },
+  "localități": {
+   "octeti": 1242051,
+   "actualizat": "2026-09-21"
+  },
+  "regiuni tematice": {
+   "octeti": 41175,
+   "actualizat": "2026-10-02"
+  },
+  "instituții regionale": {
+   "octeti": 15370,
+   "actualizat": "2026-10-02"
+  },
+  "finanțe (MF)": {
+   "octeti": 1652617,
+   "actualizat": "2026-10-02"
+  },
+  "infrastructură (INS)": {
+   "octeti": 278951,
+   "actualizat": "2026-10-02"
+  },
+  "județe cu timpi OSRM": {
+   "numar": 41
+  }
+ },
+ "national": {
+  "judete": 41,
+  "parametri": {
+   "pMin": 5000,
+   "pTinta": 7000,
+   "pMinOras": 7000,
+   "tMax": 30
+  },
+  "unitati": {
+   "inainte": 3181,
+   "dupa": 1208
+  },
+  "subPrag": {
+   "inainte": 2501,
+   "dupa": 71
+  },
+  "mediana": {
+   "inainte": 2894,
+   "dupa": 9857
+  },
+  "timpMediu": {
+   "inainte": 2.141092502027619,
+   "dupa": 5.67089258417063
+  },
+  "pesteTMax": {
+   "inainte": 85,
+   "dupa": 384
+  },
+  "sate": 13747,
+  "birouri": 933,
+  "plasi": 168,
+  "plasiSubRegula": 10
+ },
+ "regional": {
+  "regiuni": 8,
+  "populatieMedie": 2381727,
+  "raportPopulatie": 1.963549782178654,
+  "raportPibLoc": 4.183321767291233,
+  "minuteMediu": 84.34950240152413,
+  "capitaleCuCurteDeApel": 8,
+  "oficiiJudetene": 41
+ }
+}

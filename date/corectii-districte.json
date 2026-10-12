@@ -1,0 +1,58 @@
+{
+ "versiune": 1,
+ "descriere": "Alegerile voluntare: UAT-ul (cod SIRUTA) intră în districtul cu reședința în UAT-ul `district`. Se aplică peste calculul automat; ce nu e scris aici rămâne cum iese din criterii.",
+ "corectii": [
+  {
+   "uat": 145293,
+   "district": 144054,
+   "nume": "Porumbacu de Jos → Avrig"
+  },
+  {
+   "uat": 144535,
+   "district": 144054,
+   "nume": "Cârțișoara → Avrig"
+  },
+  {
+   "uat": 143959,
+   "district": 144054,
+   "nume": "Arpașu de Jos → Avrig"
+  },
+  {
+   "uat": 144508,
+   "district": 144054,
+   "nume": "Cârța → Avrig"
+  },
+  {
+   "uat": 145104,
+   "district": 143619,
+   "nume": "Moșna → Mediaș"
+  },
+  {
+   "uat": 144349,
+   "district": 143619,
+   "nume": "Brateiu → Mediaș"
+  }
+ ],
+ "comasari": [
+  {
+   "uat": 146021,
+   "cu": 145827,
+   "nume": "Boița + Tălmaciu"
+  },
+  {
+   "uat": 145934,
+   "cu": 145827,
+   "nume": "Turnu Roșu + Tălmaciu"
+  },
+  {
+   "uat": 145355,
+   "cu": 144054,
+   "nume": "Racovița + Avrig"
+  },
+  {
+   "uat": 145765,
+   "cu": 143851,
+   "nume": "Șura Mare + Ocna Sibiului"
+  }
+ ]
+}

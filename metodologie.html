@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reorganizarea administrativă a României — atribute, metodă, exemple</title>
+    <meta name="description" content="Setul de atribute ale localităților componente, metoda de comasare a UAT-urilor, două exemple (Gorj, Caraș-Severin) și experiența altor țări cu reformele teritoriale.">
+    <meta name="theme-color" content="#2a78d6">
+
+    <!-- Open Graph (fără og:url / og:image până nu există un domeniu public) -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="e-ro-adp">
+    <meta property="og:locale" content="ro_RO">
+    <meta property="og:title" content="Reorganizarea administrativă a României — metodă și exemple">
+    <meta property="og:description" content="Atributele localităților, regulile de comasare, exemplele Gorj și Caraș-Severin, lecții din Danemarca, Estonia, Grecia, Ucraina, Albania, Franța.">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Reorganizarea administrativă a României — metodă și exemple">
+    <meta name="twitter:description" content="Atributele localităților, regulile de comasare, exemplele Gorj și Caraș-Severin, lecții internaționale.">
+
+    <!-- Date structurate -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Reorganizarea administrativă a României — atribute, metodă, exemple",
+        "inLanguage": "ro",
+        "about": ["reorganizare administrativ-teritorială", "comasarea comunelor", "UAT", "România"],
+        "dateModified": "2026-09-21"
+    }
+    </script>
+
+    <link rel="stylesheet" href="css/adp-tema.css">
+</head>
+
+<body class="pagina-document">
+    <a class="sari-la-continut" href="#continut">Sari la conținut</a>
+
+    <header class="antet">
+        <h1>Reorganizarea administrativă a României</h1>
+        <span class="subtitlu">atribute · metodă · exemple · experiență internațională</span>
+        <nav aria-label="Pagini">
+            <a href="index.html">Harta</a>
+            <a href="metodologie.html" aria-current="page">Reorganizare: metodologie</a>
+            <a href="raport.html">Raport</a>
+            <a href="principii.html">Principii</a>
+        </nav>
+    </header>
+
+    <div class="document">
+        <nav class="cuprins" aria-label="Cuprins">
+            <h2>Cuprins</h2>
+            <ol>
+                <li><a href="#rezumat">Rezumat</a></li>
+                <li><a href="#plan">Planul de lucru</a></li>
+                <li><a href="#atribute">Atributele localităților</a></li>
+                <li><a href="#metoda">Metoda</a></li>
+                <li><a href="#exemplu-gorj">Exemplul 1: Gorj</a></li>
+                <li><a href="#exemplu-caras-severin">Exemplul 2: Caraș-Severin</a></li>
+                <li><a href="#national">Scenariul național</a></li>
+                <li><a href="#regional">Nivelul al doilea: regiunile</a></li>
+                <li><a href="#lume">Reforme în alte țări</a></li>
+                <li><a href="#aplicare">Ce se poate aplica în România</a></li>
+                <li><a href="#context">Contextul românesc</a></li>
+                <li><a href="#limitari">Limitări</a></li>
+                <li><a href="#surse">Surse</a></li>
+            </ol>
+        </nav>
+
+        <main id="continut" class="continut-document">
+
+            <section id="rezumat">
+                <h2>Rezumat</h2>
+                <p>România are <b>3.181 de UAT-uri</b>: 103 municipii, 216 orașe și 2.862 de comune, cu aproximativ 13.000 de sate. După recensământul din 2021, <b>2.501 UAT-uri (79%) au sub 5.000 de locuitori</b>, 1.651 de comune (58%) au sub 3.000 și 464 de UAT-uri au sub 1.500 — pragul minim pentru înființarea unei comune noi din Legea 351/2001.</p>
+                <p>Propunerea de aici pornește de la <b>localitatea componentă</b> (satul), nu de la UAT: unde gravitează, cât de repede ajunge la o primărie, ce dotări are, ce identitate are. Pe baza acestor atribute, un algoritm cu reguli explicite regrupează UAT-urile în unități mai mari, fără să îndepărteze vreun sat de reședință peste un timp maxim și fără să coboare vreo minoritate sub pragul legal de 20%.</p>
+                <ul>
+                    <li><b>Gorj</b>: <span data-val="gorj.a.unitati" data-sg="UAT" data-pl="UAT-uri">70 de UAT-uri</span> devin <b><span data-val="gorj.d.unitati" data-sg="unitate" data-pl="unități">…</span></b>; populația mediană crește de la <span data-val="gorj.a.mediana">…</span> la <span data-val="gorj.d.mediana">…</span> de locuitori.</li>
+                    <li><b>Caraș-Severin</b>: <span data-val="caras_severin.a.unitati" data-sg="UAT" data-pl="UAT-uri">77 de UAT-uri</span> devin <b><span data-val="caras_severin.d.unitati" data-sg="unitate" data-pl="unități">…</span></b>; <span data-val="caras_severin.d.subPrag">…</span> rămân sub prag, aproape toate la munte sau în comunități minoritare — excepții pe care metoda le arată explicit.</li>
+                    <li>Experiența altor țări (Danemarca, Estonia, Grecia, Letonia, Albania, Ucraina, Franța, Japonia, Norvegia) arată că reformele reușite combină un <b>prag</b>, un criteriu de <b>accesibilitate</b> și o formă de <b>reprezentare a satelor</b> după comasare.</li>
+                </ul>
+                <p class="nota">Toate cifrele exemplelor de pe această pagină sunt calculate în browser, cu același cod ca harta, deci nu pot rămâne în urmă față de metodă. Parametrii se pot schimba pe <a href="index.html">hartă</a>, în secțiunea „Reorganizare — exemple”.</p>
+            </section>
+
+            <section id="plan">
+                <h2>Planul de lucru</h2>
+                <div class="tabel-derulant">
+                    <table class="tabel-doc">
+                        <thead><tr><th>Etapa</th><th>Conținut</th><th>Stare</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row">1. Harta de bază</th><td>Regiunile ADR, județele, regiunile istorice și UAT-urile, cu atributele UAT (populație, vârste, etnie, dispersie, izolare).</td><td><span class="stare-date s-disponibil">făcut</span></td></tr>
+                            <tr><th scope="row">2. Catalogul de atribute</th><td>Atributele localităților componente, în opt categorii, cu rol, sursă și stare a datelor.</td><td><span class="stare-date s-disponibil">făcut (v1)</span></td></tr>
+                            <tr><th scope="row">3. Metoda și două exemple</th><td>Algoritmul de comasare și aplicarea lui pe Gorj și Caraș-Severin, cu timpi rutieri reali.</td><td><span class="stare-date s-disponibil">făcut</span></td></tr>
+                            <tr><th scope="row">3b. Regiuni tematice</th><td>Stratul de țări, zone etnografice și regiuni etno-culturale (25 de regiuni, apartenență mulți-la-mulți), cu analiza felului în care taie județele actuale — punct de plecare pentru viitoarele județe.</td><td><span class="stare-date s-disponibil">făcut (v1)</span></td></tr>
+                            <tr><th scope="row">4. Date naționale</th><td>Timpi rutieri pentru toate localitățile din țară — <b>făcut</b> (OSRM, județ cu județ). Rămân: dotările din surse oficiale (CNAS, ANMDMR, Poșta Română, IGPR), finanțele locale (Ministerul Finanțelor) și navetismul (INS).</td><td><span class="stare-date s-partial">parțial</span></td></tr>
+                            <tr><th scope="row">5. Calibrare</th><td>Praguri diferențiate pe relief, ponderile scorului de centralitate, validare cu consiliile județene, ADR-urile și primarii din județele-pilot.</td><td><span class="stare-date s-de-colectat">de făcut</span></td></tr>
+                            <tr><th scope="row">6. Scenarii naționale</th><td>Scenariul pe toată țara, cu parametri reglabili (prag și timp maxim), pe hartă și în <a href="#national">secțiunea de mai jos</a>; comparabil cu <a href="https://cosettechichirau.github.io/reformaadm/">simularea existentă</a> (prag 5.000).</td><td><span class="stare-date s-disponibil">făcut (v1)</span></td></tr>
+                            <tr><th scope="row">6b. Nivelul regional</th><td>Județele grupate în regiuni, cu capitalele alese dintre orașele care au deja funcții regionale (curți de apel, camere ale notarilor, direcții regionale ale finanțelor, ADR) și cu indicatorii economici care arată dezechilibrul: PIB pe locuitor și câștig pe oră lucrată.</td><td><span class="stare-date s-disponibil">făcut (v1)</span></td></tr>
+                            <tr><th scope="row">7. Evaluarea impactului</th><td>Economii (cheltuieli administrative), accesibilitate, minorități, birouri locale, investiții.</td><td><span class="stare-date s-de-colectat">de făcut</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="atribute">
+                <h2>Atributele localităților componente</h2>
+                <p>O comună din România e o sumă de sate (în medie 4,6), iar satele diferă enorm: reședința cu școală, dispensar și poștă, satul de 30 de locuitori la 40 de minute pe un drum de munte, satul lipit de oraș. O reorganizare făcută doar pe totalurile UAT-ului nu vede aceste diferențe. De aceea atributele se definesc <b>pe localitate</b>, iar la UAT se ajunge prin agregare.</p>
+                <p>Fiecare atribut are un <b>rol</b> în metodă: ori pune o condiție (prag, accesibilitate), ori alege reședința (centralitate), ori arată legăturile (afinitate, coeziune), ori doar descrie efectele (diagnostic). Catalogul complet, cu sursa fiecărui atribut, este și în <a href="date/atribute-localitati.json">date/atribute-localitati.json</a>, ca să poată fi folosit direct de cod.</p>
+                <div id="catalog" class="se-incarca">Se încarcă catalogul…</div>
+            </section>
+
+            <section id="metoda">
+                <h2>Metoda</h2>
+                <h3>Regulile</h3>
+                <ol>
+                    <li><b>Prag pe bandă, verificat de două ori.</b> O comună nouă trebuie să aibă cel puțin <span data-val="parametri.pMin">5.000</span> de locuitori și crește spre <span data-val="parametri.pTinta">7.000</span>; o unitate cu reședința în oraș pornește de la <span data-val="parametri.pMinOras">7.000</span> și are ținta la <span data-val="parametri.pTintaOras">9.000</span>, iar dacă orașul nu e reședință de județ nu trece de <span data-val="parametri.pMaxOras">100.000</span> prin comasare. Pragul se verifică azi <b>și</b> în proiecția la 2050. Pragul „durabil” împiedică situația în care o comasare trece pragul acum și îl ratează peste 25 de ani — scopul fiind o împărțire care nu trebuie refăcută la fiecare generație.</li>
+                    <li><b>Comuna întâi cu comuna.</b> Comunele se grupează mai întâi între ele. Orașul primește comune doar dacă are nevoie de ele ca să-și susțină rangul, sau dacă un rest rural nu mai are niciun vecin rural cu care să se comaseze.</li>
+                    <li><b>Pragurile legale ale rangului</b> (Legea 351/2001, anexa II): oraș <span data-val="parametri.pragOras">5.000</span>, municipiu <span data-val="parametri.pragMunicipiu">25.000</span> de locuitori. Un municipiu sub pragul lui are voie să preia comune ca să-l atingă; unul peste prag rămâne neatins. Simetric, o unitate fără oraș nu crește peste <span data-val="parametri.pMaxRural">15.000</span> de locuitori — altfel ar trebui oricum declarată oraș.</li>
+                    <li><b>Accesibilitate.</b> Nicio localitate cu cel puțin <span data-val="parametri.pSatMin">50</span> de locuitori nu ajunge la mai mult de <span data-val="parametri.tMax">30</span> de minute cu mașina de noua reședință, dacă nu era deja. Timpii sunt calculați pe rețeaua reală de drumuri (OSRM, OpenStreetMap), nu în linie dreaptă.</li>
+                    <li><b>Nicio unitate sub prag.</b> Ce rămâne sub prag după comasările „curate” se comasează forțat, cu derogare documentată: satele ajunse peste cele 30 de minute primesc <b>birou local obligatoriu</b>. Nici forțarea nu trece însă de <span data-val="parametri.tMaxFortat">45</span> de minute — dincolo de asta unitatea rămâne mică, pentru că altfel primăria devine inaccesibilă.</li>
+                    <li><b>Contiguitate și județ.</b> Unitățile noi sunt teritorii continue, formate din UAT-uri vecine, în interiorul aceluiași județ.</li>
+                    <li><b>Orașul rămâne centru.</b> Dacă o unitate nouă cuprinde un oraș sau un municipiu, reședința este acolo.</li>
+                    <li><b>Minorități.</b> Pragul de 20% din Codul administrativ (art. 94 — folosirea limbii materne în administrație) e legat azi de UAT, deci orice comasare îl poate șterge. Regula are trei regimuri, alese din pagină: <i>se păstrează la nivelul localității componente</i> (implicit — comasarea se face, iar dreptul rămâne acolo unde ponderea e peste prag, cu derogare scrisă în dosar; ar cere modificarea art. 94), <i>blochează comasarea</i> (litera legii de azi) sau <i>nu se ia în seamă</i>. Varianta rigidă dă rezultate perverse: în Sibiu, Bruiu (29,8% romi) rămânea singur cu 671 de locuitori, iar Chirpăr — singurul lui vecin firesc — era împins peste Olt.</li>
+                    <li><b>Satul se poate muta.</b> Unitatea care se comasează e UAT-ul întreg (limitele lui sunt cunoscute). Satele care ar ajunge mai repede la reședința unei unități vecine sunt propuse pentru transfer — mutarea satelor între comune e prevăzută de Legea 351/2001 (art. 5), cu referendum local.</li>
+                    <li><b>Opțional: regiunile istorice.</b> Se poate cere ca nicio unitate nouă să nu treacă granița dintre două regiuni istorice. Regula e oprită implicit, fiindcă blochează comasări rezonabile de-a lungul graniței.</li>
+                </ol>
+
+                <h3>Pașii algoritmului</h3>
+                <ol>
+                    <li><b>Nuclee rurale:</b> comunele care trec singure pragul durabil.</li>
+                    <li><b>Creștere pe vecinătăți, numai între comune:</b> fiecare comună se alipește nucleului la a cărui reședință satele ei ajung, în medie, cel mai repede (timp ponderat cu populația), dacă regulile de accesibilitate, mărime și minorități sunt respectate.</li>
+                    <li><b>Nuclee noi:</b> comunele rămase fără nucleu devin, pe rând, nuclee — întâi cea cu cel mai mare scor de centralitate.</li>
+                    <li><b>Orașele</b> pornesc ca unități de sine stătătoare.</li>
+                    <li><b>Comasarea grupurilor rurale sub prag</b> între ele, cu grupul vecin care dă cel mai mic timp mediu.</li>
+                    <li><b>Alipirea la oraș</b> — abia acum, și numai pentru orașele sub pragul rangului lor sau pentru resturile rurale fără vecin rural disponibil.</li>
+                    <li><b>Rafinare prin mutări locale</b> (în stilul procedurii AZP, Openshaw 1977): un UAT trece în grupul vecin dacă scade <i>Σ populație × timp + λ × Σ locuitori lipsă până la prag</i> (λ = 30), fără să rupă continuitatea grupului și fără să strice accesibilitatea niciunuia dintre cele două grupuri rezultate.</li>
+                    <li><b>Forțarea:</b> grupurile rămase sub prag se comasează oricum, alegând întâi partenerul rural, apoi pe cel cu cele mai puține sate noi peste timpul maxim.</li>
+                    <li><b>Reședința</b> fiecărei unități: orașul, dacă există; altfel, dintre localitățile bine dotate (scor ≥ 60% din maximul grupului), cea care minimizează timpul mediu de deplasare al locuitorilor.</li>
+                    <li><b>Diagnostic pe fiecare sat:</b> timpul acum și după, depășiri, candidați la transfer, fostele reședințe la peste <span data-val="parametri.tBirou">15</span> minute de noua reședință (care păstrează un birou local).</li>
+                </ol>
+                <p>Pașii 5–9 se repetă până se stabilizează rezultatul. Fiecare unitate propusă își păstrează <b>jurnalul deciziilor</b>: pe hartă, un clic pe unitate (sau pe numele ei din listă) deschide dosarul complet — condițiile verificate cu praguri și stare, pașii în ordinea în care s-au petrecut, reședințele respinse cu motivul respingerii și derogările acordate.</p>
+
+                <h3>Scorul de centralitate al unei reședințe</h3>
+                <p class="formula">scor = populația accesibilă în <span data-val="parametri.tAccesibil">15</span> min (mii) + nivelul școlii (liceu 3, gimnaziu 2, primar 1) + serviciile din OSM (max. 2 puncte) + 3 dacă e oraș</p>
+                <p>Scorul favorizează localitățile deja folosite de vecini (populația din jur), cu școală mare și servicii. Pentru serviciile din OpenStreetMap (primărie, dispensar, farmacie, poștă, poliție, cămin cultural etc.) acoperirea e incompletă, de aceea au pondere mică; școlile vin din rețeaua școlară oficială.</p>
+
+                <h3>De ce aceste valori implicite</h3>
+                <p>Pragul de 5.000 de locuitori e minimul folosit de Estonia în reforma din 2017 și apare în mai multe propuneri românești (vezi <a href="#context">contextul</a>). Cele 30 de minute sunt o limită rezonabilă pentru un drum la primărie, iar pragurile de rang vin din Legea 351/2001. Toate sunt <b>alegeri de politică publică, nu rezultate științifice</b>: pe hartă fiecare criteriu are propriul comutator sau cursor — prag, timp maxim, limita forțării, maximul unei unități rurale, pragurile legale, proiecția la 2050, forțarea, absorbția urbană, regiunile istorice, pragul minorităților — iar efectul se vede imediat, pe un județ, pe o regiune de dezvoltare sau pe toată țara.</p>
+            </section>
+
+            <section id="exemplu-gorj">
+                <h2>Exemplul 1: Gorj</h2>
+                <p>Gorj are 70 de UAT-uri — 2 municipii (Târgu Jiu, Motru), 7 orașe și 61 de comune — și 314.685 de locuitori (2021), în 435 de localități. Relieful merge de la Munții Parâng și Vâlcan la dealurile subcarpatice și la câmpia din sud; economia e marcată de reconversia bazinului minier. Comunele din Gorj sunt deja relativ mari: doar trei au sub 1.500 de locuitori.</p>
+                <div id="rezultat-gorj" class="se-incarca">Se calculează…</div>
+            </section>
+
+            <section id="exemplu-caras-severin">
+                <h2>Exemplul 2: Caraș-Severin</h2>
+                <p>Caraș-Severin este cel mai fragmentat județ: 77 de UAT-uri — 2 municipii (Reșița, Caransebeș), 6 orașe și 69 de comune — pentru 246.588 de locuitori, în 309 localități. 91% dintre comune au sub 3.000 de locuitori. Munții Banatului, Semenic și Almăj fac drumurile lungi, iar județul are comunități de croați (carașoveni), cehi, sârbi, ucraineni și germani. E cazul-test pentru limitele metodei.</p>
+                <div id="rezultat-caras-severin" class="se-incarca">Se calculează…</div>
+            </section>
+
+            <section id="national">
+                <h2>Scenariul național</h2>
+                <p>Aceeași metodă, aplicată tuturor județelor cu datele de accesibilitate generate (timpii rutieri sat → reședințe vin din OSRM, județ cu județ). Calculul rulează în browser, la cerere, pentru că încarcă toate fișierele de județ.</p>
+                <p><button id="national-ruleaza" class="buton principal" type="button">Calculează scenariul național</button></p>
+                <div id="rezultat-national"></div>
+                <p class="nota">O simulare independentă, cu algoritmul Max-P și același prag de 5.000 de locuitori, ajunge la 1.333 de UAT-uri (<a href="https://cosettechichirau.github.io/reformaadm/">cosettechichirau.github.io/reformaadm</a>). Diferența față de rezultatul de mai sus vine din reguli: acolo criteriul e populația și contiguitatea, aici se adaugă timpul maxim până la reședință, pragul de 20% al minorităților și regula ca orașul să rămână reședință — de aceea rămân mai multe unități mici la munte.</p>
+            </section>
+
+            <section id="regional">
+                <h2>Nivelul al doilea: regiunile</h2>
+                <p>Comasarea comunelor rezolvă baza administrației, nu și vârful. A doua simulare
+                    (stratul <b>Regiuni — simulare</b> de pe hartă) grupează județele în regiuni și
+                    arată, alături, rețelele de instituții care au <b>deja</b> circumscripție regională.</p>
+
+                <h3>Ipoteza de lucru</h3>
+                <ul>
+                    <li><b>Județele nu se desființează.</b> Ele rămân circumscripții ale serviciilor
+                        deconcentrate, iar prefectura devine <b>oficiu de control al legalității</b> —
+                        atribuția ei constituțională (art. 123), fără aparat paralel. Fiecare regiune
+                        raportează câte astfel de oficii ar avea.</li>
+                    <li><b>Capitala nu se inventează.</b> Se alege dintre orașele care găzduiesc azi
+                        funcții regionale, punctate după greutatea lor: curte de apel 3, direcție
+                        regională a finanțelor 2, agenție de dezvoltare regională 2, cameră a notarilor
+                        publici 1. La 8 și la 12 regiuni, toate capitalele rezultate sunt deja sedii de
+                        curte de apel — rețeaua judiciară, cea mai veche, e și cea mai bună aproximare
+                        a unei împărțiri regionale funcționale.</li>
+                    <li><b>Criteriile sunt reglabile</b>, ca la comune: câte regiuni, cât cântărește
+                        echilibrul de populație, cât cântărește echilibrul economic, dacă regiunile au
+                        voie să amestece regiuni istorice.</li>
+                </ul>
+
+                <h3>Ce arată datele economice</h3>
+                <p>Dezechilibrul de care se lovește orice regionalizare e măsurabil. La nivel de județ,
+                    PIB-ul pe locuitor merge de la <b>42.800 EUR în București</b> la <b>6.100 EUR în
+                    Vaslui</b> — de șapte ori mai puțin (Eurostat, 2022). La nivel de regiune de
+                    dezvoltare, remunerarea pe oră lucrată merge de la <b>13,60 EUR în București-Ilfov</b>
+                    la <b>6,17 EUR în Nord-Est</b>, iar diferența e dată mai ales de sectoarele bine
+                    plătite: în financiar, imobiliare și servicii profesionale se ajunge la 16,77 EUR pe
+                    oră în București-Ilfov, față de 7,25 EUR în Sud-Muntenia.</p>
+                <p>Consecința pentru desen: nicio grupare de județe nu egalizează nivelul economic, pentru
+                    că Bucureștiul singur produce mai mult decât regiuni întregi. Ce se poate face e să
+                    nu se lase regiuni formate numai din județe sărace — de aceea echilibrul economic e
+                    un criteriu separat, iar rezultatul lui se citește direct în raportul dintre regiunea
+                    cea mai bogată și cea mai săracă.</p>
+
+                <h3>Cum se citește comparația</h3>
+                <p>Butonul <b>Compară 8 / 12 / 16</b> rulează aceleași criterii pe trei dimensiuni de
+                    regiune. Cu cât regiunile sunt mai multe, cu atât drumul până la capitală scade și
+                    dezechilibrul economic crește: la 8 regiuni se ajunge în medie în circa 70 de minute
+                    la capitală, la 16 în circa 40, dar raportul dintre PIB-ul pe locuitor al celei mai
+                    bogate și al celei mai sărace regiuni urcă de la ~3× la ~5×. Distanțele sunt estimate
+                    în linie dreaptă, înmulțite cu 1,3 și împărțite la 70 km/h; nu sunt timpi rutieri
+                    reali, cum sunt cei de la nivelul localităților.</p>
+            </section>
+
+            <section id="lume">
+                <h2>Reforme în alte țări</h2>
+                <div class="tabel-derulant">
+                    <table class="tabel-doc">
+                        <thead>
+                            <tr><th>Țara, anul</th><th>Înainte → după</th><th>Cum</th><th>Ce rămâne satelor</th><th>Ce reținem</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Danemarca, 2007</th>
+                                <td>271 → 98 de comune; 13 comitate → 5 regiuni</td>
+                                <td>Lege-cadru, țintă de 20.000 de locuitori (cu excepții); comunele și-au ales partenerii</td>
+                                <td>—</td>
+                                <td>Sub 1% din populație a rămas în comune sub 20.000. Efectul asupra participării la vot a fost mic și amestecat, mai negativ unde comasarea a fost mai amplă.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Grecia, 2010 (Kallikratis)</th>
+                                <td>1.033 → 325 de municipalități; 54 de prefecturi → 13 regiuni alese</td>
+                                <td>Obligatoriu, prin lege (3852/2010), după reforma Kapodistrias din 1997</td>
+                                <td>Fostele municipalități devin <i>unități municipale</i>; satele, <i>comunități locale</i> cu consilii proprii</td>
+                                <td>Comasare mare, dar cu un nivel sub-municipal ales care păstrează vocea satelor.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Republica Moldova, 1999 → 2003 → 2023</th>
+                                <td>32 de raioane → 10 județe (1999), întoarcere la 32 de raioane (2003); azi 893 de UAT-uri de nivel I, din care peste 56% sub pragul legal</td>
+                                <td>Prag legal de <b>1.500 de locuitori</b> plus un criteriu financiar: cheltuielile cu aparatul administrativ și instituțiile sociale să nu depășească <b>30% din veniturile proprii</b>. Din 2023, amalgamare voluntară pe „clustere”, cu asistență de la guvern</td>
+                                <td>—</td>
+                                <td>Două lecții. Prima: o reformă regională poate fi anulată de următorul guvern — cea din 1999 a ținut patru ani. A doua: criteriul financiar („cât costă administrația din veniturile proprii”) prinde fragmentarea mai bine decât populația singură; peste 87% dintre UAT-urile moldovene au sub 3.000 de locuitori.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Polonia, 1999</th>
+                                <td>49 → 16 voievodate; powiatul reînființat: 308 + 65 orașe cu drept de powiat (azi 314 + 66); comunele (<i>gminy</i>) <b>nu</b> au fost comasate</td>
+                                <td>Regula <b>„5–10–50”</b> pentru powiat: minimum 5 comune, reședință de minimum 10.000 de locuitori, minimum 50.000 în total; secundar, centrele supralocale, împărțirea din 1957–1975 și barierele de comunicație</td>
+                                <td><i>Sołectwo</i>: fiecare sat are un <i>sołtys</i> ales și un <i>fundusz sołecki</i> — o parte din bugetul comunei, pe care adunarea satului decide cum se cheltuie</td>
+                                <td>Reformă pe trei niveluri deodată, cu reguli numerice publice. În proiectul de față se preiau <b>ideea</b> nivelului intermediar și a fondului sătesc, dar cu instituții românești: plasa din 1925 și delegatul sătesc din art. 142 al Codului administrativ. Puterea în regiune e dublă: voievodul numit de guvern (control de legalitate, administrația de stat) și mareșalul ales de <i>sejmik</i> (buget și strategie). Comunele au rămas mari din 1973, deci nu era nevoie de comasare.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Estonia, 2017</th>
+                                <td>213 → 79 de municipalități</td>
+                                <td>Prag minim 5.000 de locuitori; întâi voluntar (160 de unități s-au unit singure), apoi comasări inițiate de guvern pentru 26 rămase</td>
+                                <td>Opțional: subdiviziuni cu reprezentare proprie și bătrâni de sat (<i>külavanem</i>)</td>
+                                <td>Faza voluntară cu stimulente, urmată de lege; excepții pentru 4 insule.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Letonia, 2009 și 2021</th>
+                                <td>Peste 500 de unități → 119 (2009) → 43 (2021)</td>
+                                <td>Prin lege, în jurul centrelor de dezvoltare; Curtea Constituțională a anulat o comasare (43 în loc de 42)</td>
+                                <td>—</td>
+                                <td>Criteriul de bază: polii de dezvoltare și navetismul spre ei.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Albania, 2015</th>
+                                <td>373 → 61 de municipalități</td>
+                                <td>Prin lege (115/2014), cu sprijin internațional</td>
+                                <td>Fostele comune devin 373 de <i>unități administrative</i> — birouri locale de servicii</td>
+                                <td>Cel mai apropiat model de „birou local” din propunerea de aici.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Ucraina, 2015–2020</th>
+                                <td>~11.000 de consilii locale → 1.469 de <i>hromade</i></td>
+                                <td>Întâi voluntar, pe planuri de perspectivă și o metodologie a „comunităților capabile”; în 2020, restul prin hotărâre de guvern</td>
+                                <td><i>Starosta</i> — reprezentant ales al satului (7.740 de circumscripții în 2025)</td>
+                                <td>Descentralizare fiscală odată cu comasarea; unele comunități au încălcat planurile, care au fost apoi corectate.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Franța, din 2015</th>
+                                <td>36.658 (2015) → 34.875 de comune (2026)</td>
+                                <td>Voluntar, cu stimulente financiare (<i>communes nouvelles</i>, legea 2015-292); plus intercomunalitate obligatorie</td>
+                                <td><i>Communes déléguées</i>, cu primar delegat</td>
+                                <td>Voluntariatul produce comasări puține și dispersate; cooperarea obligatorie face restul.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Japonia, 1999–2010 (Heisei)</th>
+                                <td>3.232 → 1.727 de municipalități (−47%)</td>
+                                <td>Voluntar, cu stimulente fiscale puternice</td>
+                                <td>—</td>
+                                <td>Obiectivele administrative, atinse; în zonele rurale — pierdere de identitate și servicii mai îndepărtate.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Norvegia, 2020</th>
+                                <td>426 → 356 de comune; 19 → 11 comitate</td>
+                                <td>Parțial voluntar, parțial impus</td>
+                                <td>—</td>
+                                <td>Opoziția a dus la refacerea a 6 comitate în 2024 (15 comitate) — comasările impuse fără acord local se pot întoarce.</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Republica Moldova, din 2023</th>
+                                <td>În curs</td>
+                                <td>Amalgamare voluntară (Legea 225/2023, metodologie HG 925/2023)</td>
+                                <td>—</td>
+                                <td>Cel mai apropiat context (aceeași limbă, sate mici); evaluarea din 2024–2026 pregătește modificarea legii.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>Ce spun studiile despre efecte</h3>
+                <ul>
+                    <li><b>Economii — dovezi amestecate.</b> În landul Brandenburg, comasările obligatorii din 2001–2003 au scăzut cheltuielile administrative, cele voluntare nu (Blesse și Baskaran). În Finlanda, cheltuielile pe locuitor au crescut mai mult în comunele comasate, chiar și după zece ani (Moisio și Uusitalo).</li>
+                    <li><b>Costul democratic există, dar e mai nuanțat decât se crede.</b> În Danemarca, participarea la vot a crescut ușor imediat după comasare și a scăzut doar puțin pe termen lung, mai clar în comasările mari (Bhatti și Hansen, 2019). Mai robust e efectul asupra încrederii cetățenilor că pot influența deciziile locale, care scade în unitățile mai mari (Lassen și Serritzlew, 2011). În Japonia, satele au pierdut din identitate și din acces la servicii.</li>
+                    <li><b>Câștigul sigur e capacitatea:</b> o primărie mai mare poate avea urbanist, jurist, specialist în achiziții și în fonduri europene — lucru imposibil pentru o comună de 1.500 de locuitori.</li>
+                </ul>
+            </section>
+
+            <section id="aplicare">
+                <h2>Ce se poate aplica în România</h2>
+                <ol>
+                    <li><b>Criteriu dublu: populație și accesibilitate.</b> Un prag de populație singur produce unități absurde la munte. Exemplul Caraș-Severin arată că pragul de 5.000 nu poate fi atins în Munții Banatului fără sate la peste 30 de minute de primărie.</li>
+                    <li><b>Prag diferențiat pe relief.</b> De exemplu 5.000 la câmpie și deal, 3.000 în zona montană (Legea muntelui) și excepții motivate pentru UAT-urile izolate și dispersate de pe listele INS — cum a făcut Estonia cu insulele.</li>
+                    <li><b>Regiunea ca nivel ales, județul ca oficiu.</b> Dacă regiunea capătă consiliu ales, consiliul județean și prefectura nu mai au rost în paralel: se asimilează la regiune, iar în județ rămâne <b>un singur oficiu</b>, bine organizat, pentru serviciile deconcentrate și controlul de legalitate. Altfel se adaugă un etaj peste cele existente, ceea ce a și blocat regionalizarea din 2013. Structura rezultată: regiune (aleasă) → județ (un oficiu) → comune și orașe (alese).</li>
+                    <li><b>Criteriul financiar, de la Republica Moldova.</b> Legea moldovenească cere nu doar 1.500 de locuitori, ci și ca administrația și instituțiile sociale să nu înghită peste <b>30% din veniturile proprii</b>. E testul care arată direct dacă o unitate se poate întreține; pentru România datele există la Ministerul Finanțelor (execuțiile bugetare pe UAT) și e următoarea sursă de adăugat.</li>
+                    <li><b>Praguri pe bandă, nu pe punct.</b> Un prag unic produce unități exact la limită, care cad sub el peste zece ani. Comuna se comasează spre o bandă de <b>5.000–7.000</b> de locuitori, unitatea cu oraș spre <b>7.000–9.000</b>, iar un oraș care nu e reședință de județ nu trece de <b>100.000</b> prin absorbția comunelor din jur.</li>
+                    <li><b>Districtul, nivelul intermediar lipsă.</b> Între comuna comasată (~16.000 de locuitori în scenariul nostru) și județ (~465.000) nu există nimic. Polonia a reînființat powiatul în 1999 cu regula „5–10–50”, iar România are propriul precedent în plasa din Legea de unificare administrativă din 1925. Varianta propusă aici nu e însă o circumscripție condusă de un pretor, ci un <b>district</b> — asociere obligatorie a comunelor din jurul unui oraș, condusă de <b>consiliul primarilor</b>, cu vot ponderat după populația cu domiciliul stabil și fără drept de veto pentru orașul-centru. Temeiul juridic există: zona metropolitană din Legea 351/2001 și asociația de dezvoltare intercomunitară din Codul administrativ, art. 89. Desenul de pornire e circumscripția judecătoriei — aceeași pe care sunt arondați notarii — adică orașul cu localitățile care țin deja de el; fiecare district e verificat pe pragurile europene de finanțare (cifrele la zi sunt în <a href="raport.html#sumar-harta">raport</a>). Districtele preiau atribuțiile consiliilor județene, care dispar. Comunele își pot alege districtul: pe hartă, cu „Reorganizează districtele”.</li>
+                    <li><b>Delegatul sătesc, cu buget.</b> Instituția există deja: Codul administrativ (art. 142) prevede că locuitorii satelor fără consilieri aleși sunt reprezentați în consiliul local de un <b>delegat sătesc</b>, ales de adunarea sătenilor. Ce lipsește e partea poloneză: <i>funduszul sołecki</i>, o cotă din bugetul comunei pe care adunarea satului decide singură cum se cheltuie. Comasarea devine astfel un schimb clar — primăria dispare, dar satul capătă reprezentare garantată și bani proprii, nu doar un ghișeu în fosta reședință.</li>
+                    <li><b>Satul ca unitate de analiză.</b> Datele există pe localitate (SIRUTA, recensământ, rețeaua școlară); comasarea se face pe UAT-uri, iar satele pot fi mutate în unitatea spre care gravitează.</li>
+                    <li><b>Reședința după accesibilitate și dotări</b>, nu automat după mărime: dotările minime obligatorii din anexa IV a Legii 351/2001 (primărie, școală gimnazială, dispensar, farmacie, poștă, poliție, cămin cultural) sunt deja o listă de verificare.</li>
+                    <li><b>Reprezentarea satelor după comasare.</b> Codul administrativ are deja instituția <i>delegatului sătesc</i>; ea poate fi întărită pe modelul comunităților locale grecești, al <i>starostei</i> ucrainene sau al <i>communes déléguées</i> franceze.</li>
+                    <li><b>Birouri locale</b> în fostele reședințe aflate departe de noua reședință (modelul albanez): stare civilă, registru agricol, taxe, ghișeu pentru cereri. Metoda le numără automat.</li>
+                    <li><b>Protecția minorităților</b> ca regulă, nu ca excepție: pragul de 20% din Codul administrativ intră în algoritm. În Caraș-Severin, rezultatul este o unitate a comunității croate (Carașova, Lupac și vecinii), nu dispersarea ei în Reșița.</li>
+                    <li><b>Fază voluntară, apoi lege</b> (Estonia, Ucraina): 1–2 ani de comasări voluntare cu stimulente (bonus la cotele din impozitul pe venit, prioritate la investiții, mandatele aleșilor duse la termen), apoi comasări prin lege pentru cei rămași sub prag.</li>
+                    <li><b>Județele, păstrate în prima etapă.</b> Comasarea comunelor și reforma regională (județe, regiuni ADR) sunt două reforme diferite; amestecarea lor le blochează pe amândouă.</li>
+                    <li><b>Regiunile tematice, ca intrare pentru viitoarele județe.</b> Țările și zonele etnografice se întrepătrund și trec peste limitele actuale (Loviștea e în Vâlcea, dar a ținut de Țara Românească; Ținutul Secuiesc ajunge în Neamț și Bacău; Țara Moților și Țara Zarandului se suprapun la Brad). Un județ nou n-ar trebui să taie inutil o „țară”, dar nici să fie monopolul uneia singure — stratul „Regiuni tematice” de pe hartă arată aceste suprapuneri.</li>
+                    <li><b>Date deschise și reproductibile.</b> Scenariile să poată fi recalculate public, cu aceleași date și reguli — condiție de încredere pentru o reformă care atinge fiecare sat.</li>
+                </ol>
+            </section>
+
+            <section id="context">
+                <h2>Contextul românesc</h2>
+                <ul>
+                    <li><b>1968.</b> Legea 2/1968 a creat 39 de județe, municipiul București, 236 de orașe (dintre care 47 de municipii) și 2.706 comune cu 13.149 de sate.</li>
+                    <li><b>După 1989, fragmentare.</b> Între 2003 și 2004 au apărut 221 de comune și 40 de orașe noi. Azi sunt 2.862 de comune, 216 orașe și 103 municipii.</li>
+                    <li><b>Legea 351/2001</b> (rețeaua de localități) fixează rangurile 0–V, indicatorii minimi pentru orașe (10.000 de locuitori) și municipii (40.000), după modificarea din Legea 100/2007, și condițiile pentru o comună nouă: minimum 1.500 de locuitori, potențial economic, legături rutiere, dotări.</li>
+                    <li><b>Situația financiară.</b> O analiză din 2025 arată că doar 151 de comune și 5 orașe mici îndeplineau toate criteriile legale în 2023, iar 31% dintre comune își acopereau cheltuielile de personal din venituri proprii.</li>
+                    <li><b>Propuneri recente.</b> Un proiect USR (2023): 12 „județe”, orașe de minimum 10.000 și comune de minimum 5.000 de locuitori. Presa din octombrie 2025 relatează pregătirea unei reorganizări guvernamentale, cu praguri de 7.000 (oraș) și 25.000 (municipiu). Există și o simulare independentă cu algoritmul Max-P și prag de 5.000, care ajunge la 1.333 de UAT-uri și include date bugetare — <a href="https://cosettechichirau.github.io/reformaadm/">cosettechichirau.github.io/reformaadm</a>.</li>
+                </ul>
+                <p>Metoda de aici e complementară simulării de mai sus: aceea pornește de la bugete și populație la nivel de UAT; aceasta pornește de la sate, timpi reali de deplasare, dotări și minorități. Un scenariu național ar trebui să le combine.</p>
+            </section>
+
+            <section id="limitari">
+                <h2>Limitări</h2>
+                <ul>
+                    <li><b>Timpii de deplasare</b> sunt pentru mașină personală, fără trafic, iarnă sau transport public. Pentru localitățile fără mașină, accesul real e mai slab.</li>
+                    <li><b>Coordonatele satelor</b> sunt un singur punct (Wikidata); satele foarte răsfirate sunt reprezentate aproximativ.</li>
+                    <li><b>Serviciile din OpenStreetMap sunt incomplete</b> (doar 25 din 70 de primării din Gorj sunt marcate). Școlile vin din sursa oficială; restul trebuie înlocuite cu registrele oficiale.</li>
+                    <li><b>Minoritățile</b> sunt verificate prin minoritatea principală a fiecărui UAT (datele pe sat nu sunt publicate). E o aproximare prudentă.</li>
+                    <li><b>Transferurile de sate</b> sunt doar semnalate: nu există limite oficiale de sat, deci noile limite se desenează pe UAT-uri întregi.</li>
+                    <li><b>Limitele UAT</b> sunt la scara 1:1.000.000 (Eurostat GISCO), bune pentru analiză, nu pentru delimitare cadastrală.</li>
+                    <li><b>Timpii sunt calculați doar către reședințele din același județ</b> (drumul poate trece prin alt județ, dar reședințele candidate sunt cele din județ). Satele de lângă limita de județ pot avea, în realitate, o reședință mai apropiată dincolo de ea — o consecință a regulii că prima etapă a reformei nu atinge limitele de județ.</li>
+                    <li><b>Scenariul național</b> rulează județ cu județ, deci nu propune comasări peste limitele de județ, iar municipiul București rămâne neschimbat.</li>
+                    <li><b>Regiunile istorice</b> urmează județele interbelice din 1930, digitizate aproximativ; sunt orientative.</li>
+                    <li><b>Pragurile și ponderile</b> sunt alegeri normative. Metoda arată consecințele lor, nu le justifică.</li>
+                </ul>
+            </section>
+
+            <section id="surse">
+                <h2>Surse</h2>
+                <h3>Date</h3>
+                <ul class="surse">
+                    <li>Eurostat GISCO — Local Administrative Units (LAU) 2011, 2021, 2024: <a href="https://gisco-services.ec.europa.eu/distribution/v2/lau/">gisco-services.ec.europa.eu</a> (© EuroGeographics)</li>
+                    <li>INS — SIRUTA 2025: <a href="https://data.gov.ro/dataset/siruta-2025">data.gov.ro/dataset/siruta-2025</a></li>
+                    <li>INS — RPL 2021, rezultate definitive (tabelele 1.22, 1.3.2, 2.2.2): <a href="https://www.recensamantromania.ro/rezultate-rpl-2021/rezultate-definitive/">recensamantromania.ro</a></li>
+                    <li>INS — lista UAT-urilor izolate și dispersate: <a href="https://www.recensamantromania.ro/lista-localitatilor-izolate-si-dispersate/">recensamantromania.ro</a></li>
+                    <li>Ministerul Educației — rețeaua școlară 2024–2025: <a href="https://data.gov.ro/dataset/retea-scolara">data.gov.ro/dataset/retea-scolara</a></li>
+                    <li>geo-spatial.org — limitele județelor interbelice (1930), CC BY-SA 3.0: <a href="http://geo-spatial.org/vechi/download/romania-limitele-administrative-ale-jude-elor-interbelice-1930">geo-spatial.org</a></li>
+                    <li>Wikidata — coordonatele localităților (P625) pe cod SIRUTA (P843): <a href="https://query.wikidata.org/">query.wikidata.org</a></li>
+                    <li>OpenStreetMap — drumuri (prin OSRM, <a href="https://project-osrm.org/">project-osrm.org</a>) și dotări (prin Overpass API); © contribuitorii OpenStreetMap</li>
+                    <li>OpenTopoData — altitudini SRTM 90 m: <a href="https://www.opentopodata.org/">opentopodata.org</a></li>
+                    <li>Eurostat — PIB regional (<code>nama_10r_3gdp</code>), ocuparea (<code>nama_10r_3empers</code>), remunerarea salariaților și orele lucrate (<code>nama_10r_2coe</code>, <code>nama_10r_2emhrw</code>), 2022: <a href="https://ec.europa.eu/eurostat/web/regions/database">ec.europa.eu/eurostat</a></li>
+                    <li>Circumscripțiile instituțiilor regionale: curțile de apel (Legea 304/2022, anexa 1, prin <a href="https://portal.just.ro/">portal.just.ro</a>), camerele notarilor publici (Legea 36/1995, art. 41), direcțiile generale regionale ale finanțelor publice (HG 520/2013, ANAF)</li>
+                </ul>
+                <h3>Legislație</h3>
+                <ul class="surse">
+                    <li>Legea 351/2001 privind PATN — Secțiunea IV, Rețeaua de localități (anexele II și IV): <a href="https://legislatie.just.ro/Public/DetaliiDocument/79526">legislatie.just.ro</a>; modificată prin <a href="https://legislatie.just.ro/Public/DetaliiDocumentAfis/81514">Legea 100/2007</a></li>
+                    <li>Legea 2/1968 privind organizarea administrativă a teritoriului: <a href="https://legislatie.just.ro/Public/DetaliiDocumentAfis/189">legislatie.just.ro</a></li>
+                    <li>OUG 57/2019 — Codul administrativ (art. 94, limba minorităților): <a href="https://legislatie.just.ro/Public/DetaliiDocumentAfis/215925">legislatie.just.ro</a></li>
+                    <li>Legea 315/2004 privind dezvoltarea regională (regiunile ADR)</li>
+                    <li>Legea 304/2022 privind organizarea judiciară (circumscripțiile curților de apel): <a href="https://legislatie.just.ro/Public/DetaliiDocumentAfis/262617">legislatie.just.ro</a></li>
+                    <li>Constituția României, art. 123 — prefectul și controlul de legalitate</li>
+                </ul>
+                <h3>Reforme internaționale și studii</h3>
+                <ul class="surse">
+                    <li>Danemarca: <a href="https://www.regioner.dk/media/2845/the-local-government-reform-in-brief.pdf">The Local Government Reform – in brief</a> (Danske Regioner); <a href="https://en.wikipedia.org/wiki/Strukturreformen">Strukturreformen</a></li>
+                    <li>Grecia: <a href="https://rm.coe.int/lp-zvit-greece-engl-1/1680aef553">Consiliul Europei — raport Grecia</a>; <a href="https://encyclopedia.pub/entry/33221">Kallikratis Plan</a></li>
+                    <li>Estonia: <a href="https://www.fin.ee/en/administrative-territorial-reform">Ministerul Finanțelor — Administrative-Territorial Reform</a></li>
+                    <li>Republica Moldova: <a href="https://gov.md/en/node/5418">Guvernul RM — amalgamarea voluntară (clustere)</a>; <a href="https://www.calm.md/wp-content/uploads/2023/11/Opinie-Proiect-Amalgamare.pdf">CALM — opinie pe proiectul de amalgamare</a>; <a href="https://portal.cor.europa.eu/divisionpowers/Pages/Moldova.aspx">Comitetul European al Regiunilor — Moldova</a> (reforma din 1999 și revenirea din 2003)</li>
+                    <li>Polonia: <a href="https://pl.wikipedia.org/wiki/Reforma_administracyjna_w_Polsce_(1999)">Reforma administracyjna w Polsce (1999)</a> (regula „5–10–50”); <a href="https://en.wikipedia.org/wiki/Powiat">Powiat</a>; <a href="https://en.wikipedia.org/wiki/Voivodeships_of_Poland">Voivodeships of Poland</a> (voievod / mareșal); <a href="https://www.maszglos.pl/wp-content/uploads/2026/03/fundusz-solecki_uzup.pdf">fundusz sołecki</a></li>
+                    <li>Letonia: <a href="https://www.saeima.lv/en/news/saeima-news/29027-saeima-adopts-administrative-territorial-reform">Saeima adopts administrative-territorial reform</a></li>
+                    <li>Albania: <a href="https://en.wikipedia.org/wiki/Municipalities_of_Albania">Municipalities of Albania</a>; <a href="https://www.coe.int/en/web/congress/albania">Congresul Autorităților Locale — Albania</a></li>
+                    <li>Ucraina: <a href="https://decentralization.gov.ua/en/newgromada">decentralization.gov.ua</a>; <a href="https://voxukraine.org/en/white-book-of-reforms-2025-chapter-2-decentralization">VoxUkraine — White Book of Reforms 2025</a>; <a href="https://en.wikipedia.org/wiki/Starosta_okruh">Starosta okruh</a></li>
+                    <li>Franța: <a href="https://www.insee.fr/fr/information/2549968">INSEE — Communes nouvelles</a>; <a href="https://geoconfluences.ens-lyon.fr/actualites/veille/breves/35500-communes-france">Géoconfluences — 34 875 communes</a></li>
+                    <li>Japonia: <a href="https://www.clair.or.jp/j/forum/honyaku/hikaku/pdf/up-to-date_en1.pdf">CLAIR — The Development of Municipal Mergers in Japan</a></li>
+                    <li>Norvegia: <a href="https://en.wikipedia.org/wiki/Counties_of_Norway">Counties of Norway</a></li>
+                    <li>Republica Moldova: <a href="https://amalgamare.gov.md/ro/cadrul-normativ-si-politici">amalgamare.gov.md</a></li>
+                    <li>Blesse, S., Baskaran, T. — <a href="https://www.sciencedirect.com/science/article/abs/pii/S0166046216300254">Do municipal mergers reduce costs? Evidence from a German federal state</a>, Regional Science and Urban Economics (2016)</li>
+                    <li>Moisio, A., Uusitalo, R. — <a href="https://journals.sagepub.com/doi/10.1177/152397211301300302">The Impact of Municipal Mergers on Local Public Expenditures in Finland</a> (2013)</li>
+                    <li>Bhatti, Y., Hansen, K. M. — <a href="http://www.kaspermhansen.eu/Work/Bhatti&amp;Hansen2019.pdf">Voter turnout and municipal amalgamations — evidence from Denmark</a>, Local Government Studies 45(5), 2019</li>
+                    <li>Lassen, D. D., Serritzlew, S. — Jurisdiction Size and Local Democracy: Evidence on Internal Political Efficacy from Large-scale Municipal Reform, American Political Science Review (2011)</li>
+                    <li>Openshaw, S. (1977) — procedura AZP (Automatic Zoning Procedure) pentru regionalizare</li>
+                </ul>
+                <h3>România — dezbatere și analize</h3>
+                <ul class="surse">
+                    <li><a href="https://www.economica.net/regionalizare-romania-12-judete-prag-de-locuitori-pentru-orase-si-comune-proiect-de-lege-pentru-reforma-administrativ-teritoriala_666143.html">Economica.net — proiectul USR (2023)</a></li>
+                    <li><a href="https://gazarul.ro/2025/10/19/guvernul-pregateste-reorganizarea-teritoriala-a-romaniei-multe-orase-vor-deveni-comune/">Găzarul — reorganizarea pregătită de Guvern (octombrie 2025)</a></li>
+                    <li><a href="https://cursdeguvernare.ro/reorganizare-teritoriala-intarzie-probleme-comune-cresc.html">Curs de guvernare — comunele și criteriile legale (noiembrie 2025)</a></li>
+                    <li><a href="https://hotnews.ro/intre-anii-2003-si-2004-au-aparut-221-de-comune-si-40-de-orase-842878">HotNews — comunele și orașele apărute în 2003–2004</a></li>
+                    <li><a href="https://cosettechichirau.github.io/reformaadm/">Reformă Administrativă — România (simulare Max-P, prag 5.000)</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/adp-topologie.js"></script>
+    <script src="js/adp-reorganizare.js"></script>
+    <script src="js/adp-metodologie.js"></script>
+    <script>
+        // compunerea paginii: singurul loc care leagă modulele între ele
+        document.addEventListener("DOMContentLoaded", () => AdpMetodologie.porneste({
+            topologie: AdpTopologie,
+            reorganizare: AdpReorganizare
+        }));
+    </script>
+</body>
+
+</html>

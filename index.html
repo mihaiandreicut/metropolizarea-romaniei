@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harta administrativă a României — regiuni ADR, județe, regiuni istorice, UAT-uri</title>
+    <meta name="description" content="Hartă interactivă a României cu cele 8 regiuni de dezvoltare, 41 de județe și București, regiunile istorice și cele 3.181 de UAT-uri, cu atribute demografice pentru studiul reorganizării administrative.">
+    <meta name="theme-color" content="#2a78d6">
+
+    <!-- Open Graph (fără og:url / og:image până nu există un domeniu public) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="e-ro-adp">
+    <meta property="og:locale" content="ro_RO">
+    <meta property="og:title" content="Harta administrativă a României">
+    <meta property="og:description" content="Regiuni ADR, județe, regiuni istorice și UAT-uri, cu atribute pentru reorganizarea administrativ-teritorială.">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Harta administrativă a României">
+    <meta name="twitter:description" content="Regiuni ADR, județe, regiuni istorice și UAT-uri, cu atribute pentru reorganizarea administrativ-teritorială.">
+
+    <!-- Date structurate -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": "Harta administrativă a României — UAT-uri, județe, regiuni",
+        "description": "Limitele celor 3.181 de UAT-uri ale României, cu apartenența la județ, regiune de dezvoltare și regiune istorică, populația RPL 2021 și atribute demografice.",
+        "inLanguage": "ro",
+        "spatialCoverage": "România",
+        "isBasedOn": [
+            "Eurostat GISCO — Local Administrative Units 2024",
+            "INS — SIRUTA 2025",
+            "INS — Recensământul Populației și Locuințelor 2021",
+            "geo-spatial.org — județele interbelice (1930)"
+        ]
+    }
+    </script>
+
+    <!-- Leaflet 1.9.4, servit local (fără CDN) -->
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/adp-tema.css">
+</head>
+
+<body>
+    <a class="sari-la-continut" href="#panou">Sari la panoul de control</a>
+
+    <header class="antet">
+        <h1>Harta administrativă a României</h1>
+        <span class="subtitlu">regiuni ADR · județe · regiuni istorice · UAT-uri</span>
+        <nav aria-label="Pagini">
+            <a href="index.html" aria-current="page">Harta</a>
+            <a href="metodologie.html">Reorganizare: metodologie</a>
+            <a href="raport.html">Raport</a>
+            <a href="principii.html">Principii</a>
+        </nav>
+    </header>
+
+    <main class="aplicatie">
+        <section class="zona-harta" aria-label="Harta României">
+            <div id="harta" class="harta"></div>
+            <div id="incarcare" class="incarcare">Se încarcă harta…</div>
+            <div id="tooltip" class="tooltip" role="status" hidden></div>
+            <div id="sc-legenda" class="legenda-harta" hidden aria-label="Legenda hărții"></div>
+        </section>
+
+        <aside id="panou" class="panou" aria-label="Panou de control">
+            <section>
+                <h2>Metropolizarea României</h2>
+                <p class="nota">Două lucruri deodată: comasarea UAT-urilor pe baza atributelor localităților
+                    componente — timp rutier real (OSRM), populație, dotări, minorități — și
+                    <b>eliminarea formelor administrative redundante, care fac puțin și cheltuie bine</b>:
+                    consiliile județene, aparatele paralele ale prefecturilor și agențiile dublate pe județ.
+                    Se poate rula pe un județ, pe o regiune sau pe toată țara. Metoda:
+                    <a href="metodologie.html#metoda">metodologie</a>.</p>
+                <div class="formular-scenariu">
+                    <label>Nivelul hărții</label>
+                    <div id="sc-nivele" class="straturi" role="radiogroup" aria-label="Nivelul hărții">
+                        <label><input type="radio" name="nivel" value="regiuni" checked><span>Regiuni</span></label>
+                        <label><input type="radio" name="nivel" value="judete"><span>Județe</span></label>
+                        <label><input type="radio" name="nivel" value="districte"><span>Zone metropolitane și districte</span></label>
+                        <label><input type="radio" name="nivel" value="comune"><span>Comune comasate</span></label>
+                    </div>
+                    <p class="nota"><b>Administrativ</b> — cine e ales și are buget: regiunea și comuna.
+                        <b>Funcțional</b> — pe ce teritoriu se dau serviciile și fondurile: districtul și
+                        microregiunea. Județul rămâne limită și circumscripție.</p>
+                    <label for="sc-regiune">Teritoriul</label>
+                    <div class="cascada">
+                        <select id="sc-regiune" class="buton" aria-label="Regiunea"></select>
+                        <select id="sc-judet" class="buton" aria-label="Județul"></select>
+                        <select id="sc-zona" class="buton" aria-label="Zona metropolitană sau districtul"></select>
+                        <select id="sc-comuna" class="buton" aria-label="Comuna comasată"></select>
+                    </div>
+                    <select id="sc-exemplu" hidden style="display:none" aria-hidden="true" tabindex="-1"></select>
+                    <div id="sc-regiuni" class="regiuni-scurtaturi" hidden></div>
+                    <label for="sc-pmin">Banda de populație: <b id="sc-pmin-val"></b></label>
+                    <input id="sc-pmin" type="range" min="1500" max="10000" step="500" value="5000">
+                    <details id="sc-avansat" class="pliant">
+                        <summary>Criterii avansate</summary>
+                        <div class="formular-scenariu">
+                    <label for="sc-tmax">Timp maxim sat → reședință: <b id="sc-tmax-val"></b> min</label>
+                    <input id="sc-tmax" type="range" min="15" max="60" step="5" value="30">
+                    <label for="sc-tfortat">Limita absolută la comasarea forțată: <b id="sc-tfortat-val"></b> min</label>
+                    <input id="sc-tfortat" type="range" min="30" max="90" step="5" value="45">
+                    <label for="sc-pmax">Maximul unei unități rurale: <b id="sc-pmax-val"></b> loc.</label>
+                    <input id="sc-pmax" type="range" min="7500" max="30000" step="500" value="15000">
+                    <label for="sc-oras">Oraș autonom de la: <b id="sc-oras-val"></b> loc.</label>
+                    <input id="sc-oras" type="range" min="5000" max="50000" step="1000" value="10000">
+                    <label class="bifa"><input id="sc-legal" type="checkbox" checked> Praguri legale pe rang: oraș 5.000, municipiu 25.000 (Legea 351/2001)</label>
+                    <label class="bifa"><input id="sc-proiectie" type="checkbox" checked> Prag durabil: și populația proiectată la 2050</label>
+                    <label class="bifa"><input id="sc-fortare" type="checkbox" checked> Nicio unitate sub prag (comasare forțată)</label>
+                    <label class="bifa"><input id="sc-urban" type="checkbox"> Orașele sub pragul rangului pot prelua comune</label>
+                    <label class="bifa"><input id="sc-istorice" type="checkbox"> Unitățile nu trec peste regiunile istorice</label>
+                    <label class="bifa"><input id="sc-district" type="checkbox" checked> Nivel intermediar: zone metropolitane și districte, independente unele de altele</label>
+                    <label for="sc-baza">Desenul districtelor</label>
+                    <select id="sc-baza" class="buton">
+                        <option value="judecatorii" selected>circumscripțiile judecătoriilor (ca la notari)</option>
+                        <option value="gal">teritoriile grupurilor de acțiune locală — mai fărâmițat</option>
+                        <option value="calcul">calculat: fiecare oraș, districtul lui</option>
+                    </select>
+                    <label for="sc-minoritati">Pragul de 20% al minorităților (Codul administrativ, art. 94)</label>
+                    <select id="sc-minoritati" class="buton">
+                        <option value="localitate" selected>se păstrează la nivelul localității componente</option>
+                        <option value="blocheaza">blochează comasarea (litera legii de azi)</option>
+                        <option value="ignora">nu se ia în seamă</option>
+                    </select>
+                        </div>
+                    </details>
+                    <div class="butoane">
+                        <button id="sc-ruleaza" class="buton principal" type="button">Arată scenariul</button>
+                        <button id="sc-final" class="buton" type="button">Harta finală</button>
+                        <button id="sc-editeaza" class="buton" type="button" aria-pressed="false">Reorganizează</button>
+                        <button id="sc-inchide" class="buton" type="button" hidden>Închide scenariul</button>
+                    </div>
+                </div>
+                <div id="sc-editare" class="detalii editare-districte" hidden>
+                    <h3>Reorganizează districtele și comunele</h3>
+                    <div class="straturi" role="radiogroup" aria-label="Ce se schimbă">
+                        <label><input type="radio" name="sc-mod-editare" value="district" checked><span>Comuna trece în alt district</span></label>
+                        <label><input type="radio" name="sc-mod-editare" value="comasare"><span>Comuna se comasează cu alta</span></label>
+                    </div>
+                    <p id="sc-ajutor-editare" class="nota"></p>
+                    <label for="sc-tinta" id="sc-tinta-eticheta">Districtul-țintă</label>
+                    <select id="sc-tinta" class="buton"></select>
+                    <ul id="sc-alegeri" class="lista-alegeri"></ul>
+                    <p id="sc-stare-salvare" class="nota" role="status"></p>
+                    <div class="butoane">
+                        <button id="sc-salveaza" class="buton principal" type="button">Salvează</button>
+                        <button id="sc-renunta" class="buton" type="button">Renunță</button>
+                        <button id="sc-descarca" class="buton" type="button">Descarcă fișierul</button>
+                    </div>
+                </div>
+                <div id="sc-dosar" class="detalii" hidden aria-live="polite"></div>
+                <div id="sc-rezultat" aria-live="polite"></div>
+            </section>
+
+            <details class="pliant pliant-mare">
+                <summary>Straturi informative, căutare și afișare</summary>
+
+            <section>
+                <h2 id="cautare-eticheta">Caută UAT</h2>
+                <div class="cautare">
+                    <input id="cautare" type="search" autocomplete="off" placeholder="ex. Târgu Jiu, Cornereva…" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cautare-lista" aria-labelledby="cautare-eticheta">
+                    <ul id="cautare-lista" role="listbox" hidden></ul>
+                </div>
+            </section>
+
+            <section>
+                <h2>Straturi informative</h2>
+                <p class="nota">Hărți de context, în afara proiectului: împărțirea de azi, demografia și regiunile culturale.</p>
+                <div class="straturi" role="radiogroup" aria-label="Colorare după">
+                    <label><input type="radio" name="mod" value="adr" checked><span>Regiuni ADR</span></label>
+                    <label><input type="radio" name="mod" value="judete"><span>Județe</span></label>
+                    <label><input type="radio" name="mod" value="istorice"><span>Regiuni istorice</span></label>
+                    <label><input type="radio" name="mod" value="uat"><span>UAT-uri</span></label>
+                    <label><input type="radio" name="mod" value="populatie"><span>Populație</span></label>
+                    <label><input type="radio" name="mod" value="densitate"><span>Densitate</span></label>
+                    <label><input type="radio" name="mod" value="varstnici"><span>Vârstnici 65+</span></label>
+                    <label><input type="radio" name="mod" value="tematice"><span>Regiuni tematice</span></label>
+                    <label><input type="radio" name="mod" value="regiuni"><span>Regiuni — explorare</span></label>
+                </div>
+            </section>
+
+            <section>
+                <h2>Limite</h2>
+                <div id="limite" class="limite">
+                    <label><input type="checkbox" value="uat"> <span class="culoare" style="background:var(--limita-uat-simpla)"></span> UAT-uri</label>
+                    <label><input type="checkbox" value="judet"> <span class="culoare" style="background:var(--limita-judet-culoare)"></span> Județe</label>
+                    <label><input type="checkbox" value="adr"> <span class="culoare" style="background:var(--limita-adr-culoare)"></span> Regiuni ADR</label>
+                    <label><input type="checkbox" value="istoric"> <span class="culoare" style="background:var(--limita-istoric-culoare)"></span> Regiuni istorice</label>
+                </div>
+            </section>
+            <section id="tm-sectiune" hidden>
+                <h2 style="display:flex;justify-content:space-between;align-items:center">Regiuni tematice <button id="tm-deselecteaza" class="buton" type="button" style="padding:2px 8px;font-size:12px">toate</button></h2>
+                <p class="nota">Țări, zone etnografice și regiuni etno-culturale. Un UAT poate ține de mai multe regiuni, iar regiunile trec peste limitele de județ — întrepătrunderea e parte din realitate, nu o eroare. Listele sunt orientative; certitudinea e marcată la fiecare regiune.</p>
+                <div id="tm-tipuri" class="limite" style="grid-template-columns:1fr;margin:8px 0"></div>
+                <div id="tm-detalii" class="detalii" hidden aria-live="polite"></div>
+                <ol id="tm-lista" class="lista-grupuri lista-tematice"></ol>
+                <h3 class="subtitlu-sectiune">Cum taie județele actuale</h3>
+                <div id="tm-analiza"></div>
+            </section>
+
+            <section id="rg-sectiune" hidden>
+                <h2>Regiuni — explorare</h2>
+                <p class="nota"><b>Strat de explorare, în afara proiectului.</b> Proiectul folosește
+                    regiunile de dezvoltare existente (Legea 315/2004), cu București–Ilfov ca Metropolă —
+                    vezi butonul „Harta finală”. Aici se poate încerca un alt desen, ca să se vadă cât de mult
+                    ar schimba el echilibrul: județele grupate în regiuni, cu capitalele alese dintre orașele
+                    care au deja funcții regionale.</p>
+                <div class="formular-scenariu">
+                    <label for="rg-nr">Câte regiuni: <b id="rg-nr-val"></b></label>
+                    <input id="rg-nr" type="range" min="4" max="20" step="1" value="8">
+                    <label for="rg-pop">Echilibru de populație: <b id="rg-pop-val"></b></label>
+                    <input id="rg-pop" type="range" min="0" max="300" step="15" value="150">
+                    <label for="rg-eco">Echilibru economic (PIB/loc.): <b id="rg-eco-val"></b></label>
+                    <input id="rg-eco" type="range" min="0" max="300" step="15" value="60">
+                    <label class="bifa"><input id="rg-institutii" type="checkbox" checked> Capitala = orașul cu cele mai multe funcții regionale</label>
+                    <label class="bifa"><input id="rg-istorice" type="checkbox"> Regiunile nu amestecă regiuni istorice</label>
+                    <div class="butoane">
+                        <button id="rg-compara" class="buton" type="button">Compară 8 / 12 / 16</button>
+                    </div>
+                </div>
+                <h3 class="subtitlu-sectiune">Instituțiile de arătat pe hartă</h3>
+                <div id="rg-retele" class="limite" style="grid-template-columns:1fr;margin:8px 0"></div>
+                <div id="rg-comparatie"></div>
+                <div id="rg-detalii" class="detalii" hidden aria-live="polite"></div>
+                <div id="rg-rezultat" aria-live="polite"></div>
+            </section>
+
+            <section id="detalii-sectiune" hidden>
+                <h2 style="display:flex;justify-content:space-between;align-items:center">UAT selectat <button id="inchide-detalii" class="buton" type="button" aria-label="Închide detaliile" style="padding:2px 8px;font-size:12px">închide</button></h2>
+                <div id="detalii" class="detalii" aria-live="polite"></div>
+            </section>
+
+            <section>
+                <h2 id="legenda-titlu">Legendă</h2>
+                <div id="legenda"></div>
+            </section>
+
+            <section>
+                <h2>Afișare</h2>
+                <p><label for="fundal">Hartă de fundal</label><br>
+                    <select id="fundal" class="buton" style="width:100%;margin-top:4px"></select>
+                </p>
+                <p><label for="opacitate">Opacitate umplere</label><br>
+                    <input id="opacitate" type="range" min="0" max="100" value="70" style="width:100%">
+                </p>
+                <p class="limite"><label><input id="etichete-uat" type="checkbox" checked> Nume UAT de aproape</label></p>
+                <button id="reset-vedere" class="buton" type="button">Toată țara</button>
+            </section>
+
+            <section>
+                <h2>Surse</h2>
+                <p class="nota">Limite UAT: Eurostat GISCO, LAU 2024 (© EuroGeographics). Tip UAT, județ, regiune ADR: INS, SIRUTA 2025. Populație, vârste, etnie: INS, RPL 2021. Regiuni istorice: județele interbelice 1930, geo-spatial.org (CC BY-SA 3.0). Regiuni tematice: Wikipedia, liste GAL (MADR), asociații locale — sursa e dată la fiecare regiune. Coordonate localități: Wikidata. Fundal: © OpenStreetMap, OpenTopoMap.</p>
+            </section>
+            </details>
+        </aside>
+    </main>
+
+    <script src="vendor/leaflet/leaflet.js"></script>
+    <script src="js/adp-topologie.js"></script>
+    <script src="js/adp-harta.js"></script>
+    <script src="js/adp-reorganizare.js"></script>
+    <script src="js/adp-infrastructura.js"></script>
+    <script src="js/adp-scenariu.js"></script>
+    <script src="js/adp-tematice.js"></script>
+    <script src="js/adp-regionalizare.js"></script>
+    <script src="js/adp-regiuni.js"></script>
+    <script src="js/adp-aplicatie.js"></script>
+    <script>
+        // compunerea paginii: singurul loc care leagă modulele între ele
+        document.addEventListener("DOMContentLoaded", () => AdpAplicatie.porneste({
+            leaflet: L,
+            topologie: AdpTopologie,
+            harta: AdpHarta,
+            reorganizare: AdpReorganizare,
+            regionalizare: AdpRegionalizare,
+            infrastructura: AdpInfrastructura,
+            extensii: [AdpScenariu, AdpTematice, AdpRegiuni]
+        }));
+    </script>
+</body>
+
+</html>

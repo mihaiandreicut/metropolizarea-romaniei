@@ -1,0 +1,291 @@
+{
+ "judete": [
+  {
+   "cod": 1,
+   "nume": "Alba",
+   "auto": "AB",
+   "fisier": "judete/alba.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 2,
+   "nume": "Arad",
+   "auto": "AR",
+   "fisier": "judete/arad.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 3,
+   "nume": "Argeș",
+   "auto": "AG",
+   "fisier": "judete/arges.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 4,
+   "nume": "Bacău",
+   "auto": "BC",
+   "fisier": "judete/bacau.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 5,
+   "nume": "Bihor",
+   "auto": "BH",
+   "fisier": "judete/bihor.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 6,
+   "nume": "Bistrița-Năsăud",
+   "auto": "BN",
+   "fisier": "judete/bistrita-nasaud.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 7,
+   "nume": "Botoșani",
+   "auto": "BT",
+   "fisier": "judete/botosani.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 8,
+   "nume": "Brașov",
+   "auto": "BV",
+   "fisier": "judete/brasov.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 9,
+   "nume": "Brăila",
+   "auto": "BR",
+   "fisier": "judete/braila.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 10,
+   "nume": "Buzău",
+   "auto": "BZ",
+   "fisier": "judete/buzau.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 11,
+   "nume": "Caraș-Severin",
+   "auto": "CS",
+   "fisier": "judete/caras-severin.json",
+   "generat": "2026-09-21"
+  },
+  {
+   "cod": 12,
+   "nume": "Cluj",
+   "auto": "CJ",
+   "fisier": "judete/cluj.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 13,
+   "nume": "Constanța",
+   "auto": "CT",
+   "fisier": "judete/constanta.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 14,
+   "nume": "Covasna",
+   "auto": "CV",
+   "fisier": "judete/covasna.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 51,
+   "nume": "Călărași",
+   "auto": "CL",
+   "fisier": "judete/calarasi.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 16,
+   "nume": "Dolj",
+   "auto": "DJ",
+   "fisier": "judete/dolj.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 15,
+   "nume": "Dâmbovița",
+   "auto": "DB",
+   "fisier": "judete/dambovita.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 17,
+   "nume": "Galați",
+   "auto": "GL",
+   "fisier": "judete/galati.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 52,
+   "nume": "Giurgiu",
+   "auto": "GR",
+   "fisier": "judete/giurgiu.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 18,
+   "nume": "Gorj",
+   "auto": "GJ",
+   "fisier": "judete/gorj.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 19,
+   "nume": "Harghita",
+   "auto": "HR",
+   "fisier": "judete/harghita.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 20,
+   "nume": "Hunedoara",
+   "auto": "HD",
+   "fisier": "judete/hunedoara.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 21,
+   "nume": "Ialomița",
+   "auto": "IL",
+   "fisier": "judete/ialomita.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 22,
+   "nume": "Iași",
+   "auto": "IS",
+   "fisier": "judete/iasi.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 23,
+   "nume": "Ilfov",
+   "auto": "IF",
+   "fisier": "judete/ilfov.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 24,
+   "nume": "Maramureș",
+   "auto": "MM",
+   "fisier": "judete/maramures.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 25,
+   "nume": "Mehedinți",
+   "auto": "MH",
+   "fisier": "judete/mehedinti.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 26,
+   "nume": "Mureș",
+   "auto": "MS",
+   "fisier": "judete/mures.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 27,
+   "nume": "Neamț",
+   "auto": "NT",
+   "fisier": "judete/neamt.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 28,
+   "nume": "Olt",
+   "auto": "OT",
+   "fisier": "judete/olt.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 29,
+   "nume": "Prahova",
+   "auto": "PH",
+   "fisier": "judete/prahova.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 30,
+   "nume": "Satu Mare",
+   "auto": "SM",
+   "fisier": "judete/satu-mare.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 32,
+   "nume": "Sibiu",
+   "auto": "SB",
+   "fisier": "judete/sibiu.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 33,
+   "nume": "Suceava",
+   "auto": "SV",
+   "fisier": "judete/suceava.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 31,
+   "nume": "Sălaj",
+   "auto": "SJ",
+   "fisier": "judete/salaj.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 34,
+   "nume": "Teleorman",
+   "auto": "TR",
+   "fisier": "judete/teleorman.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 35,
+   "nume": "Timiș",
+   "auto": "TM",
+   "fisier": "judete/timis.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 36,
+   "nume": "Tulcea",
+   "auto": "TL",
+   "fisier": "judete/tulcea.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 37,
+   "nume": "Vaslui",
+   "auto": "VS",
+   "fisier": "judete/vaslui.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 39,
+   "nume": "Vrancea",
+   "auto": "VN",
+   "fisier": "judete/vrancea.json",
+   "generat": "2026-09-22"
+  },
+  {
+   "cod": 38,
+   "nume": "Vâlcea",
+   "auto": "VL",
+   "fisier": "judete/valcea.json",
+   "generat": "2026-09-22"
+  }
+ ]
+}

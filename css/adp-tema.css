@@ -1,0 +1,1923 @@
+/* ============================================================================
+   e-ro-adp — tema paginii (tokeni + layout + hartă)
+   Legat de: index.html, metodologie.html. Nu leagă nimic din alte proiecte:
+   proiectele din D:\e-dev-ai sunt independente, așa că tokenii stau aici.
+
+   Culorile de date (serie-1..8, secv-1..7) sunt paleta de referință validată
+   pentru daltonism (Machado 2009) și contrast, pas separat pentru modul
+   întunecat — nu se modifică valorile fără a rula din nou validatorul.
+   Atribuirea culorilor pe regiuni (ce regiune ia ce slot) e calculată astfel
+   încât regiunile vecine să rămână distinguibile — vine din date/romania-uat.json.
+   ========================================================================== */
+
+:root {
+    color-scheme: light;
+
+    /* suprafețe și text */
+    --plan: #f9f9f7;
+    --suprafata: #fcfcfb;
+    --panou: #ffffff;
+    --text: #0b0b0b;
+    --text-2: #52514e;
+    --text-3: #6b6a65;
+    --linie: #e1e0d9;
+    --axa: #c3c2b7;
+    --margine: rgba(11, 11, 11, 0.10);
+    --umbra: 0 1px 2px rgba(11, 11, 11, 0.06), 0 4px 16px rgba(11, 11, 11, 0.06);
+    --accent: #2a78d6;
+    --accent-text: #1c5cab;
+    --accent-fundal: #e8f1fc;
+    --bun-text: #006300;
+    --atentie-text: #8c4602;
+    --critic-text: #b42f2f;
+
+    /* culori categoriale (identitate) */
+    --serie-1: #2a78d6;
+    --serie-2: #eb6834;
+    --serie-3: #1baf7a;
+    --serie-4: #eda100;
+    --serie-5: #e87ba4;
+    --serie-6: #008300;
+    --serie-7: #4a3aa7;
+    --serie-8: #e34948;
+
+    /* secvențial (mărime) — albastru, deschis → închis */
+    --secv-1: #cde2fb;
+    --secv-2: #9ec5f4;
+    --secv-3: #6da7ec;
+    --secv-4: #3987e5;
+    --secv-5: #256abf;
+    --secv-6: #184f95;
+    --secv-7: #0d366b;
+    --fara-date: #e1e0d9;
+
+    /* limite pe hartă */
+    --limita-uat: rgba(255, 255, 255, 0.75);
+    --limita-uat-simpla: rgba(11, 11, 11, 0.22);
+    --limita-judet: rgba(11, 11, 11, 0.55);
+    --limita-regiune: #0b0b0b;
+    /* fiecare strat de limite are culoarea lui, ca să se poată suprapune și citi */
+    --limita-judet-culoare: #e34948;
+    --limita-adr-culoare: #2a78d6;
+    --limita-istoric-culoare: #4a3aa7;
+    --limita-district-culoare: #eb6834;
+    --limita-unitate-culoare: #0b0b0b;
+    --contur-tara: #0b0b0b;
+    --evidentiere: #0b0b0b;
+    --eticheta-halou: rgba(252, 252, 251, 0.92);
+    --neutru-harta: #ecebe6;
+
+    /* stări (fixe, aceleași în ambele teme; mereu însoțite de etichetă în legendă) */
+    --stare-atentie: #fab219;
+    --stare-serios: #ec835a;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --plan: #0d0d0d;
+        --suprafata: #1a1a19;
+        --panou: #151514;
+        --text: #ffffff;
+        --text-2: #c3c2b7;
+        --text-3: #a9a89f;
+        --linie: #2c2c2a;
+        --axa: #383835;
+        --margine: rgba(255, 255, 255, 0.10);
+        --umbra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+        --accent: #3987e5;
+        --accent-text: #86b6ef;
+        --accent-fundal: #14263d;
+        --bun-text: #0ca30c;
+        --atentie-text: #fab219;
+        --critic-text: #f08a8a;
+
+        --serie-1: #3987e5;
+        --serie-2: #d95926;
+        --serie-3: #199e70;
+        --serie-4: #c98500;
+        --serie-5: #d55181;
+        --serie-6: #008300;
+        --serie-7: #9085e9;
+        --serie-8: #e66767;
+
+        /* în modul întunecat, valorile mici se apropie de suprafață (închis) */
+        --secv-1: #0d366b;
+        --secv-2: #184f95;
+        --secv-3: #256abf;
+        --secv-4: #3987e5;
+        --secv-5: #6da7ec;
+        --secv-6: #9ec5f4;
+        --secv-7: #cde2fb;
+        --fara-date: #383835;
+
+        --limita-uat: rgba(26, 26, 25, 0.75);
+        --limita-uat-simpla: rgba(255, 255, 255, 0.22);
+        --limita-judet: rgba(255, 255, 255, 0.6);
+        --limita-regiune: #ffffff;
+        --limita-judet-culoare: #ff7a79;
+        --limita-adr-culoare: #6aa9f0;
+        --limita-istoric-culoare: #9b8cf0;
+        --limita-district-culoare: #ff9d6b;
+        --limita-unitate-culoare: #ffffff;
+        --contur-tara: #ffffff;
+        --evidentiere: #ffffff;
+        --eticheta-halou: rgba(26, 26, 25, 0.92);
+        --neutru-harta: #2c2c2a;
+    }
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --plan: #0d0d0d;
+    --suprafata: #1a1a19;
+    --panou: #151514;
+    --text: #ffffff;
+    --text-2: #c3c2b7;
+    --text-3: #a9a89f;
+    --linie: #2c2c2a;
+    --axa: #383835;
+    --margine: rgba(255, 255, 255, 0.10);
+    --umbra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+    --accent: #3987e5;
+    --accent-text: #86b6ef;
+    --accent-fundal: #14263d;
+    --bun-text: #0ca30c;
+    --atentie-text: #fab219;
+    --critic-text: #f08a8a;
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
+    --serie-3: #199e70;
+    --serie-4: #c98500;
+    --serie-5: #d55181;
+    --serie-6: #008300;
+    --serie-7: #9085e9;
+    --serie-8: #e66767;
+    --secv-1: #0d366b;
+    --secv-2: #184f95;
+    --secv-3: #256abf;
+    --secv-4: #3987e5;
+    --secv-5: #6da7ec;
+    --secv-6: #9ec5f4;
+    --secv-7: #cde2fb;
+    --fara-date: #383835;
+    --limita-uat: rgba(26, 26, 25, 0.75);
+    --limita-uat-simpla: rgba(255, 255, 255, 0.22);
+    --limita-judet: rgba(255, 255, 255, 0.6);
+    --limita-regiune: #ffffff;
+    --contur-tara: #ffffff;
+    --evidentiere: #ffffff;
+    --eticheta-halou: rgba(26, 26, 25, 0.92);
+    --neutru-harta: #2c2c2a;
+}
+
+/* ------------------------------------------------------------------ bază */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    background: var(--plan);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+a {
+    color: var(--accent-text);
+}
+
+.sari-la-continut {
+    position: absolute;
+    left: -9999px;
+}
+
+.sari-la-continut:focus {
+    left: 16px;
+    top: 8px;
+    z-index: 100;
+    background: var(--panou);
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ antet */
+.antet {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    background: var(--panou);
+    border-bottom: 1px solid var(--margine);
+    min-height: 56px;
+}
+
+.antet h1 {
+    font-size: 17px;
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.antet .subtitlu {
+    color: var(--text-2);
+    font-size: 13px;
+}
+
+.antet nav {
+    margin-left: auto;
+    display: flex;
+    gap: 4px;
+}
+
+.antet nav a {
+    text-decoration: none;
+    color: var(--text-2);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.antet nav a[aria-current="page"] {
+    color: var(--accent-text);
+    background: var(--accent-fundal);
+    font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ aplicație */
+.aplicatie {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    height: calc(100vh - 57px);
+    height: calc(100dvh - 57px);
+}
+
+.zona-harta {
+    position: relative;
+    background: var(--suprafata);
+    overflow: hidden;
+    min-height: 0;
+}
+
+.harta {
+    position: absolute;
+    inset: 0;
+}
+
+.panou {
+    background: var(--panou);
+    border-left: 1px solid var(--margine);
+    overflow-y: auto;
+    padding: 4px 20px 32px;
+}
+
+.panou section {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--linie);
+}
+
+.panou section:last-child {
+    border-bottom: 0;
+}
+
+.panou h2 {
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-2);
+    margin: 0 0 10px;
+}
+
+.panou p {
+    margin: 0 0 8px;
+}
+
+.nota {
+    color: var(--text-2);
+    font-size: 13px;
+}
+
+/* selector de strat: butoane segmentate */
+.straturi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.straturi label {
+    position: relative;
+    display: block;
+}
+
+.straturi input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.straturi span {
+    display: block;
+    padding: 7px 10px;
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: var(--text-2);
+    background: var(--panou);
+    text-align: center;
+}
+
+.straturi input:checked + span {
+    border-color: var(--accent);
+    background: var(--accent-fundal);
+    color: var(--accent-text);
+    font-weight: 600;
+}
+
+.straturi input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.limite {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-size: 14px;
+}
+
+.limite label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.limite input {
+    accent-color: var(--accent);
+}
+
+/* căutare */
+.cautare {
+    position: relative;
+}
+
+.cautare input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    font: inherit;
+    background: var(--suprafata);
+    color: var(--text);
+}
+
+.cautare ul {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin: 4px 0 0;
+    padding: 4px;
+    list-style: none;
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    box-shadow: var(--umbra);
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.cautare li {
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cautare li small {
+    color: var(--text-2);
+}
+
+.cautare li[aria-selected="true"],
+.cautare li:hover {
+    background: var(--accent-fundal);
+}
+
+/* legendă */
+.legenda {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 4px;
+    font-size: 13.5px;
+}
+
+.legenda li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legenda .mostra {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex: none;
+    box-shadow: inset 0 0 0 1px var(--margine);
+}
+
+.legenda .numar {
+    margin-left: auto;
+    color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.legenda-secv {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.legenda-secv div {
+    flex: 1;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--text-2);
+}
+
+.legenda-secv .mostra {
+    height: 12px;
+    border-radius: 3px;
+    margin-bottom: 4px;
+}
+
+/* detalii UAT */
+.detalii h3 {
+    margin: 0 0 2px;
+    font-size: 18px;
+}
+
+.detalii .tip {
+    color: var(--text-2);
+    font-size: 13.5px;
+    margin-bottom: 10px;
+}
+
+.tabel-atribute {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.tabel-atribute th {
+    text-align: left;
+    font-weight: 400;
+    color: var(--text-2);
+    padding: 3px 8px 3px 0;
+    vertical-align: top;
+    width: 52%;
+}
+
+.tabel-atribute td {
+    padding: 3px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.eticheta-stare {
+    display: inline-block;
+    font-size: 12px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+}
+
+.eticheta-stare.atentie {
+    color: var(--atentie-text);
+}
+
+.eticheta-stare.bun {
+    color: var(--bun-text);
+}
+
+.buton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    background: var(--panou);
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.buton.principal {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+}
+
+.buton:hover {
+    border-color: var(--accent);
+}
+
+/* tooltip */
+.tooltip {
+    position: absolute;
+    z-index: 30;
+    pointer-events: none;
+    background: var(--panou);
+    color: var(--text);
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    box-shadow: var(--umbra);
+    padding: 8px 10px;
+    font-size: 13px;
+    max-width: 280px;
+}
+
+.tooltip strong {
+    display: block;
+    font-size: 14px;
+}
+
+.tooltip .rand {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--text-2);
+}
+
+.tooltip .rand b {
+    color: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.sursa-harta {
+    position: absolute;
+    left: 12px;
+    bottom: 8px;
+    font-size: 11.5px;
+    color: var(--text-2);
+    background: var(--eticheta-halou);
+    padding: 2px 6px;
+    border-radius: 4px;
+    max-width: calc(100% - 24px);
+    z-index: 500;
+}
+
+.incarcare {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--text-2);
+}
+
+/* ------------------------------------------------------------------ legendă: mostre */
+.mostra.f-c0 { background: var(--serie-1); }
+.mostra.f-c1 { background: var(--serie-2); }
+.mostra.f-c2 { background: var(--serie-3); }
+.mostra.f-c3 { background: var(--serie-4); }
+.mostra.f-c4 { background: var(--serie-5); }
+.mostra.f-c5 { background: var(--serie-6); }
+.mostra.f-c6 { background: var(--serie-7); }
+.mostra.f-c7 { background: var(--serie-8); }
+.mostra.f-s1 { background: var(--secv-1); }
+.mostra.f-s2 { background: var(--secv-2); }
+.mostra.f-s3 { background: var(--secv-3); }
+.mostra.f-s4 { background: var(--secv-4); }
+.mostra.f-s5 { background: var(--secv-5); }
+.mostra.f-s6 { background: var(--secv-6); }
+.mostra.f-s7 { background: var(--secv-7); }
+.mostra.f-nd { background: var(--fara-date); }
+.mostra.f-neutru { background: var(--neutru-harta); }
+
+.mostra.linie {
+    height: 0;
+    border-top: 2px solid var(--limita-regiune);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.mostra.linie.punctata {
+    border-top-style: dashed;
+}
+
+.mostra.punct {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text);
+    box-shadow: 0 0 0 1.5px var(--suprafata);
+    margin: 0 2px;
+}
+
+.mostra.punct.sediu {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    background: var(--suprafata);
+    box-shadow: inset 0 0 0 2.5px var(--text);
+}
+
+.mostra.punct.atentie {
+    background: var(--stare-atentie);
+}
+
+.mostra.punct.serios {
+    background: var(--stare-serios);
+}
+
+/* ------------------------------------------------------------------ scenariu de reorganizare */
+.formular-scenariu {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.formular-scenariu input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+}
+
+.formular-scenariu .bifa {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.formular-scenariu .butoane {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+#sc-rezultat {
+    margin-top: 12px;
+}
+
+.tabel-comparatie th,
+.tabel-comparatie td {
+    padding: 4px 6px 4px 0;
+}
+
+.tabel-comparatie thead th {
+    font-size: 12px;
+    color: var(--text-2);
+    font-weight: 600;
+    text-align: right;
+}
+
+.tabel-comparatie td {
+    text-align: right;
+}
+
+.subtitlu-sectiune {
+    font-size: 13px;
+    font-weight: 650;
+    margin: 12px 0 6px;
+}
+
+.lista-grupuri {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.lista-grupuri li {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    gap: 2px 8px;
+    align-items: center;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13.5px;
+}
+
+.lista-grupuri li:hover,
+.lista-grupuri li:focus-visible {
+    background: var(--accent-fundal);
+}
+
+.lista-grupuri .grup-detalii {
+    grid-column: 2 / 4;
+    color: var(--text-2);
+    font-size: 12.5px;
+}
+
+.lista-grupuri .grup-detalii .eticheta-stare {
+    margin-left: 4px;
+}
+
+/* dosarul unei unități propuse: condițiile verificate și pașii deciziei */
+#sc-dosar {
+    margin: 10px 0;
+}
+
+.tabel-dosar tr.c-derogare th,
+.tabel-dosar tr.c-derogare td {
+    background: var(--accent-fundal);
+}
+
+.pasi-dosar {
+    margin: 6px 0 10px;
+    padding-left: 18px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-2);
+}
+
+.pasi-dosar li {
+    margin-bottom: 5px;
+}
+
+.pasi-dosar b {
+    color: var(--text);
+}
+
+label.inactiv {
+    opacity: 0.45;
+}
+
+.eticheta-harta.e-scenariu span {
+    font-size: 12.5px;
+    font-weight: 700;
+    transform: translate(-50%, -150%);
+}
+
+/* legenda de pe hartă: ce înseamnă culorile și liniile la nivelul ales */
+.legenda-harta {
+    position: absolute;
+    left: 10px;
+    bottom: 24px;
+    z-index: 500;
+    max-width: 260px;
+    padding: 8px 10px;
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    background: var(--suprafata);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.legenda-harta h4 {
+    margin: 0 0 4px;
+    font-size: 12px;
+}
+
+.legenda-harta ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.legenda-harta li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.legenda-harta .legenda-grup {
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-2);
+}
+
+.legenda-harta .linie {
+    flex: 0 0 26px;
+    height: 0;
+    border-top-style: solid;
+}
+
+.legenda-harta .umplere {
+    flex: 0 0 26px;
+    height: 11px;
+    border-radius: 2px;
+}
+
+/* editarea districtelor: lista alegerilor voluntare, fiecare cu butonul ei de ștergere */
+.lista-alegeri {
+    list-style: none;
+    margin: 8px 0;
+    padding: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.lista-alegeri li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.lista-alegeri button {
+    padding: 2px 8px;
+}
+
+.buton:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.buton[aria-pressed="true"] {
+    border-color: var(--evidentiere);
+}
+
+.cascada {
+    display: grid;
+    gap: 6px;
+}
+
+.cascada select {
+    width: 100%;
+}
+
+.cascada select:disabled {
+    opacity: 0.5;
+}
+
+.pliant > summary {
+    cursor: pointer;
+    font-size: 12.5px;
+    color: var(--text-2);
+    padding: 6px 0;
+}
+
+.pliant[open] > summary {
+    margin-bottom: 6px;
+}
+
+.pliant-mare {
+    border-top: 1px solid var(--margine);
+    margin-top: 12px;
+    padding-top: 6px;
+}
+
+.pliant-mare > summary {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11.5px;
+}
+
+.sumar-financiar {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--margine);
+    border-radius: 10px;
+    background: var(--suprafata);
+}
+
+.sumar-financiar h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+}
+
+.sumar-financiar .cifre {
+    display: grid;
+    gap: 8px;
+}
+
+.sumar-financiar .cifra {
+    display: grid;
+    gap: 1px;
+}
+
+.sumar-financiar .eticheta {
+    font-size: 12px;
+    color: var(--text-2);
+}
+
+.sumar-financiar .cifra b {
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+.sumar-financiar .cifra small {
+    font-size: 11.5px;
+    color: var(--text-2);
+}
+
+.sumar-financiar .castig b {
+    color: var(--emerald-text, var(--serie-3));
+}
+
+.fir-navigare {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 8px;
+    font-size: 12.5px;
+}
+
+.fir-navigare .pas {
+    font: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.fir-navigare .pas-activ {
+    font-weight: 600;
+}
+
+.fir-navigare .separator {
+    color: var(--text-2);
+}
+
+.lista-grupuri li.selectat {
+    background: var(--accent-fundal);
+}
+
+.regiuni-scurtaturi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 2px 0 6px;
+}
+
+.regiuni-scurtaturi[hidden] {
+    display: none;
+}
+
+.regiuni-scurtaturi button {
+    font: inherit;
+    font-size: 12px;
+    padding: 3px 8px;
+    border: 1px solid var(--margine);
+    border-radius: 999px;
+    background: var(--suprafata);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.regiuni-scurtaturi button:hover,
+.regiuni-scurtaturi button:focus-visible {
+    background: var(--accent-fundal);
+}
+
+.regiuni-scurtaturi button[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.limite label .culoare {
+    display: inline-block;
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    margin-right: 2px;
+    vertical-align: middle;
+}
+
+.tabel-judete tr[data-cod] {
+    cursor: pointer;
+}
+
+.tabel-judete tr[data-cod]:hover,
+.tabel-judete tr[data-cod]:focus-visible {
+    background: var(--accent-fundal);
+}
+
+/* ------------------------------------------------------------------ regiuni tematice */
+.lista-tematice li {
+    grid-template-columns: 1fr auto;
+}
+
+.lista-tematice .grup-detalii {
+    grid-column: 1 / 3;
+}
+
+.lista-tematice li[aria-selected="true"] {
+    background: var(--accent-fundal);
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.eticheta-harta.e-tematic span {
+    font-size: 11.5px;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.eticheta-harta.e-tematic.e-selectat span {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-text);
+}
+
+#tm-detalii {
+    margin: 8px 0 12px;
+    padding: 10px;
+    border: 1px solid var(--linie);
+    border-radius: 8px;
+}
+
+/* ------------------------------------------------------------------ Leaflet */
+.leaflet-container {
+    background: var(--suprafata);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.leaflet-bar a,
+.leaflet-control-layers {
+    background: var(--panou);
+    color: var(--text);
+    border-color: var(--linie);
+}
+
+.leaflet-bar a:hover {
+    background: var(--accent-fundal);
+    color: var(--text);
+}
+
+.leaflet-control-attribution {
+    background: var(--eticheta-halou) !important;
+    color: var(--text-2);
+    font-size: 11px;
+}
+
+.leaflet-control-attribution a {
+    color: var(--accent-text);
+}
+
+/* fundalul „Simplă”: plăci OSM desaturate, ca să nu concureze cu umplerile */
+.fundal-gri {
+    filter: grayscale(1) contrast(0.85) brightness(1.06);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .fundal-gri {
+        filter: grayscale(1) invert(1) contrast(0.8) brightness(0.9);
+    }
+}
+
+:root[data-theme="dark"] .fundal-gri {
+    filter: grayscale(1) invert(1) contrast(0.8) brightness(0.9);
+}
+
+/* etichete pe hartă (L.divIcon) — halou în culoarea suprafeței pentru lizibilitate */
+.eticheta-harta {
+    background: none;
+    border: 0;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.eticheta-harta span {
+    display: inline-block;
+    transform: translate(-50%, -50%);
+    color: var(--text);
+    text-shadow: 0 0 2px var(--eticheta-halou), 0 0 3px var(--eticheta-halou), 0 0 4px var(--eticheta-halou), 0 0 6px var(--eticheta-halou);
+    font-size: 12px;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.eticheta-harta.e-regiune span {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.eticheta-harta.e-judet span {
+    font-size: 12.5px;
+    font-weight: 650;
+}
+
+.eticheta-harta.e-uat span {
+    font-size: 11.5px;
+}
+
+.eticheta-harta.e-uat.e-urban span {
+    font-weight: 650;
+}
+
+/* ------------------------------------------------------------------ pagina metodologie.html */
+.document {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 40px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 24px 24px 64px;
+}
+
+.cuprins {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    font-size: 14px;
+}
+
+.cuprins h2 {
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-2);
+    margin: 0 0 8px;
+}
+
+.cuprins ol {
+    margin: 0;
+    padding-left: 20px;
+    display: grid;
+    gap: 4px;
+}
+
+.cuprins a {
+    color: var(--text-2);
+    text-decoration: none;
+}
+
+.cuprins a:hover {
+    color: var(--accent-text);
+    text-decoration: underline;
+}
+
+.continut-document {
+    min-width: 0;
+}
+
+.continut-document section {
+    padding: 8px 0 24px;
+    border-bottom: 1px solid var(--linie);
+    scroll-margin-top: 16px;
+}
+
+.continut-document section:last-child {
+    border-bottom: 0;
+}
+
+.continut-document h2 {
+    font-size: 24px;
+    letter-spacing: -0.01em;
+    margin: 24px 0 12px;
+}
+
+.continut-document h3 {
+    font-size: 17px;
+    margin: 22px 0 8px;
+}
+
+.continut-document h4 {
+    font-size: 15px;
+    margin: 20px 0 6px;
+}
+
+.continut-document p,
+.continut-document li {
+    max-width: 78ch;
+}
+
+.continut-document ul,
+.continut-document ol {
+    padding-left: 22px;
+}
+
+.continut-document li + li {
+    margin-top: 4px;
+}
+
+.formula {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 13.5px;
+    background: var(--suprafata);
+    border: 1px solid var(--linie);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.se-incarca {
+    color: var(--text-2);
+}
+
+/* harta în tabele (raport.html): fiecare nivel își poartă culoarea de pe hartă */
+.strat {
+    --culoare-strat: var(--axa);
+    margin: 8px 0;
+    border: 1px solid var(--linie);
+    border-left: 6px solid var(--culoare-strat);
+    border-radius: 8px;
+    background: var(--panou);
+}
+
+.strat > summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    cursor: pointer;
+    padding: 9px 12px;
+    font-weight: 650;
+}
+
+.strat > summary small {
+    font-weight: 400;
+    color: var(--text-2);
+}
+
+.strat > .strat-continut {
+    padding: 0 12px 10px;
+}
+
+.strat.serie-1 { --culoare-strat: var(--serie-1); }
+.strat.serie-2 { --culoare-strat: var(--serie-2); }
+.strat.serie-3 { --culoare-strat: var(--serie-3); }
+.strat.serie-4 { --culoare-strat: var(--serie-4); }
+.strat.serie-5 { --culoare-strat: var(--serie-5); }
+.strat.serie-6 { --culoare-strat: var(--serie-6); }
+.strat.serie-7 { --culoare-strat: var(--serie-7); }
+.strat.serie-8 { --culoare-strat: var(--serie-8); }
+
+.tabel-harta .mostra {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: -1px;
+}
+
+.tabel-harta tr.rand-district th {
+    background: var(--accent-fundal);
+    border-left: 5px solid var(--limita-district-culoare);
+    font-weight: 650;
+}
+
+.tabel-harta tr.rand-district.metropolitan th {
+    border-left-color: var(--limita-adr-culoare);
+}
+
+.tabel-harta tr.rand-district small {
+    font-weight: 400;
+}
+
+.tabel-harta tr.rand-actiuni td {
+    border-left: 5px solid var(--stare-atentie);
+    color: var(--text-2);
+}
+
+.tabel-harta tr.rand-total th,
+.tabel-harta tr.rand-total td {
+    font-weight: 650;
+    border-top: 2px solid var(--axa);
+}
+
+/* bara de acoperire: cât din populație stă în UAT-uri cu rețea */
+.bara {
+    display: inline-block;
+    width: 64px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 4px;
+    background: var(--fara-date);
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+.bara > span {
+    display: block;
+    height: 100%;
+    background: var(--serie-3);
+}
+
+.bara.atentie > span { background: var(--stare-atentie); }
+.bara.serios > span { background: var(--stare-serios); }
+
+.eticheta-stare.critic {
+    color: var(--critic-text);
+}
+
+.eticheta-stare.plin {
+    border-color: transparent;
+    background: var(--accent-fundal);
+    color: var(--accent-text);
+}
+
+/* ------------------------------------------------------------------ raportul: tabloul cu filtre */
+.raport-pagina {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 20px 24px 64px;
+}
+
+.raport-pagina .document {
+    max-width: none;
+    padding: 28px 0 0;
+}
+
+.tablou {
+    display: grid;
+    gap: 16px;
+    scroll-margin-top: 12px;
+}
+
+.tablou-cap h2 {
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    margin: 8px 0 4px;
+}
+
+.tablou-cap p {
+    margin: 0;
+    color: var(--text-2);
+}
+
+.card,
+.card-cifra,
+.filtre {
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 14px;
+    box-shadow: var(--umbra);
+}
+
+.filtre {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 10px 14px;
+    padding: 12px 14px;
+}
+
+.filtre label {
+    display: grid;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-2);
+}
+
+.filtre select,
+.filtre input[type="search"] {
+    font: inherit;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    min-width: 170px;
+    padding: 7px 10px;
+    border: 1px solid var(--axa);
+    border-radius: 8px;
+    background: var(--suprafata);
+    color: var(--text);
+}
+
+.filtru-text {
+    flex: 1 1 220px;
+}
+
+.filtru-text input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.cipuri {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cip {
+    font: inherit;
+    font-size: 13px;
+    padding: 4px 11px;
+    border: 1px solid var(--axa);
+    border-radius: 999px;
+    background: var(--suprafata);
+    color: var(--text-2);
+    cursor: pointer;
+}
+
+.cip:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+}
+
+.cip[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--panou);
+}
+
+.carduri {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+}
+
+.card-cifra {
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    padding: 14px 16px;
+    border-top: 4px solid var(--accent);
+}
+
+.card-cifra.bun {
+    border-top-color: var(--serie-3);
+}
+
+.card-cifra.atentie {
+    border-top-color: var(--stare-atentie);
+}
+
+.card-cifra strong {
+    font-size: 26px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.card-eticheta {
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-2);
+}
+
+.card-cifra small {
+    color: var(--text-2);
+}
+
+.card {
+    min-width: 0;
+    padding: 14px 16px 16px;
+}
+
+.card > h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+}
+
+.legatura,
+.sortare {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+}
+
+.sortare {
+    text-transform: inherit;
+    letter-spacing: inherit;
+    white-space: nowrap;
+}
+
+.legatura:hover,
+.sortare:hover {
+    color: var(--accent-text);
+    text-decoration: underline;
+}
+
+.tabel-explorator tbody tr.rand-explorator:hover > * {
+    background: var(--suprafata);
+}
+
+.tabel-explorator tbody tr.deschis > * {
+    background: var(--accent-fundal);
+}
+
+.tabel-explorator tr.rand-fisa > td {
+    padding: 14px 16px 18px;
+    background: var(--suprafata);
+    border-left: 5px solid var(--accent);
+}
+
+.fisa-coloane {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px 28px;
+    margin-bottom: 10px;
+}
+
+.fisa-district h4 {
+    margin: 6px 0;
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-2);
+}
+
+.fisa-district ul,
+.fisa-district ol {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.fisa-district li + li {
+    margin-top: 5px;
+}
+
+.fisa-district .lista-criterii {
+    list-style: none;
+    padding-left: 0;
+}
+
+.clase-populatie {
+    display: grid;
+    gap: 4px;
+}
+
+.rand-clasa {
+    display: grid;
+    grid-template-columns: 150px minmax(60px, 1fr) minmax(170px, auto);
+    align-items: center;
+    gap: 10px;
+    font: inherit;
+    text-align: left;
+    color: var(--text);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+.rand-clasa:hover {
+    background: var(--suprafata);
+}
+
+.rand-clasa[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: var(--accent-fundal);
+}
+
+.clasa-bara {
+    height: 14px;
+    border-radius: 7px;
+    background: var(--fara-date);
+    overflow: hidden;
+}
+
+.clasa-bara > span {
+    display: block;
+    height: 100%;
+    border-radius: 7px;
+    background: var(--accent);
+}
+
+.clasa-numar {
+    font-variant-numeric: tabular-nums;
+}
+
+.clasa-numar small {
+    color: var(--text-2);
+}
+
+/* cuprinsul raportului: fișă lipită de marginea de sus, cu capitolul curent evidențiat */
+.raport-pagina .cuprins {
+    top: 12px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    padding: 14px 10px;
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 14px;
+    box-shadow: var(--umbra);
+}
+
+.raport-pagina .cuprins h2 {
+    padding: 0 8px;
+}
+
+.raport-pagina .cuprins ol {
+    list-style: none;
+    padding-left: 0;
+    gap: 2px;
+}
+
+.raport-pagina .cuprins a {
+    display: block;
+    padding: 5px 8px;
+    border-radius: 8px;
+}
+
+.raport-pagina .cuprins a:hover {
+    background: var(--suprafata);
+    text-decoration: none;
+}
+
+.raport-pagina .cuprins a[aria-current="true"] {
+    background: var(--accent-fundal);
+    color: var(--accent-text);
+    font-weight: 600;
+}
+
+/* capitolele raportului, ca fișe */
+.raport-pagina .continut-document section {
+    margin-bottom: 16px;
+    padding: 4px 22px 22px;
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 14px;
+    box-shadow: var(--umbra);
+}
+
+.raport-pagina .continut-document h2 {
+    margin-top: 16px;
+}
+
+/* sub lățimea la care încap două coloane, cuprinsul devine un șir de etichete, lipit sus */
+@media (max-width: 1100px) {
+    .raport-pagina .document {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .raport-pagina .cuprins {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        max-height: none;
+        padding: 8px 10px;
+        border-radius: 12px;
+    }
+
+    .raport-pagina .cuprins h2 {
+        display: none;
+    }
+
+    .raport-pagina .cuprins ol {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        padding-bottom: 2px;
+    }
+
+    .raport-pagina .cuprins li {
+        flex: 0 0 auto;
+        margin: 0;
+    }
+
+    .raport-pagina .cuprins a {
+        white-space: nowrap;
+        padding: 4px 11px;
+        font-size: 13px;
+        border: 1px solid var(--axa);
+        border-radius: 999px;
+    }
+
+    .raport-pagina .cuprins a[aria-current="true"] {
+        border-color: var(--accent);
+    }
+
+    .raport-pagina .continut-document section {
+        scroll-margin-top: 60px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tablou-cap h2 {
+        font-size: 22px;
+    }
+
+    .filtre {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .filtre label {
+        flex: 1 1 calc(50% - 8px);
+    }
+
+    .filtre select,
+    .filtre input[type="search"] {
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .carduri {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .card-cifra {
+        padding: 10px 12px;
+    }
+
+    .card-cifra strong {
+        font-size: 20px;
+    }
+
+    .card {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 860px) {
+    .raport-pagina {
+        padding: 12px 12px 48px;
+    }
+
+    .filtre {
+        position: static;
+    }
+
+    .rand-clasa {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .raport-pagina .continut-document section {
+        padding: 2px 14px 16px;
+    }
+}
+
+.tabel-derulant {
+    overflow-x: auto;
+    margin: 8px 0 12px;
+}
+
+.tabel-doc {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: var(--panou);
+}
+
+.tabel-doc th,
+.tabel-doc td {
+    text-align: left;
+    vertical-align: top;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--linie);
+}
+
+.tabel-doc thead th {
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-2);
+    border-bottom: 1px solid var(--axa);
+    white-space: nowrap;
+}
+
+.tabel-doc tbody th {
+    font-weight: 600;
+    min-width: 140px;
+}
+
+.tabel-doc code {
+    font-size: 12px;
+    color: var(--text-2);
+}
+
+.tabel-doc small {
+    color: var(--text-2);
+}
+
+.tabel-doc .num,
+.tabel-numeric td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tabel-numeric tbody th {
+    font-weight: 400;
+}
+
+/* starea datelor: text în culori AA, cu contur — nu doar culoare */
+.stare-date {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+}
+
+.stare-date.s-disponibil {
+    color: var(--bun-text);
+}
+
+.stare-date.s-exemple {
+    color: var(--accent-text);
+}
+
+.stare-date.s-partial {
+    color: var(--atentie-text);
+}
+
+.stare-date.s-de-colectat {
+    color: var(--text-2);
+    border-style: dashed;
+}
+
+.rol {
+    display: inline-block;
+    font-size: 12px;
+    padding: 1px 7px;
+    border-radius: 6px;
+    background: var(--plan);
+    border: 1px solid var(--linie);
+    color: var(--text-2);
+    margin: 0 2px 2px 0;
+}
+
+.doua-coloane {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.lista-simpla {
+    list-style: none;
+    padding-left: 0 !important;
+    font-size: 14px;
+}
+
+.surse li {
+    font-size: 14px;
+}
+
+/* ------------------------------------------------------------------ mobil */
+@media (max-width: 860px) {
+    .aplicatie {
+        grid-template-columns: 1fr;
+        grid-template-rows: 62vh auto;
+        height: auto;
+    }
+
+    .panou {
+        border-left: 0;
+        border-top: 1px solid var(--margine);
+        overflow: visible;
+        padding: 4px 16px 32px;
+    }
+
+    .antet {
+        padding: 8px 16px;
+        flex-wrap: wrap;
+    }
+
+    .antet .subtitlu {
+        display: none;
+    }
+
+    .document {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 16px 16px 48px;
+    }
+
+    .cuprins {
+        position: static;
+    }
+
+    .doua-coloane {
+        grid-template-columns: 1fr;
+    }
+}

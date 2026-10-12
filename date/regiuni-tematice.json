@@ -1,0 +1,2785 @@
+{
+ "versiune": 1,
+ "tipuri": {
+  "tara": "Țară (regiune istorico-etnografică)",
+  "zona": "Zonă etnografică",
+  "etnoculturala": "Regiune etno-culturală / comunitate",
+  "functionala": "Zonă funcțională"
+ },
+ "nota": "Un UAT poate ține de mai multe regiuni. UAT-urile incluse doar cu unele sate apar ca parțiale.",
+ "campuri": {
+  "s": "cod SIRUTA al UAT-ului",
+  "f": "partea din populația UAT-ului (RPL 2021) care ține de regiune; 1 = UAT întreg",
+  "sate": "codurile SIRUTA ale satelor, la UAT-urile parțiale"
+ },
+ "regiuni": [
+  {
+   "id": "barsei",
+   "nume": "Țara Bârsei",
+   "tip": "tara",
+   "certitudine": "reconstituita",
+   "descriere": "Lista din sursă, completată cu Săcele și Tărlungeni (satele săcelene), care lipsesc din ea.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Bârsei",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Bârsei"
+    }
+   ],
+   "uat": [
+    {
+     "s": 40198,
+     "f": 1.0
+    },
+    {
+     "s": 40214,
+     "f": 1.0
+    },
+    {
+     "s": 40241,
+     "f": 1.0
+    },
+    {
+     "s": 40367,
+     "f": 1.0
+    },
+    {
+     "s": 40438,
+     "f": 1.0
+    },
+    {
+     "s": 40492,
+     "f": 1.0
+    },
+    {
+     "s": 40606,
+     "f": 1.0
+    },
+    {
+     "s": 40633,
+     "f": 1.0
+    },
+    {
+     "s": 40900,
+     "f": 1.0
+    },
+    {
+     "s": 40928,
+     "f": 0.834,
+     "sate": [
+      40937
+     ]
+    },
+    {
+     "s": 40955,
+     "f": 1.0
+    },
+    {
+     "s": 41033,
+     "f": 1.0
+    },
+    {
+     "s": 41088,
+     "f": 1.0
+    },
+    {
+     "s": 41382,
+     "f": 0.551,
+     "sate": [
+      41391
+     ]
+    },
+    {
+     "s": 41667,
+     "f": 1.0
+    },
+    {
+     "s": 41925,
+     "f": 1.0
+    },
+    {
+     "s": 42003,
+     "f": 1.0
+    },
+    {
+     "s": 42398,
+     "f": 1.0
+    }
+   ],
+   "populatie": 410999
+  },
+  {
+   "id": "fagarasului",
+   "nume": "Țara Făgărașului (Țara Oltului)",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Făgărașului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Făgărașului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 40278,
+     "f": 1.0
+    },
+    {
+     "s": 40465,
+     "f": 1.0
+    },
+    {
+     "s": 40544,
+     "f": 1.0
+    },
+    {
+     "s": 40857,
+     "f": 0.502,
+     "sate": [
+      40866,
+      40875
+     ]
+    },
+    {
+     "s": 41113,
+     "f": 1.0
+    },
+    {
+     "s": 41177,
+     "f": 1.0
+    },
+    {
+     "s": 41346,
+     "f": 1.0
+    },
+    {
+     "s": 41417,
+     "f": 1.0
+    },
+    {
+     "s": 41578,
+     "f": 1.0
+    },
+    {
+     "s": 41738,
+     "f": 1.0
+    },
+    {
+     "s": 41818,
+     "f": 1.0
+    },
+    {
+     "s": 41854,
+     "f": 1.0
+    },
+    {
+     "s": 42101,
+     "f": 1.0
+    },
+    {
+     "s": 42236,
+     "f": 1.0
+    },
+    {
+     "s": 42307,
+     "f": 1.0
+    },
+    {
+     "s": 42449,
+     "f": 1.0
+    },
+    {
+     "s": 42464,
+     "f": 0.914,
+     "sate": [
+      42361
+     ]
+    },
+    {
+     "s": 42480,
+     "f": 1.0
+    },
+    {
+     "s": 143959,
+     "f": 1.0
+    },
+    {
+     "s": 144054,
+     "f": 1.0
+    },
+    {
+     "s": 144508,
+     "f": 1.0
+    },
+    {
+     "s": 144535,
+     "f": 1.0
+    },
+    {
+     "s": 145293,
+     "f": 1.0
+    },
+    {
+     "s": 145355,
+     "f": 1.0
+    },
+    {
+     "s": 145934,
+     "f": 1.0
+    }
+   ],
+   "populatie": 96316
+  },
+  {
+   "id": "hategului",
+   "nume": "Țara Hațegului",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Hațegului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Hațegului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 87424,
+     "f": 0.754,
+     "sate": [
+      87433,
+      87442
+     ]
+    },
+    {
+     "s": 87576,
+     "f": 1.0
+    },
+    {
+     "s": 87996,
+     "f": 1.0
+    },
+    {
+     "s": 89348,
+     "f": 1.0
+    },
+    {
+     "s": 90538,
+     "f": 1.0
+    },
+    {
+     "s": 90725,
+     "f": 1.0
+    },
+    {
+     "s": 90878,
+     "f": 1.0
+    },
+    {
+     "s": 91054,
+     "f": 1.0
+    },
+    {
+     "s": 91116,
+     "f": 1.0
+    },
+    {
+     "s": 91232,
+     "f": 1.0
+    },
+    {
+     "s": 91624,
+     "f": 1.0
+    },
+    {
+     "s": 91731,
+     "f": 1.0
+    }
+   ],
+   "populatie": 36631
+  },
+  {
+   "id": "padurenilor",
+   "nume": "Ținutul Pădurenilor",
+   "tip": "zona",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Ținutul Pădurenilor",
+     "url": "https://ro.wikipedia.org/wiki/Ținutul_Pădurenilor"
+    }
+   ],
+   "uat": [
+    {
+     "s": 86883,
+     "f": 1.0
+    },
+    {
+     "s": 88216,
+     "f": 1.0
+    },
+    {
+     "s": 89026,
+     "f": 1.0
+    },
+    {
+     "s": 89151,
+     "f": 1.0
+    },
+    {
+     "s": 90066,
+     "f": 1.0
+    },
+    {
+     "s": 90119,
+     "f": 1.0
+    },
+    {
+     "s": 90431,
+     "f": 0.087,
+     "sate": [
+      90468,
+      90477,
+      90486
+     ]
+    },
+    {
+     "s": 91535,
+     "f": 1.0
+    }
+   ],
+   "populatie": 4069
+  },
+  {
+   "id": "zarandului",
+   "nume": "Țara Zarandului",
+   "tip": "tara",
+   "certitudine": "reconstituita",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "GAL „Țara Zarandului” (MADR, LEADER 2023–2027) — partea din Hunedoara",
+     "url": "https://www.madr.ro/docs/dezvoltare-rurala/Axa_LEADER/2014-2020/2024/Lista-cu-Grupurile-de-Ac%C8%9Biune-Local%C4%83-2023-2027-selectate-de-MADR-si-datele-de-contact-ale-acestora.pdf"
+    },
+    {
+     "titlu": "Wikipedia — Țara Zarandului (partea din Crișana)",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Zarandului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 10239,
+     "f": 1.0
+    },
+    {
+     "s": 10943,
+     "f": 1.0
+    },
+    {
+     "s": 11058,
+     "f": 1.0
+    },
+    {
+     "s": 11174,
+     "f": 1.0
+    },
+    {
+     "s": 11762,
+     "f": 1.0
+    },
+    {
+     "s": 12689,
+     "f": 1.0
+    },
+    {
+     "s": 87291,
+     "f": 1.0
+    },
+    {
+     "s": 87362,
+     "f": 1.0
+    },
+    {
+     "s": 87745,
+     "f": 1.0
+    },
+    {
+     "s": 88092,
+     "f": 1.0
+    },
+    {
+     "s": 88350,
+     "f": 1.0
+    },
+    {
+     "s": 88788,
+     "f": 1.0
+    },
+    {
+     "s": 88868,
+     "f": 1.0
+    },
+    {
+     "s": 88920,
+     "f": 1.0
+    },
+    {
+     "s": 90208,
+     "f": 1.0
+    },
+    {
+     "s": 90805,
+     "f": 1.0
+    },
+    {
+     "s": 91447,
+     "f": 1.0
+    },
+    {
+     "s": 91795,
+     "f": 1.0
+    },
+    {
+     "s": 91937,
+     "f": 1.0
+    }
+   ],
+   "populatie": 44505
+  },
+  {
+   "id": "motilor",
+   "nume": "Țara Moților",
+   "tip": "tara",
+   "certitudine": "reconstituita",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Moților",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Moților"
+    },
+    {
+     "titlu": "GAL „Arieșul Mare” și GAL „Drumul Iancului” (MADR, LEADER 2023–2027)",
+     "url": "https://www.madr.ro/docs/dezvoltare-rurala/Axa_LEADER/2014-2020/2024/Lista-cu-Grupurile-de-Ac%C8%9Biune-Local%C4%83-2023-2027-selectate-de-MADR-si-datele-de-contact-ale-acestora.pdf"
+    }
+   ],
+   "uat": [
+    {
+     "s": 1151,
+     "f": 1.0
+    },
+    {
+     "s": 1455,
+     "f": 1.0
+    },
+    {
+     "s": 2130,
+     "f": 1.0
+    },
+    {
+     "s": 2381,
+     "f": 1.0
+    },
+    {
+     "s": 2577,
+     "f": 1.0
+    },
+    {
+     "s": 2915,
+     "f": 1.0
+    },
+    {
+     "s": 3039,
+     "f": 1.0
+    },
+    {
+     "s": 3459,
+     "f": 1.0
+    },
+    {
+     "s": 4008,
+     "f": 1.0
+    },
+    {
+     "s": 4525,
+     "f": 1.0
+    },
+    {
+     "s": 4767,
+     "f": 1.0
+    },
+    {
+     "s": 5336,
+     "f": 1.0
+    },
+    {
+     "s": 5826,
+     "f": 1.0
+    },
+    {
+     "s": 6271,
+     "f": 1.0
+    },
+    {
+     "s": 6761,
+     "f": 1.0
+    },
+    {
+     "s": 6976,
+     "f": 1.0
+    },
+    {
+     "s": 7197,
+     "f": 1.0
+    },
+    {
+     "s": 7446,
+     "f": 1.0
+    },
+    {
+     "s": 8229,
+     "f": 1.0
+    },
+    {
+     "s": 8425,
+     "f": 1.0
+    },
+    {
+     "s": 87291,
+     "f": 1.0
+    },
+    {
+     "s": 87745,
+     "f": 1.0
+    },
+    {
+     "s": 88920,
+     "f": 1.0
+    }
+   ],
+   "populatie": 57102
+  },
+  {
+   "id": "oasului",
+   "nume": "Țara Oașului",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Oașului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Oașului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 136599,
+     "f": 1.0
+    },
+    {
+     "s": 136919,
+     "f": 1.0
+    },
+    {
+     "s": 137069,
+     "f": 1.0
+    },
+    {
+     "s": 137229,
+     "f": 1.0
+    },
+    {
+     "s": 137274,
+     "f": 1.0
+    },
+    {
+     "s": 137407,
+     "f": 1.0
+    },
+    {
+     "s": 137746,
+     "f": 1.0
+    },
+    {
+     "s": 138351,
+     "f": 1.0
+    },
+    {
+     "s": 139009,
+     "f": 1.0
+    },
+    {
+     "s": 139143,
+     "f": 1.0
+    },
+    {
+     "s": 139170,
+     "f": 1.0
+    },
+    {
+     "s": 139330,
+     "f": 1.0
+    },
+    {
+     "s": 180091,
+     "f": 1.0
+    }
+   ],
+   "populatie": 66289
+  },
+  {
+   "id": "codrului",
+   "nume": "Țara Codrului",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Codrului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Codrului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 107001,
+     "f": 1.0
+    },
+    {
+     "s": 107047,
+     "f": 1.0
+    },
+    {
+     "s": 107083,
+     "f": 1.0
+    },
+    {
+     "s": 107118,
+     "f": 1.0
+    },
+    {
+     "s": 107190,
+     "f": 1.0
+    },
+    {
+     "s": 107234,
+     "f": 1.0
+    },
+    {
+     "s": 108106,
+     "f": 1.0
+    },
+    {
+     "s": 108366,
+     "f": 1.0
+    },
+    {
+     "s": 108918,
+     "f": 1.0
+    },
+    {
+     "s": 109265,
+     "f": 0.673,
+     "sate": [
+      109283,
+      109292,
+      109309,
+      109318,
+      109327,
+      109336,
+      109345
+     ]
+    },
+    {
+     "s": 136964,
+     "f": 1.0
+    },
+    {
+     "s": 137103,
+     "f": 1.0
+    },
+    {
+     "s": 137130,
+     "f": 1.0
+    },
+    {
+     "s": 137363,
+     "f": 1.0
+    },
+    {
+     "s": 137504,
+     "f": 1.0
+    },
+    {
+     "s": 137844,
+     "f": 1.0
+    },
+    {
+     "s": 137899,
+     "f": 1.0
+    },
+    {
+     "s": 138618,
+     "f": 1.0
+    },
+    {
+     "s": 138770,
+     "f": 1.0
+    },
+    {
+     "s": 138805,
+     "f": 1.0
+    },
+    {
+     "s": 138869,
+     "f": 1.0
+    },
+    {
+     "s": 138921,
+     "f": 1.0
+    },
+    {
+     "s": 139287,
+     "f": 1.0
+    },
+    {
+     "s": 139394,
+     "f": 1.0
+    },
+    {
+     "s": 139740,
+     "f": 0.327,
+     "sate": [
+      139768,
+      139777,
+      139786,
+      139795
+     ]
+    },
+    {
+     "s": 140244,
+     "f": 1.0
+    },
+    {
+     "s": 179855,
+     "f": 1.0
+    }
+   ],
+   "populatie": 58125
+  },
+  {
+   "id": "chioarului",
+   "nume": "Țara Chioarului",
+   "tip": "tara",
+   "certitudine": "reconstituita",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Chioarului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Chioarului"
+    },
+    {
+     "titlu": "Portal Maramureș — Țara Chioarului",
+     "url": "https://portal-maramures.ro/tara-chioarului/"
+    }
+   ],
+   "uat": [
+    {
+     "s": 107582,
+     "f": 1.0
+    },
+    {
+     "s": 107733,
+     "f": 1.0
+    },
+    {
+     "s": 108035,
+     "f": 1.0
+    },
+    {
+     "s": 108268,
+     "f": 1.0
+    },
+    {
+     "s": 108491,
+     "f": 1.0
+    },
+    {
+     "s": 108712,
+     "f": 1.0
+    },
+    {
+     "s": 108794,
+     "f": 1.0
+    },
+    {
+     "s": 109176,
+     "f": 1.0
+    },
+    {
+     "s": 109354,
+     "f": 1.0
+    },
+    {
+     "s": 179837,
+     "f": 1.0
+    },
+    {
+     "s": 179846,
+     "f": 1.0
+    }
+   ],
+   "populatie": 43474
+  },
+  {
+   "id": "lapusului",
+   "nume": "Țara Lăpușului",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Lăpușului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Lăpușului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 106817,
+     "f": 1.0
+    },
+    {
+     "s": 107154,
+     "f": 1.0
+    },
+    {
+     "s": 107868,
+     "f": 1.0
+    },
+    {
+     "s": 107920,
+     "f": 1.0
+    },
+    {
+     "s": 108222,
+     "f": 1.0
+    },
+    {
+     "s": 109041,
+     "f": 1.0
+    },
+    {
+     "s": 179622,
+     "f": 1.0
+    }
+   ],
+   "populatie": 27798
+  },
+  {
+   "id": "maramuresului",
+   "nume": "Țara Maramureșului",
+   "tip": "tara",
+   "certitudine": "regula",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Maramureșul istoric = județul interbelic Maramureș (1930), geo-spatial.org",
+     "url": "http://geo-spatial.org/vechi/download/romania-limitele-administrative-ale-jude-elor-interbelice-1930"
+    }
+   ],
+   "uat": [
+    {
+     "s": 106559,
+     "f": 1.0
+    },
+    {
+     "s": 106620,
+     "f": 1.0
+    },
+    {
+     "s": 106648,
+     "f": 1.0
+    },
+    {
+     "s": 106746,
+     "f": 1.0
+    },
+    {
+     "s": 106979,
+     "f": 1.0
+    },
+    {
+     "s": 107270,
+     "f": 1.0
+    },
+    {
+     "s": 107314,
+     "f": 1.0
+    },
+    {
+     "s": 107350,
+     "f": 1.0
+    },
+    {
+     "s": 107403,
+     "f": 1.0
+    },
+    {
+     "s": 107485,
+     "f": 1.0
+    },
+    {
+     "s": 107519,
+     "f": 1.0
+    },
+    {
+     "s": 107546,
+     "f": 1.0
+    },
+    {
+     "s": 107715,
+     "f": 1.0
+    },
+    {
+     "s": 107975,
+     "f": 1.0
+    },
+    {
+     "s": 108017,
+     "f": 1.0
+    },
+    {
+     "s": 108151,
+     "f": 1.0
+    },
+    {
+     "s": 108204,
+     "f": 1.0
+    },
+    {
+     "s": 108240,
+     "f": 1.0
+    },
+    {
+     "s": 108348,
+     "f": 1.0
+    },
+    {
+     "s": 108400,
+     "f": 1.0
+    },
+    {
+     "s": 108455,
+     "f": 1.0
+    },
+    {
+     "s": 108473,
+     "f": 1.0
+    },
+    {
+     "s": 108552,
+     "f": 1.0
+    },
+    {
+     "s": 108598,
+     "f": 1.0
+    },
+    {
+     "s": 108614,
+     "f": 1.0
+    },
+    {
+     "s": 108632,
+     "f": 1.0
+    },
+    {
+     "s": 108669,
+     "f": 1.0
+    },
+    {
+     "s": 108696,
+     "f": 1.0
+    },
+    {
+     "s": 108874,
+     "f": 1.0
+    },
+    {
+     "s": 108892,
+     "f": 1.0
+    },
+    {
+     "s": 108945,
+     "f": 1.0
+    },
+    {
+     "s": 109005,
+     "f": 1.0
+    },
+    {
+     "s": 109504,
+     "f": 1.0
+    },
+    {
+     "s": 179604,
+     "f": 1.0
+    },
+    {
+     "s": 179613,
+     "f": 1.0
+    },
+    {
+     "s": 179864,
+     "f": 1.0
+    }
+   ],
+   "populatie": 191385
+  },
+  {
+   "id": "nasaudului",
+   "nume": "Țara Năsăudului",
+   "tip": "tara",
+   "certitudine": "reconstituita",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "GAL „Țara Năsăudului” și GAL al Someșului Mare superior (MADR, LEADER 2023–2027)",
+     "url": "https://www.madr.ro/docs/dezvoltare-rurala/Axa_LEADER/2014-2020/2024/Lista-cu-Grupurile-de-Ac%C8%9Biune-Local%C4%83-2023-2027-selectate-de-MADR-si-datele-de-contact-ale-acestora.pdf"
+    }
+   ],
+   "uat": [
+    {
+     "s": 32544,
+     "f": 1.0
+    },
+    {
+     "s": 32599,
+     "f": 1.0
+    },
+    {
+     "s": 33177,
+     "f": 1.0
+    },
+    {
+     "s": 33202,
+     "f": 1.0
+    },
+    {
+     "s": 33248,
+     "f": 1.0
+    },
+    {
+     "s": 33621,
+     "f": 1.0
+    },
+    {
+     "s": 33989,
+     "f": 1.0
+    },
+    {
+     "s": 34155,
+     "f": 1.0
+    },
+    {
+     "s": 34262,
+     "f": 1.0
+    },
+    {
+     "s": 34280,
+     "f": 1.0
+    },
+    {
+     "s": 34333,
+     "f": 1.0
+    },
+    {
+     "s": 34360,
+     "f": 1.0
+    },
+    {
+     "s": 34397,
+     "f": 1.0
+    },
+    {
+     "s": 34618,
+     "f": 1.0
+    },
+    {
+     "s": 34690,
+     "f": 1.0
+    },
+    {
+     "s": 34903,
+     "f": 1.0
+    },
+    {
+     "s": 35054,
+     "f": 1.0
+    }
+   ],
+   "populatie": 85239
+  },
+  {
+   "id": "dornelor",
+   "nume": "Țara Dornelor",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Dornelor",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Dornelor"
+    }
+   ],
+   "uat": [
+    {
+     "s": 146744,
+     "f": 1.0
+    },
+    {
+     "s": 147713,
+     "f": 1.0
+    },
+    {
+     "s": 148131,
+     "f": 1.0
+    },
+    {
+     "s": 148202,
+     "f": 1.0
+    },
+    {
+     "s": 149138,
+     "f": 1.0
+    },
+    {
+     "s": 149682,
+     "f": 1.0
+    },
+    {
+     "s": 149851,
+     "f": 1.0
+    },
+    {
+     "s": 150445,
+     "f": 1.0
+    },
+    {
+     "s": 151451,
+     "f": 1.0
+    },
+    {
+     "s": 151497,
+     "f": 1.0
+    }
+   ],
+   "populatie": 32427
+  },
+  {
+   "id": "vrancei",
+   "nume": "Țara Vrancei",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Asociația Țara Vrancei — teritoriu",
+     "url": "https://tara-vrancei.ro/despre-noi/teritoriu/"
+    }
+   ],
+   "uat": [
+    {
+     "s": 175224,
+     "f": 1.0
+    },
+    {
+     "s": 175670,
+     "f": 1.0
+    },
+    {
+     "s": 176891,
+     "f": 1.0
+    },
+    {
+     "s": 176944,
+     "f": 1.0
+    },
+    {
+     "s": 177003,
+     "f": 1.0
+    },
+    {
+     "s": 177101,
+     "f": 1.0
+    },
+    {
+     "s": 177405,
+     "f": 1.0
+    },
+    {
+     "s": 177762,
+     "f": 1.0
+    },
+    {
+     "s": 178117,
+     "f": 1.0
+    },
+    {
+     "s": 178313,
+     "f": 1.0
+    },
+    {
+     "s": 178377,
+     "f": 1.0
+    },
+    {
+     "s": 178545,
+     "f": 1.0
+    },
+    {
+     "s": 178750,
+     "f": 1.0
+    },
+    {
+     "s": 178885,
+     "f": 1.0
+    },
+    {
+     "s": 178910,
+     "f": 1.0
+    },
+    {
+     "s": 178965,
+     "f": 1.0
+    }
+   ],
+   "populatie": 41745
+  },
+  {
+   "id": "lovistei",
+   "nume": "Țara Loviștei",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "Nucleul (Loviștea „populară”, la est de defileul Oltului): Câineni, Titești, Boișoara, Racovița, Perișani. Loviștea extinsă cuprinde și Brezoi, Mălaia și Voineasa. A aparținut Țării Românești (județul Argeș), azi e în Vâlcea.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Loviștei",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Loviștei"
+    },
+    {
+     "titlu": "Via Valahia — The Land of Loviștea",
+     "url": "https://viavalahia.ro/en/the-land-of-lovistea/"
+    }
+   ],
+   "uat": [
+    {
+     "s": 167794,
+     "f": 1.0
+    },
+    {
+     "s": 168755,
+     "f": 1.0
+    },
+    {
+     "s": 169119,
+     "f": 1.0
+    },
+    {
+     "s": 171021,
+     "f": 1.0
+    },
+    {
+     "s": 172153,
+     "f": 1.0
+    },
+    {
+     "s": 172509,
+     "f": 1.0
+    },
+    {
+     "s": 174254,
+     "f": 1.0
+    },
+    {
+     "s": 174496,
+     "f": 1.0
+    }
+   ],
+   "populatie": 16184
+  },
+  {
+   "id": "almajului",
+   "nume": "Țara Almăjului",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Almăjului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Almăjului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 51305,
+     "f": 1.0
+    },
+    {
+     "s": 51573,
+     "f": 1.0
+    },
+    {
+     "s": 52570,
+     "f": 1.0
+    },
+    {
+     "s": 53103,
+     "f": 1.0
+    },
+    {
+     "s": 53577,
+     "f": 1.0
+    },
+    {
+     "s": 53700,
+     "f": 1.0
+    },
+    {
+     "s": 54163,
+     "f": 1.0
+    }
+   ],
+   "populatie": 11047
+  },
+  {
+   "id": "clisurii",
+   "nume": "Clisura Dunării",
+   "tip": "zona",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Clisura Dunării",
+     "url": "https://ro.wikipedia.org/wiki/Clisura_Dunării"
+    }
+   ],
+   "uat": [
+    {
+     "s": 51056,
+     "f": 1.0
+    },
+    {
+     "s": 51449,
+     "f": 1.0
+    },
+    {
+     "s": 52909,
+     "f": 1.0
+    },
+    {
+     "s": 53489,
+     "f": 1.0
+    },
+    {
+     "s": 53513,
+     "f": 1.0
+    },
+    {
+     "s": 53853,
+     "f": 1.0
+    },
+    {
+     "s": 54109,
+     "f": 1.0
+    },
+    {
+     "s": 110063,
+     "f": 1.0
+    },
+    {
+     "s": 110820,
+     "f": 1.0
+    },
+    {
+     "s": 112245,
+     "f": 1.0
+    },
+    {
+     "s": 112334,
+     "f": 1.0
+    },
+    {
+     "s": 112904,
+     "f": 1.0
+    },
+    {
+     "s": 113607,
+     "f": 1.0
+    }
+   ],
+   "populatie": 37546
+  },
+  {
+   "id": "marginimii",
+   "nume": "Mărginimea Sibiului",
+   "tip": "zona",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Mărginimea Sibiului",
+     "url": "https://ro.wikipedia.org/wiki/Mărginimea_Sibiului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 143502,
+     "f": 1.0
+    },
+    {
+     "s": 143520,
+     "f": 1.0
+    },
+    {
+     "s": 144599,
+     "f": 1.0
+    },
+    {
+     "s": 144713,
+     "f": 1.0
+    },
+    {
+     "s": 145202,
+     "f": 1.0
+    },
+    {
+     "s": 145275,
+     "f": 1.0
+    },
+    {
+     "s": 145382,
+     "f": 1.0
+    },
+    {
+     "s": 145471,
+     "f": 1.0
+    },
+    {
+     "s": 145499,
+     "f": 1.0
+    },
+    {
+     "s": 145827,
+     "f": 1.0
+    },
+    {
+     "s": 145907,
+     "f": 1.0
+    },
+    {
+     "s": 146021,
+     "f": 0.938,
+     "sate": [
+      145845
+     ]
+    }
+   ],
+   "populatie": 37542
+  },
+  {
+   "id": "amlasului",
+   "nume": "Țara Amlașului",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "Cacova Sibiului din sursă se numește azi Fântânele (orașul Săliște).",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Amlașului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Amlașului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 145202,
+     "f": 1.0
+    },
+    {
+     "s": 145499,
+     "f": 0.843,
+     "sate": [
+      145505,
+      145514,
+      145523,
+      145541,
+      145550,
+      145578,
+      145587
+     ]
+    },
+    {
+     "s": 145907,
+     "f": 0.722,
+     "sate": [
+      145916
+     ]
+    }
+   ],
+   "populatie": 8753
+  },
+  {
+   "id": "secaselor",
+   "nume": "Țara Secașelor",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "GAL „Țara Secașelor Alba–Sibiu” (MADR, LEADER 2023–2027)",
+     "url": "https://madr.ro/docs/dezvoltare-rurala/Axa_LEADER/2023-2027/2025/Lista-Grupuri-de-Actiune-Locala-2023-2027-selectate-de-MADR-si-datele-de-contact-ale-acestora-actualizata-la-data-de-22.08.2025.pdf"
+    }
+   ],
+   "uat": [
+    {
+     "s": 1071,
+     "f": 1.0
+    },
+    {
+     "s": 2988,
+     "f": 1.0
+    },
+    {
+     "s": 3761,
+     "f": 1.0
+    },
+    {
+     "s": 3805,
+     "f": 1.0
+    },
+    {
+     "s": 4106,
+     "f": 1.0
+    },
+    {
+     "s": 4188,
+     "f": 1.0
+    },
+    {
+     "s": 4240,
+     "f": 1.0
+    },
+    {
+     "s": 4268,
+     "f": 1.0
+    },
+    {
+     "s": 4482,
+     "f": 1.0
+    },
+    {
+     "s": 5700,
+     "f": 1.0
+    },
+    {
+     "s": 6164,
+     "f": 1.0
+    },
+    {
+     "s": 6930,
+     "f": 1.0
+    },
+    {
+     "s": 7384,
+     "f": 1.0
+    },
+    {
+     "s": 7945,
+     "f": 1.0
+    },
+    {
+     "s": 8354,
+     "f": 1.0
+    },
+    {
+     "s": 9019,
+     "f": 1.0
+    },
+    {
+     "s": 9026,
+     "f": 1.0
+    },
+    {
+     "s": 143851,
+     "f": 1.0
+    },
+    {
+     "s": 143922,
+     "f": 1.0
+    },
+    {
+     "s": 144795,
+     "f": 1.0
+    },
+    {
+     "s": 144866,
+     "f": 1.0
+    },
+    {
+     "s": 145220,
+     "f": 1.0
+    },
+    {
+     "s": 145603,
+     "f": 1.0
+    },
+    {
+     "s": 145765,
+     "f": 1.0
+    },
+    {
+     "s": 145792,
+     "f": 1.0
+    }
+   ],
+   "populatie": 54237
+  },
+  {
+   "id": "calatei",
+   "nume": "Țara Călatei",
+   "tip": "tara",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Călatei",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Călatei"
+    }
+   ],
+   "uat": [
+    {
+     "s": 55446,
+     "f": 1.0
+    },
+    {
+     "s": 55473,
+     "f": 1.0
+    },
+    {
+     "s": 56461,
+     "f": 1.0
+    },
+    {
+     "s": 56568,
+     "f": 0.153,
+     "sate": [
+      56586
+     ]
+    },
+    {
+     "s": 57582,
+     "f": 1.0
+    },
+    {
+     "s": 57706,
+     "f": 0.007,
+     "sate": [
+      57733
+     ]
+    },
+    {
+     "s": 57902,
+     "f": 1.0
+    },
+    {
+     "s": 58204,
+     "f": 0.131,
+     "sate": [
+      58222
+     ]
+    },
+    {
+     "s": 58393,
+     "f": 0.171,
+     "sate": [
+      58437,
+      58455
+     ]
+    },
+    {
+     "s": 58464,
+     "f": 1.0
+    },
+    {
+     "s": 59041,
+     "f": 1.0
+    },
+    {
+     "s": 59283,
+     "f": 1.0
+    },
+    {
+     "s": 59327,
+     "f": 1.0
+    },
+    {
+     "s": 59434,
+     "f": 1.0
+    },
+    {
+     "s": 59586,
+     "f": 0.185,
+     "sate": [
+      59639
+     ]
+    },
+    {
+     "s": 141081,
+     "f": 1.0
+    }
+   ],
+   "populatie": 46586
+  },
+  {
+   "id": "beiusului",
+   "nume": "Țara Beiușului",
+   "tip": "tara",
+   "certitudine": "reconstituita",
+   "descriere": "Depresiunea Beiușului, pe Crișul Negru superior.",
+   "surse": [
+    {
+     "titlu": "Bihor în imagini — Țara Beiușului",
+     "url": "https://www.bihorinimagini.ro/en/photo-gallery/beiusului-county/"
+    }
+   ],
+   "uat": [
+    {
+     "s": 26804,
+     "f": 1.0
+    },
+    {
+     "s": 26840,
+     "f": 1.0
+    },
+    {
+     "s": 26920,
+     "f": 1.0
+    },
+    {
+     "s": 27007,
+     "f": 1.0
+    },
+    {
+     "s": 27846,
+     "f": 1.0
+    },
+    {
+     "s": 27971,
+     "f": 1.0
+    },
+    {
+     "s": 28077,
+     "f": 1.0
+    },
+    {
+     "s": 28193,
+     "f": 1.0
+    },
+    {
+     "s": 28709,
+     "f": 1.0
+    },
+    {
+     "s": 28889,
+     "f": 1.0
+    },
+    {
+     "s": 28941,
+     "f": 1.0
+    },
+    {
+     "s": 29243,
+     "f": 1.0
+    },
+    {
+     "s": 29403,
+     "f": 1.0
+    },
+    {
+     "s": 29760,
+     "f": 1.0
+    },
+    {
+     "s": 30336,
+     "f": 1.0
+    },
+    {
+     "s": 30416,
+     "f": 1.0
+    },
+    {
+     "s": 30719,
+     "f": 1.0
+    },
+    {
+     "s": 30773,
+     "f": 1.0
+    },
+    {
+     "s": 30844,
+     "f": 1.0
+    },
+    {
+     "s": 31422,
+     "f": 1.0
+    },
+    {
+     "s": 31609,
+     "f": 1.0
+    },
+    {
+     "s": 31921,
+     "f": 1.0
+    }
+   ],
+   "populatie": 59938
+  },
+  {
+   "id": "secuiesc",
+   "nume": "Ținutul Secuiesc",
+   "tip": "etnoculturala",
+   "certitudine": "regula",
+   "descriere": "Scaunele secuiești Ciuc, Odorhei și Trei Scaune (= județele interbelice omonime) și UAT-urile cu majoritate maghiară din fostul județ interbelic Mureș — aproximare a scaunului Mureș.",
+   "surse": [
+    {
+     "titlu": "Județele interbelice (1930), geo-spatial.org",
+     "url": "http://geo-spatial.org/vechi/download/romania-limitele-administrative-ale-jude-elor-interbelice-1930"
+    },
+    {
+     "titlu": "INS — RPL 2021, tabelul 2.2.2 (etnie pe UAT)",
+     "url": "https://www.recensamantromania.ro/rezultate-rpl-2021/rezultate-definitive-caracteristici-etno-culturale-demografice/"
+    }
+   ],
+   "uat": [
+    {
+     "s": 22718,
+     "f": 1.0
+    },
+    {
+     "s": 41541,
+     "f": 1.0
+    },
+    {
+     "s": 63394,
+     "f": 1.0
+    },
+    {
+     "s": 63447,
+     "f": 1.0
+    },
+    {
+     "s": 63526,
+     "f": 1.0
+    },
+    {
+     "s": 63553,
+     "f": 1.0
+    },
+    {
+     "s": 63740,
+     "f": 1.0
+    },
+    {
+     "s": 63777,
+     "f": 1.0
+    },
+    {
+     "s": 63802,
+     "f": 1.0
+    },
+    {
+     "s": 63866,
+     "f": 1.0
+    },
+    {
+     "s": 63893,
+     "f": 1.0
+    },
+    {
+     "s": 63937,
+     "f": 1.0
+    },
+    {
+     "s": 64005,
+     "f": 1.0
+    },
+    {
+     "s": 64041,
+     "f": 1.0
+    },
+    {
+     "s": 64096,
+     "f": 1.0
+    },
+    {
+     "s": 64130,
+     "f": 1.0
+    },
+    {
+     "s": 64194,
+     "f": 1.0
+    },
+    {
+     "s": 64238,
+     "f": 1.0
+    },
+    {
+     "s": 64318,
+     "f": 1.0
+    },
+    {
+     "s": 64345,
+     "f": 1.0
+    },
+    {
+     "s": 64390,
+     "f": 1.0
+    },
+    {
+     "s": 64425,
+     "f": 1.0
+    },
+    {
+     "s": 64461,
+     "f": 1.0
+    },
+    {
+     "s": 64504,
+     "f": 1.0
+    },
+    {
+     "s": 64568,
+     "f": 1.0
+    },
+    {
+     "s": 64602,
+     "f": 1.0
+    },
+    {
+     "s": 64639,
+     "f": 1.0
+    },
+    {
+     "s": 64719,
+     "f": 1.0
+    },
+    {
+     "s": 64773,
+     "f": 1.0
+    },
+    {
+     "s": 64826,
+     "f": 1.0
+    },
+    {
+     "s": 64871,
+     "f": 1.0
+    },
+    {
+     "s": 64906,
+     "f": 1.0
+    },
+    {
+     "s": 64942,
+     "f": 1.0
+    },
+    {
+     "s": 64997,
+     "f": 1.0
+    },
+    {
+     "s": 65011,
+     "f": 1.0
+    },
+    {
+     "s": 65048,
+     "f": 1.0
+    },
+    {
+     "s": 65099,
+     "f": 1.0
+    },
+    {
+     "s": 65105,
+     "f": 1.0
+    },
+    {
+     "s": 65113,
+     "f": 1.0
+    },
+    {
+     "s": 65121,
+     "f": 1.0
+    },
+    {
+     "s": 65139,
+     "f": 1.0
+    },
+    {
+     "s": 65147,
+     "f": 1.0
+    },
+    {
+     "s": 65154,
+     "f": 1.0
+    },
+    {
+     "s": 83133,
+     "f": 1.0
+    },
+    {
+     "s": 83151,
+     "f": 1.0
+    },
+    {
+     "s": 83197,
+     "f": 1.0
+    },
+    {
+     "s": 83320,
+     "f": 1.0
+    },
+    {
+     "s": 83375,
+     "f": 1.0
+    },
+    {
+     "s": 83428,
+     "f": 1.0
+    },
+    {
+     "s": 83464,
+     "f": 1.0
+    },
+    {
+     "s": 83491,
+     "f": 1.0
+    },
+    {
+     "s": 83525,
+     "f": 1.0
+    },
+    {
+     "s": 83561,
+     "f": 1.0
+    },
+    {
+     "s": 83749,
+     "f": 1.0
+    },
+    {
+     "s": 83785,
+     "f": 1.0
+    },
+    {
+     "s": 83847,
+     "f": 1.0
+    },
+    {
+     "s": 83963,
+     "f": 1.0
+    },
+    {
+     "s": 83981,
+     "f": 1.0
+    },
+    {
+     "s": 84086,
+     "f": 1.0
+    },
+    {
+     "s": 84102,
+     "f": 1.0
+    },
+    {
+     "s": 84175,
+     "f": 1.0
+    },
+    {
+     "s": 84237,
+     "f": 1.0
+    },
+    {
+     "s": 84264,
+     "f": 1.0
+    },
+    {
+     "s": 84344,
+     "f": 1.0
+    },
+    {
+     "s": 84380,
+     "f": 1.0
+    },
+    {
+     "s": 84415,
+     "f": 1.0
+    },
+    {
+     "s": 84558,
+     "f": 1.0
+    },
+    {
+     "s": 84594,
+     "f": 1.0
+    },
+    {
+     "s": 84629,
+     "f": 1.0
+    },
+    {
+     "s": 84656,
+     "f": 1.0
+    },
+    {
+     "s": 84754,
+     "f": 1.0
+    },
+    {
+     "s": 84825,
+     "f": 1.0
+    },
+    {
+     "s": 84923,
+     "f": 1.0
+    },
+    {
+     "s": 85056,
+     "f": 1.0
+    },
+    {
+     "s": 85074,
+     "f": 1.0
+    },
+    {
+     "s": 85127,
+     "f": 1.0
+    },
+    {
+     "s": 85243,
+     "f": 1.0
+    },
+    {
+     "s": 85289,
+     "f": 1.0
+    },
+    {
+     "s": 85341,
+     "f": 1.0
+    },
+    {
+     "s": 85412,
+     "f": 1.0
+    },
+    {
+     "s": 85467,
+     "f": 1.0
+    },
+    {
+     "s": 85582,
+     "f": 1.0
+    },
+    {
+     "s": 85626,
+     "f": 1.0
+    },
+    {
+     "s": 85680,
+     "f": 1.0
+    },
+    {
+     "s": 85760,
+     "f": 1.0
+    },
+    {
+     "s": 85788,
+     "f": 1.0
+    },
+    {
+     "s": 85840,
+     "f": 1.0
+    },
+    {
+     "s": 85920,
+     "f": 1.0
+    },
+    {
+     "s": 85984,
+     "f": 1.0
+    },
+    {
+     "s": 86133,
+     "f": 1.0
+    },
+    {
+     "s": 86188,
+     "f": 1.0
+    },
+    {
+     "s": 86222,
+     "f": 1.0
+    },
+    {
+     "s": 86311,
+     "f": 1.0
+    },
+    {
+     "s": 86339,
+     "f": 1.0
+    },
+    {
+     "s": 86366,
+     "f": 1.0
+    },
+    {
+     "s": 86438,
+     "f": 1.0
+    },
+    {
+     "s": 86446,
+     "f": 1.0
+    },
+    {
+     "s": 86453,
+     "f": 1.0
+    },
+    {
+     "s": 86461,
+     "f": 1.0
+    },
+    {
+     "s": 86479,
+     "f": 1.0
+    },
+    {
+     "s": 86487,
+     "f": 1.0
+    },
+    {
+     "s": 86495,
+     "f": 1.0
+    },
+    {
+     "s": 86501,
+     "f": 1.0
+    },
+    {
+     "s": 86519,
+     "f": 1.0
+    },
+    {
+     "s": 114854,
+     "f": 1.0
+    },
+    {
+     "s": 114970,
+     "f": 1.0
+    },
+    {
+     "s": 115147,
+     "f": 1.0
+    },
+    {
+     "s": 116288,
+     "f": 1.0
+    },
+    {
+     "s": 116590,
+     "f": 1.0
+    },
+    {
+     "s": 116652,
+     "f": 1.0
+    },
+    {
+     "s": 116796,
+     "f": 1.0
+    },
+    {
+     "s": 116867,
+     "f": 1.0
+    },
+    {
+     "s": 116983,
+     "f": 1.0
+    },
+    {
+     "s": 117042,
+     "f": 1.0
+    },
+    {
+     "s": 117113,
+     "f": 1.0
+    },
+    {
+     "s": 117177,
+     "f": 1.0
+    },
+    {
+     "s": 117505,
+     "f": 1.0
+    },
+    {
+     "s": 118094,
+     "f": 1.0
+    },
+    {
+     "s": 118281,
+     "f": 1.0
+    },
+    {
+     "s": 118511,
+     "f": 1.0
+    },
+    {
+     "s": 118691,
+     "f": 1.0
+    },
+    {
+     "s": 118753,
+     "f": 1.0
+    },
+    {
+     "s": 119331,
+     "f": 1.0
+    },
+    {
+     "s": 120076,
+     "f": 1.0
+    },
+    {
+     "s": 120174,
+     "f": 1.0
+    },
+    {
+     "s": 120316,
+     "f": 1.0
+    },
+    {
+     "s": 120478,
+     "f": 1.0
+    },
+    {
+     "s": 120496,
+     "f": 1.0
+    },
+    {
+     "s": 120502,
+     "f": 1.0
+    },
+    {
+     "s": 120511,
+     "f": 1.0
+    },
+    {
+     "s": 121297,
+     "f": 1.0
+    },
+    {
+     "s": 121340,
+     "f": 1.0
+    },
+    {
+     "s": 122249,
+     "f": 1.0
+    },
+    {
+     "s": 178117,
+     "f": 1.0
+    }
+   ],
+   "populatie": 556136
+  },
+  {
+   "id": "carasovenilor",
+   "nume": "Carașovenii (croații din Caraș)",
+   "tip": "etnoculturala",
+   "certitudine": "publicata",
+   "descriere": "",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Carașoveni",
+     "url": "https://ro.wikipedia.org/wiki/Carașoveni"
+    }
+   ],
+   "uat": [
+    {
+     "s": 51804,
+     "f": 1.0
+    },
+    {
+     "s": 53167,
+     "f": 1.0
+    }
+   ],
+   "populatie": 4952
+  },
+  {
+   "id": "vaii_jiului",
+   "nume": "Valea Jiului",
+   "tip": "functionala",
+   "certitudine": "publicata",
+   "descriere": "Bazinul carbonifer: cele șase orașe din Valea Jiului.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Valea Jiului",
+     "url": "https://ro.wikipedia.org/wiki/Valea_Jiului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 86990,
+     "f": 1.0
+    },
+    {
+     "s": 87059,
+     "f": 1.0
+    },
+    {
+     "s": 87077,
+     "f": 1.0
+    },
+    {
+     "s": 87139,
+     "f": 1.0
+    },
+    {
+     "s": 87175,
+     "f": 1.0
+    },
+    {
+     "s": 87219,
+     "f": 1.0
+    }
+   ],
+   "populatie": 99153
+  },
+  {
+   "id": "wiki-tarasilvaniei",
+   "nume": "Țara Silvaniei",
+   "tip": "zona",
+   "certitudine": "reconstituita",
+   "descriere": "Listă reconstituită automat din articolul Wikipedia: UAT-urile pomenite în text. De verificat local.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Silvaniei",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Silvaniei"
+    }
+   ],
+   "uat": [
+    {
+     "s": 107190,
+     "f": 1.0
+    },
+    {
+     "s": 108222,
+     "f": 1.0
+    },
+    {
+     "s": 139740,
+     "f": 1.0
+    },
+    {
+     "s": 139884,
+     "f": 1.0
+    },
+    {
+     "s": 140627,
+     "f": 1.0
+    },
+    {
+     "s": 142239,
+     "f": 1.0
+    },
+    {
+     "s": 142337,
+     "f": 1.0
+    }
+   ],
+   "populatie": 36956
+  },
+  {
+   "id": "wiki-tarahangului",
+   "nume": "Țara Hangului",
+   "tip": "zona",
+   "certitudine": "reconstituita",
+   "descriere": "Listă reconstituită automat din articolul Wikipedia: UAT-urile pomenite în text. De verificat local.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Țara Hangului",
+     "url": "https://ro.wikipedia.org/wiki/Țara_Hangului"
+    }
+   ],
+   "uat": [
+    {
+     "s": 122025,
+     "f": 1.0
+    },
+    {
+     "s": 122864,
+     "f": 1.0
+    },
+    {
+     "s": 122953,
+     "f": 1.0
+    },
+    {
+     "s": 123790,
+     "f": 1.0
+    }
+   ],
+   "populatie": 11036
+  },
+  {
+   "id": "wiki-codriivlasiei",
+   "nume": "Codrii Vlăsiei",
+   "tip": "zona",
+   "certitudine": "reconstituita",
+   "descriere": "Listă reconstituită automat din articolul Wikipedia: UAT-urile pomenite în text. De verificat local.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Codrii Vlăsiei",
+     "url": "https://ro.wikipedia.org/wiki/Codrii_Vlăsiei"
+    }
+   ],
+   "uat": [
+    {
+     "s": 101001,
+     "f": 1.0
+    },
+    {
+     "s": 102106,
+     "f": 1.0
+    },
+    {
+     "s": 105160,
+     "f": 1.0
+    },
+    {
+     "s": 130785,
+     "f": 1.0
+    },
+    {
+     "s": 130847,
+     "f": 1.0
+    },
+    {
+     "s": 131443,
+     "f": 1.0
+    },
+    {
+     "s": 131577,
+     "f": 1.0
+    },
+    {
+     "s": 179463,
+     "f": 1.0
+    }
+   ],
+   "populatie": 59433
+  },
+  {
+   "id": "wiki-dobrogeadenord",
+   "nume": "Dobrogea de Nord",
+   "tip": "zona",
+   "certitudine": "reconstituita",
+   "descriere": "Listă reconstituită automat din articolul Wikipedia: UAT-urile pomenite în text. De verificat local.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Dobrogea de Nord",
+     "url": "https://ro.wikipedia.org/wiki/Dobrogea_de_Nord"
+    }
+   ],
+   "uat": [
+    {
+     "s": 60455,
+     "f": 1.0
+    },
+    {
+     "s": 60482,
+     "f": 1.0
+    },
+    {
+     "s": 60507,
+     "f": 1.0
+    },
+    {
+     "s": 60534,
+     "f": 1.0
+    },
+    {
+     "s": 60632,
+     "f": 1.0
+    },
+    {
+     "s": 60687,
+     "f": 1.0
+    },
+    {
+     "s": 60776,
+     "f": 1.0
+    },
+    {
+     "s": 60801,
+     "f": 1.0
+    },
+    {
+     "s": 60847,
+     "f": 1.0
+    },
+    {
+     "s": 62397,
+     "f": 1.0
+    },
+    {
+     "s": 63152,
+     "f": 1.0
+    },
+    {
+     "s": 159650,
+     "f": 1.0
+    },
+    {
+     "s": 159687,
+     "f": 1.0
+    },
+    {
+     "s": 159730,
+     "f": 1.0
+    },
+    {
+     "s": 159767,
+     "f": 1.0
+    },
+    {
+     "s": 159963,
+     "f": 1.0
+    },
+    {
+     "s": 160127,
+     "f": 1.0
+    }
+   ],
+   "populatie": 206773
+  },
+  {
+   "id": "wiki-deltadunarii",
+   "nume": "Delta Dunării",
+   "tip": "zona",
+   "certitudine": "reconstituita",
+   "descriere": "Listă reconstituită automat din articolul Wikipedia: UAT-urile pomenite în text. De verificat local.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Delta Dunării",
+     "url": "https://ro.wikipedia.org/wiki/Delta_Dunării"
+    }
+   ],
+   "uat": [
+    {
+     "s": 60632,
+     "f": 1.0
+    },
+    {
+     "s": 60721,
+     "f": 1.0
+    },
+    {
+     "s": 62020,
+     "f": 1.0
+    },
+    {
+     "s": 128374,
+     "f": 1.0
+    },
+    {
+     "s": 129898,
+     "f": 1.0
+    },
+    {
+     "s": 159650,
+     "f": 1.0
+    },
+    {
+     "s": 159730,
+     "f": 1.0
+    },
+    {
+     "s": 159767,
+     "f": 1.0
+    },
+    {
+     "s": 160172,
+     "f": 1.0
+    },
+    {
+     "s": 160261,
+     "f": 1.0
+    },
+    {
+     "s": 160458,
+     "f": 1.0
+    },
+    {
+     "s": 160644,
+     "f": 1.0
+    },
+    {
+     "s": 160724,
+     "f": 1.0
+    },
+    {
+     "s": 160911,
+     "f": 1.0
+    },
+    {
+     "s": 161133,
+     "f": 1.0
+    },
+    {
+     "s": 161231,
+     "f": 1.0
+    },
+    {
+     "s": 161552,
+     "f": 1.0
+    }
+   ],
+   "populatie": 58052
+  },
+  {
+   "id": "wiki-horezu",
+   "nume": "Horezu",
+   "tip": "zona",
+   "certitudine": "reconstituita",
+   "descriere": "Listă reconstituită automat din articolul Wikipedia: UAT-urile pomenite în text. De verificat local.",
+   "surse": [
+    {
+     "titlu": "Wikipedia — Horezu",
+     "url": "https://ro.wikipedia.org/wiki/Horezu"
+    }
+   ],
+   "uat": [
+    {
+     "s": 168041,
+     "f": 1.0
+    },
+    {
+     "s": 168130,
+     "f": 1.0
+    },
+    {
+     "s": 172340,
+     "f": 1.0
+    }
+   ],
+   "populatie": 12248
+  }
+ ]
+}

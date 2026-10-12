@@ -1,0 +1,114 @@
+{
+    "versiune": 1,
+    "actualizat": "2026-09-21",
+    "descriere": "Catalogul atributelor unei localități componente (sat, localitate componentă a unui oraș/municipiu) folosite pentru reorganizarea administrativ-teritorială. Unitatea de analiză este localitatea; unitatea care se comasează este UAT-ul (sau, prin transfer, satul).",
+    "roluri": {
+        "prag": "Condiție de viabilitate a unității noi (ex. populația minimă).",
+        "accesibilitate": "Limitează cât de departe poate fi reședința de fiecare localitate.",
+        "centralitate": "Arată cât de potrivită e localitatea ca reședință a unității noi.",
+        "afinitate": "Arată spre ce centru gravitează localitatea (unde merg oamenii).",
+        "coeziune": "Motive de a ține localități împreună sau separat (identitate, minorități, istorie).",
+        "diagnostic": "Descrie situația și efectele reorganizării; nu decide singur."
+    },
+    "stari": {
+        "disponibil": "În datele proiectului, pentru toată țara.",
+        "exemple": "În datele proiectului, doar pentru județele-exemplu (Gorj, Caraș-Severin).",
+        "partial": "Există o sursă, dar incompletă (ex. OpenStreetMap) — de înlocuit cu sursa oficială.",
+        "de colectat": "Sursa oficială e identificată; datele nu sunt încă preluate."
+    },
+    "categorii": [
+        {
+            "cod": "A",
+            "nume": "Identificare și statut",
+            "atribute": [
+                { "cod": "siruta", "nume": "Cod SIRUTA", "descriere": "Identificatorul unic al localității; leagă toate celelalte surse.", "unitate": "cod", "nivel": "localitate", "rol": ["diagnostic"], "sursa": "INS — SIRUTA 2025 (data.gov.ro)", "stare": "disponibil" },
+                { "cod": "uat_actual", "nume": "UAT-ul actual", "descriere": "Comuna / orașul / municipiul din care face parte (câmpul SIRSUP).", "unitate": "cod SIRUTA", "nivel": "localitate", "rol": ["diagnostic"], "sursa": "INS — SIRUTA 2025", "stare": "disponibil" },
+                { "cod": "tip", "nume": "Tip de localitate", "descriere": "Reședință de comună / oraș / municipiu, localitate componentă sau sat aparținător.", "unitate": "clasă", "nivel": "localitate", "rol": ["centralitate"], "sursa": "INS — SIRUTA 2025 (câmpul TIP)", "stare": "disponibil" },
+                { "cod": "rang", "nume": "Rang în rețeaua de localități", "descriere": "Rangurile 0–V din Legea 351/2001; satele-reședință sunt rang IV, celelalte sate rang V.", "unitate": "rang", "nivel": "localitate", "rol": ["centralitate"], "sursa": "Legea 351/2001, derivat din tip", "stare": "disponibil" },
+                { "cod": "coordonate", "nume": "Coordonate", "descriere": "Punctul localității, folosit pentru distanțe și timpi de deplasare.", "unitate": "lat, lng", "nivel": "localitate", "rol": ["accesibilitate"], "sursa": "Wikidata (P625), pe cod SIRUTA; alternativ ANCPI", "stare": "disponibil" },
+                { "cod": "istoric_administrativ", "nume": "Istoric administrativ", "descriere": "Comuna din care s-a desprins, anul înființării, fostele apartenențe (1950, 1968, 2002–2008).", "unitate": "text", "nivel": "localitate", "rol": ["coeziune", "diagnostic"], "sursa": "Legile de înființare; SIRUTA istoric (INS)", "stare": "de colectat" }
+            ]
+        },
+        {
+            "cod": "B",
+            "nume": "Demografie",
+            "atribute": [
+                { "cod": "pop_2021", "nume": "Populație rezidentă 2021", "descriere": "Principalul criteriu de prag și ponderea în toți indicatorii de accesibilitate.", "unitate": "locuitori", "nivel": "localitate", "rol": ["prag", "centralitate"], "sursa": "INS — RPL 2021, tabelul 1.22", "stare": "disponibil" },
+                { "cod": "pop_2011", "nume": "Populație 2011 și evoluție", "descriere": "Dinamica 2011–2021: localitățile în declin rapid au nevoie de alt tip de servicii (mobile, comasate).", "unitate": "locuitori, %", "nivel": "localitate", "rol": ["diagnostic"], "sursa": "INS — RPL 2011 pe localități (la UAT: populația după domiciliu 2011–2024, Eurostat LAU)", "stare": "partial" },
+                { "cod": "structura_varsta", "nume": "Structura pe vârste", "descriere": "Ponderea copiilor (0–14) și a vârstnicilor (65+): cerere de școli vs. servicii sociale și medicale.", "unitate": "%", "nivel": "UAT (pe sat: la cerere, INS)", "rol": ["diagnostic"], "sursa": "INS — RPL 2021, tabelul 1.3.2", "stare": "disponibil" },
+                { "cod": "locuinte_nelocuite", "nume": "Locuințe nelocuite", "descriere": "Ponderea locuințelor goale: semnal de depopulare și de sat în risc de dispariție.", "unitate": "%", "nivel": "UAT", "rol": ["diagnostic"], "sursa": "INS — RPL 2021, locuințe", "stare": "de colectat" }
+            ]
+        },
+        {
+            "cod": "C",
+            "nume": "Geografie și accesibilitate",
+            "atribute": [
+                { "cod": "timp_resedinta_actuala", "nume": "Timp până la reședința actuală", "descriere": "Timpul cu mașina până la primăria de acum — referința „înainte”.", "unitate": "minute", "nivel": "localitate", "rol": ["accesibilitate", "diagnostic"], "sursa": "OSRM pe rețeaua de drumuri OpenStreetMap", "stare": "exemple" },
+                { "cod": "timp_resedinte", "nume": "Timp până la fiecare reședință candidată", "descriere": "Matricea sat × reședințe din județ; stă la baza alipirilor și a alegerii reședinței.", "unitate": "minute, km", "nivel": "localitate", "rol": ["accesibilitate", "afinitate", "centralitate"], "sursa": "OSRM pe rețeaua de drumuri OpenStreetMap", "stare": "exemple" },
+                { "cod": "altitudine", "nume": "Altitudine", "descriere": "Distinge câmpia, dealul și muntele; în zona montană pragurile trebuie adaptate.", "unitate": "m", "nivel": "localitate", "rol": ["diagnostic"], "sursa": "SRTM 90 m (OpenTopoData)", "stare": "exemple" },
+                { "cod": "zona_montana", "nume": "Zonă montană", "descriere": "Apartenența la zona montană delimitată oficial (Legea muntelui nr. 197/2018).", "unitate": "da/nu", "nivel": "UAT", "rol": ["accesibilitate", "diagnostic"], "sursa": "MADR — lista UAT-urilor din zona montană", "stare": "de colectat" },
+                { "cod": "izolare", "nume": "Izolare", "descriere": "UAT la peste 20 km în linie dreaptă de un drum național, european sau autostradă.", "unitate": "da/nu", "nivel": "UAT", "rol": ["accesibilitate", "diagnostic"], "sursa": "INS — lista UAT-urilor izolate (RPL 2021)", "stare": "disponibil" },
+                { "cod": "dispersie", "nume": "Indice de dispersie (Demangeon)", "descriere": "(N − N′)·n / N: populația din afara reședinței ori numărul de sate. Peste 5 = UAT dispersat.", "unitate": "indice", "nivel": "UAT", "rol": ["diagnostic"], "sursa": "Calculat din RPL 2021; lista INS a UAT-urilor dispersate", "stare": "disponibil" },
+                { "cod": "acces_rutier", "nume": "Calitatea accesului rutier", "descriere": "Tipul drumului spre reședință (DN/DJ/DC, asfaltat sau nu) și închiderile de iarnă.", "unitate": "clasă", "nivel": "localitate", "rol": ["accesibilitate"], "sursa": "OpenStreetMap (parțial); CNAIR / consiliile județene", "stare": "partial" },
+                { "cod": "transport_public", "nume": "Transport public", "descriere": "Numărul de curse pe zi spre reședință și spre orașul cel mai apropiat.", "unitate": "curse/zi", "nivel": "localitate", "rol": ["accesibilitate", "afinitate"], "sursa": "Programele județene de transport; ARR", "stare": "de colectat" }
+            ]
+        },
+        {
+            "cod": "D",
+            "nume": "Dotări și servicii (Legea 351/2001, anexa IV)",
+            "atribute": [
+                { "cod": "scoli", "nume": "Unități de învățământ", "descriere": "Grădinițe, școli primare, gimnaziale, licee (inclusiv structuri arondate). Nivelul maxim intră în scorul de centralitate.", "unitate": "număr pe nivel", "nivel": "localitate", "rol": ["centralitate", "coeziune"], "sursa": "Ministerul Educației — rețeaua școlară 2024–2025 (data.gov.ro), pe cod SIRUTA", "stare": "disponibil" },
+                { "cod": "medic", "nume": "Medic de familie / dispensar", "descriere": "Dotare minimă obligatorie pentru reședința de comună (anexa IV).", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate"], "sursa": "CNAS / DSP; OpenStreetMap (parțial)", "stare": "partial" },
+                { "cod": "farmacie", "nume": "Farmacie / punct farmaceutic", "descriere": "Dotare minimă obligatorie pentru reședința de comună.", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate"], "sursa": "ANMDMR; OpenStreetMap (parțial)", "stare": "partial" },
+                { "cod": "posta", "nume": "Oficiu poștal", "descriere": "Dotare minimă obligatorie pentru reședința de comună.", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate"], "sursa": "Poșta Română; OpenStreetMap (parțial)", "stare": "partial" },
+                { "cod": "politie", "nume": "Post de poliție", "descriere": "Dotare minimă obligatorie pentru reședința de comună.", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate"], "sursa": "IGPR; OpenStreetMap (parțial)", "stare": "partial" },
+                { "cod": "cultura", "nume": "Cămin cultural / bibliotecă", "descriere": "Loc de întâlnire al comunității; candidat pentru biroul local după comasare.", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate", "coeziune"], "sursa": "OpenStreetMap (parțial); consiliile locale", "stare": "partial" },
+                { "cod": "biserica", "nume": "Parohie / lăcaș de cult, cimitir", "descriere": "Marker de identitate: satele cu parohie comună au legături vechi.", "unitate": "număr", "nivel": "localitate", "rol": ["coeziune"], "sursa": "OpenStreetMap (parțial); cultele", "stare": "partial" },
+                { "cod": "magazin", "nume": "Magazin / servicii comerciale", "descriere": "Dotare minimă și pentru satele de peste 200 de locuitori (anexa IV).", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate"], "sursa": "OpenStreetMap (parțial); ONRC", "stare": "partial" },
+                { "cod": "gara_autogara", "nume": "Gară / stație de transport", "descriere": "Nod de transport: ridică centralitatea localității.", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate", "afinitate"], "sursa": "OpenStreetMap; CFR", "stare": "partial" },
+                { "cod": "retele", "nume": "Apă, canalizare, gaz", "descriere": "Echiparea tehnico-edilitară (anexele II și IV).", "unitate": "da/nu, km", "nivel": "localitate / UAT", "rol": ["centralitate", "diagnostic"], "sursa": "INS TEMPO (pe UAT); operatorii regionali; ANRE", "stare": "de colectat" },
+                { "cod": "internet", "nume": "Internet în bandă largă", "descriere": "Condiție pentru servicii administrative la distanță după comasare.", "unitate": "da/nu", "nivel": "localitate", "rol": ["accesibilitate", "diagnostic"], "sursa": "ANCOM — harta acoperirii", "stare": "de colectat" }
+            ]
+        },
+        {
+            "cod": "E",
+            "nume": "Economie și relații funcționale",
+            "atribute": [
+                { "cod": "navetism", "nume": "Fluxuri de navetă", "descriere": "Unde lucrează și unde merg la școală locuitorii — cel mai bun indicator al afinității; până la preluare, timpul de deplasare îl aproximează.", "unitate": "persoane, destinație", "nivel": "localitate / UAT", "rol": ["afinitate"], "sursa": "INS — RPL 2021 (locul de muncă); date de telefonie mobilă (studii)", "stare": "de colectat" },
+                { "cod": "locuri_de_munca", "nume": "Locuri de muncă și firme", "descriere": "Angajatori pe localitate: arată polii economici locali.", "unitate": "număr", "nivel": "localitate", "rol": ["centralitate", "afinitate"], "sursa": "ONRC; ITM / REVISAL (agregat)", "stare": "de colectat" },
+                { "cod": "ocupare_neagricola", "nume": "Ocupare în activități neagricole", "descriere": "Indicator legal pentru statutul urban (85% municipiu, 75% oraș).", "unitate": "%", "nivel": "UAT", "rol": ["centralitate", "diagnostic"], "sursa": "INS — RPL 2021", "stare": "de colectat" },
+                { "cod": "asocieri", "nume": "Asocieri existente", "descriere": "Zona metropolitană, zona urbană funcțională, ADI (apă, deșeuri), GAL: cooperări care arată grupări deja funcționale.", "unitate": "listă", "nivel": "UAT", "rol": ["afinitate", "coeziune"], "sursa": "MDLPA; ADI-uri; rețeaua GAL (MADR)", "stare": "de colectat" }
+            ]
+        },
+        {
+            "cod": "F",
+            "nume": "Capacitate fiscală și administrativă",
+            "atribute": [
+                { "cod": "venituri_proprii", "nume": "Venituri proprii pe locuitor", "descriere": "Impozite și taxe locale, cote din impozitul pe venit; baza autonomiei financiare.", "unitate": "lei/locuitor", "nivel": "UAT", "rol": ["prag", "diagnostic"], "sursa": "Ministerul Finanțelor — execuția bugetară a UAT-urilor; ANAF", "stare": "de colectat" },
+                { "cod": "autofinantare", "nume": "Grad de autofinanțare", "descriere": "Cât din cheltuielile de personal și funcționare acoperă veniturile proprii.", "unitate": "%", "nivel": "UAT", "rol": ["prag", "diagnostic"], "sursa": "Ministerul Finanțelor — execuția bugetară (COFOG)", "stare": "de colectat" },
+                { "cod": "cost_administrativ", "nume": "Cheltuieli administrative pe locuitor", "descriere": "Costul aparatului propriu; baza estimării economiilor după comasare.", "unitate": "lei/locuitor", "nivel": "UAT", "rol": ["diagnostic"], "sursa": "Ministerul Finanțelor — execuția bugetară (COFOG)", "stare": "de colectat" },
+                { "cod": "personal", "nume": "Personalul primăriei", "descriere": "Posturi ocupate și specialiști (urbanism, achiziții, fonduri europene).", "unitate": "posturi", "nivel": "UAT", "rol": ["diagnostic"], "sursa": "ANFP; organigramele aprobate", "stare": "de colectat" }
+            ]
+        },
+        {
+            "cod": "G",
+            "nume": "Identitate și coeziune",
+            "atribute": [
+                { "cod": "minoritati", "nume": "Minorități naționale", "descriere": "Peste 20% dintr-o minoritate într-un UAT dă dreptul la folosirea limbii materne în administrație; comasarea nu trebuie să coboare ponderea sub prag.", "unitate": "%", "nivel": "UAT (pe sat: la cerere, INS)", "rol": ["coeziune", "prag"], "sursa": "INS — RPL 2021, tabelul 2.2.2; Codul administrativ (OUG 57/2019), art. 94", "stare": "disponibil" },
+                { "cod": "regiune_istorica", "nume": "Regiune istorică / județ interbelic", "descriere": "Provincia istorică (după județul din 1930); comasările peste o limită istorică se semnalează.", "unitate": "clasă", "nivel": "UAT", "rol": ["coeziune"], "sursa": "geo-spatial.org — județele interbelice (1930)", "stare": "disponibil" },
+                { "cod": "zona_etnografica", "nume": "Zonă etnografică / „țară”", "descriere": "Țara Hațegului, Clisura Dunării, Țara Almăjului etc.: comunități cu identitate comună.", "unitate": "clasă", "nivel": "localitate", "rol": ["coeziune"], "sursa": "Literatura de specialitate; muzeele județene", "stare": "de colectat" },
+                { "cod": "preferinta_locala", "nume": "Preferința locuitorilor", "descriere": "Rezultatul consultării / referendumului local — obligatoriu la mutarea satelor (Legea 351/2001, art. 5).", "unitate": "rezultat", "nivel": "localitate", "rol": ["coeziune"], "sursa": "Consultări publice; referendum local (Legea 3/2000)", "stare": "de colectat" }
+            ]
+        },
+        {
+            "cod": "H",
+            "nume": "Indicatori calculați (rezultatul metodei)",
+            "atribute": [
+                { "cod": "scor_centralitate", "nume": "Scor de centralitate", "descriere": "Populația accesibilă în 15 min (mii) + nivelul școlii (liceu 3, gimnaziu 2, primar 1) + servicii OSM (max. 2) + 3 pentru oraș.", "unitate": "puncte", "nivel": "localitate-reședință", "rol": ["centralitate"], "sursa": "Calculat (js/adp-reorganizare.js)", "stare": "exemple" },
+                { "cod": "timp_resedinta_noua", "nume": "Timp până la noua reședință", "descriere": "Și diferența față de acum: câștigul sau costul reorganizării pentru fiecare sat.", "unitate": "minute", "nivel": "localitate", "rol": ["diagnostic"], "sursa": "Calculat", "stare": "exemple" },
+                { "cod": "candidat_transfer", "nume": "Candidat la transfer", "descriere": "Satul ajunge la reședința unei unități vecine cu cel puțin 5 minute (sau 25%) mai repede.", "unitate": "da/nu", "nivel": "localitate", "rol": ["afinitate", "diagnostic"], "sursa": "Calculat", "stare": "exemple" },
+                { "cod": "birou_local", "nume": "Birou local necesar", "descriere": "Fosta reședință aflată la peste 15 min de noua reședință păstrează un punct de lucru (ghișeu, stare civilă).", "unitate": "da/nu", "nivel": "localitate-reședință", "rol": ["diagnostic"], "sursa": "Calculat", "stare": "exemple" }
+            ]
+        }
+    ]
+}

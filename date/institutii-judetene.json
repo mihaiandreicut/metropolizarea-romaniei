@@ -1,0 +1,518 @@
+{
+ "versiune": 1,
+ "generat": "2026-10-02",
+ "nota": "Instituțiile care au azi câte o structură în fiecare județ și ce devin în model. Listă întocmită din legile de organizare ale fiecărei instituții; sediile structurilor regionale existente vin din date/regiuni-institutii.json. Coloana „regionalAzi” spune unde statul a făcut deja pasul.",
+ "grupuri": [
+  {
+   "cod": "administratie",
+   "nume": "Administrație, legalitate și fonduri",
+   "ancora": "adr",
+   "explicatie": "stă unde e azi agenția de dezvoltare regională"
+  },
+  {
+   "cod": "finante",
+   "nume": "Finanțe, registre și consumatori",
+   "ancora": "dgrfp",
+   "explicatie": "stă unde e azi direcția regională a finanțelor"
+  },
+  {
+   "cod": "sanatate",
+   "nume": "Sănătate și protecție socială",
+   "ancora": "medical",
+   "explicatie": "stă în centrul universitar medical al regiunii, unde există"
+  },
+  {
+   "cod": "ordine",
+   "nume": "Ordine publică și situații de urgență",
+   "ancora": null,
+   "explicatie": "merge în reședința cea mai puțin încărcată"
+  },
+  {
+   "cod": "munca-educatie",
+   "nume": "Muncă, educație și cultură",
+   "ancora": null,
+   "explicatie": "merge în reședința cea mai puțin încărcată"
+  },
+  {
+   "cod": "mediu-agricultura",
+   "nume": "Mediu, agricultură și siguranța alimentelor",
+   "ancora": null,
+   "explicatie": "merge în reședința cea mai puțin încărcată"
+  },
+  {
+   "cod": "infrastructura",
+   "nume": "Drumuri, transport și construcții",
+   "ancora": null,
+   "explicatie": "merge în reședința cea mai puțin încărcată"
+  }
+ ],
+ "centreMedicale": [
+  "București",
+  "Cluj-Napoca",
+  "Iași",
+  "Timișoara",
+  "Târgu Mureș",
+  "Craiova"
+ ],
+ "institutii": [
+  {
+   "nume": "Instituția prefectului",
+   "tutela": "Ministerul Afacerilor Interne",
+   "grup": "administratie",
+   "face": "Controlul legalității actelor locale; conduce serviciile deconcentrate",
+   "regionalAzi": null,
+   "devine": "Serviciu juridic regional: actele se verifică automat, iar câțiva juriști analizează doar anomaliile",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Consiliul județean — aparatul propriu",
+   "tutela": "autoritate aleasă",
+   "grup": "administratie",
+   "face": "Bugetul județului, drumurile județene, instituțiile subordonate",
+   "regionalAzi": null,
+   "devine": "Devine consiliu regional, ales, cu locuri pe județe după populație; drumurile și serviciile de zonă trec la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Direcția județeană de evidență a persoanelor",
+   "tutela": "consiliul județean",
+   "grup": "administratie",
+   "face": "Coordonează serviciile locale de evidență a persoanelor și starea civilă",
+   "regionalAzi": null,
+   "devine": "Registru național; cartea de identitate se face la ghișeul districtului",
+   "destinatie": "district"
+  },
+  {
+   "nume": "Serviciul de pașapoarte",
+   "tutela": "prefect (Ministerul Afacerilor Interne)",
+   "grup": "administratie",
+   "face": "Pașapoarte",
+   "regionalAzi": null,
+   "devine": "Ghișeul de documente al districtului",
+   "destinatie": "district"
+  },
+  {
+   "nume": "Serviciul de permise și înmatriculări",
+   "tutela": "prefect (Ministerul Afacerilor Interne)",
+   "grup": "administratie",
+   "face": "Permise de conducere, înmatriculări, numere",
+   "regionalAzi": null,
+   "devine": "Ghișeul de documente al districtului",
+   "destinatie": "district"
+  },
+  {
+   "nume": "Serviciul județean al Arhivelor Naționale",
+   "tutela": "Ministerul Afacerilor Interne",
+   "grup": "administratie",
+   "face": "Păstrarea și eliberarea documentelor de arhivă",
+   "regionalAzi": null,
+   "devine": "Depozit regional, cu acces digital",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Direcția județeană de statistică",
+   "tutela": "Institutul Național de Statistică",
+   "grup": "administratie",
+   "face": "Culegerea datelor statistice",
+   "regionalAzi": "direcții regionale de statistică",
+   "devine": "Rămâne direcția regională; indicatorii se publică pe district",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Tribunalul și parchetul de pe lângă el",
+   "tutela": "sistemul judiciar",
+   "grup": "administratie",
+   "face": "Instanța județului, peste judecătorii",
+   "regionalAzi": "curțile de apel sunt deja regionale",
+   "devine": "Rămân: harta judiciară nu se schimbă; pe ea se sprijină districtele",
+   "destinatie": "rămâne"
+  },
+  {
+   "nume": "Biroul județean al Autorității Electorale Permanente",
+   "tutela": "Autoritatea Electorală Permanentă",
+   "grup": "administratie",
+   "face": "Registrul electoral, sprijin la alegeri",
+   "regionalAzi": "filiale regionale",
+   "devine": "Rămâne filiala regională",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Administrația județeană a finanțelor publice",
+   "tutela": "ANAF",
+   "grup": "finante",
+   "face": "Impozite și taxe de stat, trezorerie",
+   "regionalAzi": "8 direcții generale regionale",
+   "devine": "Rămâne direcția regională; punct fiscal unic în district, cu taxele locale",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Oficiul registrului comerțului",
+   "tutela": "Ministerul Justiției",
+   "grup": "finante",
+   "face": "Înregistrarea firmelor",
+   "regionalAzi": null,
+   "devine": "Oficiu regional și procedură online; depunere asistată la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Oficiul de cadastru și publicitate imobiliară",
+   "tutela": "ANCPI",
+   "grup": "finante",
+   "face": "Cadastru și carte funciară",
+   "regionalAzi": "birourile de carte funciară sunt deja pe circumscripții de judecătorie",
+   "devine": "Oficiu regional; biroul de carte funciară rămâne la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Comisariatul județean pentru protecția consumatorilor",
+   "tutela": "ANPC",
+   "grup": "finante",
+   "face": "Controale și reclamații",
+   "regionalAzi": "comisariate regionale",
+   "devine": "Rămâne comisariatul regional",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Camera de conturi județeană",
+   "tutela": "Curtea de Conturi",
+   "grup": "finante",
+   "face": "Auditul banilor publici ai județului și ai primăriilor",
+   "regionalAzi": null,
+   "devine": "Cameră regională; auditorii lucrează pe teren, fără sediu în fiecare județ",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Direcția de sănătate publică",
+   "tutela": "Ministerul Sănătății",
+   "grup": "sanatate",
+   "face": "Inspecție sanitară, programe de sănătate, avize",
+   "regionalAzi": null,
+   "devine": "Direcție regională; inspecția și programele se fac pe district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Casa județeană de asigurări de sănătate",
+   "tutela": "CNAS",
+   "grup": "sanatate",
+   "face": "Contracte cu furnizorii, decontări, carduri",
+   "regionalAzi": null,
+   "devine": "Casă regională; ghișeu la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Serviciul județean de ambulanță",
+   "tutela": "Ministerul Sănătății",
+   "grup": "sanatate",
+   "face": "Asistență medicală de urgență",
+   "regionalAzi": null,
+   "devine": "Dispecerat regional; stațiile rămân în districte",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Spitalul județean de urgență",
+   "tutela": "consiliul județean",
+   "grup": "sanatate",
+   "face": "Spitalul de referință al județului",
+   "regionalAzi": null,
+   "devine": "Intră în rețeaua regională de spitale",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Casa județeană de pensii",
+   "tutela": "Casa Națională de Pensii Publice",
+   "grup": "sanatate",
+   "face": "Dosare și plăți de pensii",
+   "regionalAzi": null,
+   "devine": "Casă regională; ghișeu la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Agenția județeană pentru plăți și inspecție socială",
+   "tutela": "ANPIS",
+   "grup": "sanatate",
+   "face": "Alocații, indemnizații, ajutoare, inspecție socială",
+   "regionalAzi": null,
+   "devine": "Agenție regională; ghișeu la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Direcția generală de asistență socială și protecția copilului",
+   "tutela": "consiliul județean",
+   "grup": "sanatate",
+   "face": "Protecția copilului, persoane cu dizabilități, centre rezidențiale",
+   "regionalAzi": null,
+   "devine": "Serviciile specializate la regiune, cele de zi la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Serviciul județean de medicină legală",
+   "tutela": "Ministerul Sănătății",
+   "grup": "sanatate",
+   "face": "Expertize și constatări medico-legale",
+   "regionalAzi": "institute de medicină legală în centrele universitare",
+   "devine": "Institut regional; puncte de lucru pe lângă spitalele de district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Centrul de transfuzie sanguină",
+   "tutela": "Ministerul Sănătății",
+   "grup": "sanatate",
+   "face": "Recoltarea și distribuirea sângelui",
+   "regionalAzi": null,
+   "devine": "Centru regional; puncte de recoltare în districte",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Inspectoratul de poliție județean",
+   "tutela": "Ministerul Afacerilor Interne",
+   "grup": "ordine",
+   "face": "Ordine publică, cercetare penală, circulație",
+   "regionalAzi": null,
+   "devine": "Inspectorat regional; poliția de district, pe circumscripția judecătoriei și a parchetului",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Inspectoratul de jandarmi județean",
+   "tutela": "Ministerul Afacerilor Interne",
+   "grup": "ordine",
+   "face": "Ordine publică la adunări, pază",
+   "regionalAzi": null,
+   "devine": "Inspectorat regional",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Inspectoratul pentru situații de urgență",
+   "tutela": "Ministerul Afacerilor Interne",
+   "grup": "ordine",
+   "face": "Pompieri, descarcerare, protecție civilă",
+   "regionalAzi": null,
+   "devine": "Comandă regională; detașamentele rămân în districte",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Serviciul de probațiune",
+   "tutela": "Ministerul Justiției",
+   "grup": "ordine",
+   "face": "Supravegherea persoanelor condamnate fără închisoare",
+   "regionalAzi": null,
+   "devine": "Direcție regională; consilierii lucrează pe districte",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Agenția județeană pentru ocuparea forței de muncă",
+   "tutela": "ANOFM",
+   "grup": "munca-educatie",
+   "face": "Șomaj, mediere, formare",
+   "regionalAzi": null,
+   "devine": "Agenție regională; birou de ocupare la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Inspectoratul teritorial de muncă",
+   "tutela": "Inspecția Muncii",
+   "grup": "munca-educatie",
+   "face": "Controlul relațiilor de muncă și al securității muncii",
+   "regionalAzi": null,
+   "devine": "Inspectorat regional",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Inspectoratul școlar județean",
+   "tutela": "Ministerul Educației",
+   "grup": "munca-educatie",
+   "face": "Rețeaua școlară, personalul didactic, inspecția",
+   "regionalAzi": null,
+   "devine": "Inspectorat regional; rețeaua școlară se planifică pe district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Direcția județeană pentru cultură",
+   "tutela": "Ministerul Culturii",
+   "grup": "munca-educatie",
+   "face": "Monumente istorice, avize",
+   "regionalAzi": null,
+   "devine": "Direcție regională",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Direcția județeană de sport",
+   "tutela": "Agenția Națională pentru Sport",
+   "grup": "munca-educatie",
+   "face": "Baze sportive, cluburi, competiții",
+   "regionalAzi": null,
+   "devine": "Direcție regională; bazele sportive trec la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Biblioteca, muzeul și centrul de cultură ale județului",
+   "tutela": "consiliul județean",
+   "grup": "munca-educatie",
+   "face": "Instituțiile de cultură ale județului",
+   "regionalAzi": null,
+   "devine": "Rețea regională, cu sediul în orașul în care sunt",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Casa corpului didactic",
+   "tutela": "Ministerul Educației",
+   "grup": "munca-educatie",
+   "face": "Formarea profesorilor",
+   "regionalAzi": null,
+   "devine": "Centru regional de formare; cursurile se țin în districte și online",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Centrul județean de resurse și asistență educațională",
+   "tutela": "consiliul județean și inspectoratul",
+   "grup": "munca-educatie",
+   "face": "Consilieri școlari, logopezi, orientare",
+   "regionalAzi": null,
+   "devine": "Coordonare regională; consilierii și logopezii țin de district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Palatul copiilor și cluburile școlare",
+   "tutela": "Ministerul Educației",
+   "grup": "munca-educatie",
+   "face": "Activități în afara școlii",
+   "regionalAzi": null,
+   "devine": "Trec la districtul în care sunt",
+   "destinatie": "district"
+  },
+  {
+   "nume": "Agenția pentru protecția mediului",
+   "tutela": "ANPM",
+   "grup": "mediu-agricultura",
+   "face": "Avize și autorizații de mediu, monitorizare",
+   "regionalAzi": "au mai existat agenții regionale",
+   "devine": "Agenție regională",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Comisariatul județean al Gărzii de Mediu",
+   "tutela": "Garda Națională de Mediu",
+   "grup": "mediu-agricultura",
+   "face": "Control de mediu",
+   "regionalAzi": null,
+   "devine": "Comisariat regional",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Direcția pentru agricultură județeană",
+   "tutela": "Ministerul Agriculturii",
+   "grup": "mediu-agricultura",
+   "face": "Politici agricole, consultanță, statistică agricolă",
+   "regionalAzi": null,
+   "devine": "Direcție regională; consultanța agricolă, la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Centrul județean al Agenției de Plăți și Intervenție pentru Agricultură",
+   "tutela": "APIA",
+   "grup": "mediu-agricultura",
+   "face": "Subvențiile pe suprafață și pe animal",
+   "regionalAzi": null,
+   "devine": "Centru regional pentru plăți; centrele locale rămân la district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Oficiul județean pentru finanțarea investițiilor rurale",
+   "tutela": "AFIR",
+   "grup": "mediu-agricultura",
+   "face": "Proiectele de dezvoltare rurală și LEADER",
+   "regionalAzi": "8 centre regionale",
+   "devine": "Rămâne centrul regional; lucrează cu biroul de proiecte al districtului",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Direcția sanitară veterinară și pentru siguranța alimentelor",
+   "tutela": "ANSVSA",
+   "grup": "mediu-agricultura",
+   "face": "Sănătatea animalelor, siguranța alimentelor, laboratoare",
+   "regionalAzi": null,
+   "devine": "Direcție și laborator regional; circumscripțiile veterinare, pe district",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Sistemul de gospodărire a apelor",
+   "tutela": "Administrația Națională „Apele Române”",
+   "grup": "mediu-agricultura",
+   "face": "Cursuri de apă, baraje, avize",
+   "regionalAzi": "administrații pe bazine hidrografice",
+   "devine": "Rămâne pe bazin hidrografic, nu pe regiune",
+   "destinatie": "rămâne"
+  },
+  {
+   "nume": "Oficiul fitosanitar",
+   "tutela": "Autoritatea Națională Fitosanitară",
+   "grup": "mediu-agricultura",
+   "face": "Controlul plantelor și al produselor de protecție",
+   "regionalAzi": null,
+   "devine": "Oficiu regional; inspectorii lucrează pe districte",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Oficiul de studii pedologice și agrochimice",
+   "tutela": "Ministerul Agriculturii",
+   "grup": "mediu-agricultura",
+   "face": "Studii de sol",
+   "regionalAzi": null,
+   "devine": "Laborator regional",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Oficiul județean pentru zootehnie",
+   "tutela": "Agenția Națională pentru Zootehnie",
+   "grup": "mediu-agricultura",
+   "face": "Evidența și ameliorarea animalelor",
+   "regionalAzi": null,
+   "devine": "Oficiu regional; tehnicienii, pe districte",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Direcția silvică",
+   "tutela": "Regia Națională a Pădurilor",
+   "grup": "mediu-agricultura",
+   "face": "Administrarea pădurilor statului, prin ocoale",
+   "regionalAzi": "garda forestieră e deja regională",
+   "devine": "Direcție regională; ocoalele silvice rămân unde sunt",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Direcția județeană de drumuri",
+   "tutela": "consiliul județean",
+   "grup": "infrastructura",
+   "face": "Drumurile județene",
+   "regionalAzi": null,
+   "devine": "Drumuri de district și drumuri regionale",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Urbanismul județului (arhitectul-șef)",
+   "tutela": "consiliul județean",
+   "grup": "infrastructura",
+   "face": "Planul de amenajare a teritoriului, avize, autorizații pentru comunele fără specialiști",
+   "regionalAzi": null,
+   "devine": "Urbanismul de district, cu planuri corelate; amenajarea teritoriului, la regiune",
+   "destinatie": "regiune și district"
+  },
+  {
+   "nume": "Inspectoratul județean în construcții",
+   "tutela": "Inspectoratul de Stat în Construcții",
+   "grup": "infrastructura",
+   "face": "Controlul calității în construcții",
+   "regionalAzi": "inspectorate regionale",
+   "devine": "Rămâne inspectoratul regional",
+   "destinatie": "regiune"
+  },
+  {
+   "nume": "Agenția teritorială a Autorității Rutiere",
+   "tutela": "Ministerul Transporturilor",
+   "grup": "infrastructura",
+   "face": "Licențe și atestate în transportul rutier",
+   "regionalAzi": null,
+   "devine": "Agenție regională, lângă autoritatea regională de transport",
+   "destinatie": "regiune"
+  }
+ ]
+}

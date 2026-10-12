@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raport comparativ: administrația României înainte și după reorganizare</title>
+    <meta name="description" content="Raport comparativ al reorganizării administrative a României: unități, cost administrativ, accesibilitate, aleși și oficii, înainte și după, cu repere din Polonia, Danemarca, Estonia și Republica Moldova, și un model de administrare în trei niveluri cu ghișeu unic.">
+    <meta name="theme-color" content="#2a78d6">
+
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="ro-adp">
+    <meta property="og:locale" content="ro_RO">
+    <meta property="og:title" content="Raport comparativ: administrația României înainte și după">
+    <meta property="og:description" content="Cifrele comparate ale reorganizării — unități, cost administrativ, accesibilitate, aleși — și modelul propus de administrare.">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Raport comparativ: administrația României înainte și după">
+    <meta name="twitter:description" content="Cifrele comparate ale reorganizării și modelul propus de administrare.">
+
+    <link rel="stylesheet" href="css/adp-tema.css">
+</head>
+
+<body>
+    <a class="sari-la-continut" href="#tablou">Sari la conținut</a>
+
+    <header class="antet">
+        <h1>Raport comparativ</h1>
+        <span class="subtitlu">administrația României înainte și după reorganizare</span>
+        <nav aria-label="Pagini">
+            <a href="index.html">Harta</a>
+            <a href="metodologie.html">Reorganizare: metodologie</a>
+            <a href="raport.html" aria-current="page">Raport</a>
+            <a href="principii.html">Principii</a>
+        </nav>
+    </header>
+
+    <main class="raport-pagina">
+        <section id="tablou" class="tablou" aria-labelledby="tablou-titlu">
+            <div class="tablou-cap">
+                <h2 id="tablou-titlu">Metropolizarea României, în cifre</h2>
+                <p>Alege o regiune, un județ sau caută un oraș: tot ce e mai jos se schimbă odată cu filtrele.
+                    Explicațiile, modelul și calculele sunt în <a href="#rezumat">capitolele raportului</a>.</p>
+            </div>
+            <div class="filtre" role="search" aria-label="Filtre">
+                <label>Regiunea <select id="f-adr"></select></label>
+                <label>Județul <select id="f-judet"></select></label>
+                <label>Tipul <select id="f-tip">
+                    <option value="">toate</option>
+                    <option value="metropolitan">zone metropolitane</option>
+                    <option value="rural">districte</option>
+                </select></label>
+                <label class="filtru-text">Caută <input id="f-text" type="search" autocomplete="off"
+                    placeholder="district, oraș sau comună"></label>
+                <button id="f-reset" class="buton" type="button" disabled>Resetează</button>
+                <span id="f-numar" class="nota" role="status" aria-live="polite"></span>
+                <div id="f-probleme" class="cipuri" role="group" aria-label="Doar districtele"></div>
+            </div>
+            <div id="carduri" class="carduri" aria-live="polite"></div>
+            <div class="card">
+                <h3>Regiuni și județe</h3>
+                <p class="nota">Clic pe o regiune arată județele ei; clic pe un județ, districtele lui.</p>
+                <div id="tabel-teritorii"></div>
+            </div>
+            <div class="card">
+                <h3>Populația pe districte</h3>
+                <div id="grafic-populatie"></div>
+            </div>
+            <div class="card">
+                <h3>Districtele</h3>
+                <p class="nota">Clic pe un district îi deschide fișa: criteriile, ce e de făcut, grupurile de acțiune
+                    locală de azi și microregiunile propuse, comunele. Clic pe capul unei coloane sortează.
+                    <span class="eticheta-stare bun">îndeplinit</span>
+                    <span class="eticheta-stare atentie">de urmărit</span>
+                    <span class="eticheta-stare critic">lipsă</span></p>
+                <div id="tabel-districte"><p class="nota">Se calculează…</p></div>
+            </div>
+        </section>
+
+        <div class="document">
+        <nav class="cuprins" aria-label="Cuprins">
+            <h2>Cuprins</h2>
+            <ol>
+                <li><a href="#tablou">Tabloul cu filtre</a></li>
+                <li><a href="#rezumat">Verdictul în cifre</a></li>
+                <li><a href="#sumar-harta">Harta, pe scurt</a></li>
+                <li><a href="#diagnostic">Diagnosticul: ce arată banii</a></li>
+                <li><a href="#model">Modelul propus: trei niveluri și un ghișeu</a></li>
+                <li><a href="#guvernanta">Guvernanța: două voturi, trei mese</a></li>
+                <li><a href="#zonare">O singură zonare</a></li>
+                <li><a href="#fonduri">Districtul și fondurile europene</a></li>
+                <li><a href="#institutii">Instituțiile județene devin regionale</a></li>
+                <li><a href="#infrastructura">Infrastructura esențială, pe fiecare formă</a></li>
+                <li><a href="#voluntar">Etapa voluntară și criteriile</a></li>
+                <li><a href="#impact">Impactul financiar</a></li>
+                <li><a href="#transport">Transportul: descentralizare pe trei paliere</a></li>
+                <li><a href="#comparatie">Comparația, reper cu reper</a></li>
+                <li><a href="#repere">România față de alte țări</a></li>
+                <li><a href="#riscuri">Ce pierdem, ce riscăm</a></li>
+                <li><a href="#riscuri-europa">Cum a rezolvat Europa</a></li>
+                <li><a href="#viziune">Viziunea: statul care răspunde în 24 de ore</a></li>
+                <li><a href="#surse-raport">Cum s-au calculat cifrele</a></li>
+            </ol>
+        </nav>
+
+        <div class="continut-document">
+
+        <section id="rezumat">
+            <h2>Verdictul în cifre</h2>
+            <p class="nota">Toate cifrele sunt calculate pe loc, cu aceleași module ca harta, pe datele din
+                <a href="metodologie.html#surse">surse</a>. „Înainte” e situația de azi; „după” e scenariul
+                implicit: prag durabil de 5.000–7.000 de locuitori, maximum 30 de minute până la reședință,
+                comasare forțată cu limita de 45 de minute, praguri legale pe rang.</p>
+            <div id="rezumat-cifre"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="sumar-harta">
+            <h2>Harta, pe scurt: cum arată și ce îmbunătățește</h2>
+            <p>Patru straturi, unul peste altul, plus satele. Se văd toate în <a href="index.html">hartă</a>:
+                regiune, județ, zonă metropolitană sau district, comună — din două-trei clicuri.</p>
+            <div id="sumar-harta-cifre"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="diagnostic">
+            <h2>Diagnosticul: ce arată banii</h2>
+            <p>Fragmentarea nu e o chestiune de hartă, ci de buget. Testul e cel din legea Republicii Moldova:
+                <b>cât din veniturile proprii ale unei unități se duce pe propriul aparat administrativ</b>.
+                Pragul moldovenesc e 30%. Mai jos, testul aplicat execuției bugetare din 2025 a fiecărei primării
+                din România — capitolele „Autorități executive” și „Alte servicii publice generale”, raportate la
+                veniturile proprii (fără sume defalcate din TVA, subvenții și fonduri europene).</p>
+            <div id="diagnostic-cifre"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="model">
+            <h2>Modelul propus: trei niveluri și un ghișeu</h2>
+            <p>Reorganizarea nu are sens dacă mută doar liniile de pe hartă. Modelul de mai jos schimbă
+                <b>cine face ce</b>, și e construit pe o singură idee: cetățeanul are de-a face cu un singur
+                ghișeu, iar statul se descurcă pe dinăuntru.</p>
+
+            <h3>Două organizări, aceeași hartă</h3>
+            <p>Modelul desparte două lucruri pe care legea de azi le amestecă. <b>Organizarea administrativă</b>
+                spune cine e ales, cine are buget și cine răspunde: comuna și regiunea. <b>Organizarea
+                funcțională</b> spune pe ce teritoriu se dă un serviciu sau se cheltuie un fond: satul,
+                microregiunea, districtul. Cele două nu se calcă: fiecare treaptă funcțională e făcută din trepte
+                administrative întregi, așa că o comună are o singură adresă pe toată scara.</p>
+            <div id="organizare-cifre"><p class="nota">Se calculează…</p></div>
+
+            <h3>Ce rol mai are județul</h3>
+            <p>Județul nu dispare. Pierde aparatul și păstrează tot ce ține de identitate și de orientare:</p>
+            <ul>
+                <li><b>Limită și nume.</b> Adresa, indicativul, numărul de înmatriculare, apartenența — nimic nu
+                    se schimbă pentru om.</li>
+                <li><b>Circumscripție electorală.</b> În județ se aleg consilierii regionali, după populație, și
+                    tot el rămâne circumscripția pentru Parlament.</li>
+                <li><b>Cadrul districtelor.</b> Niciun district nu trece peste limita de județ; tribunalul
+                    rămâne instanța județului, peste judecătoriile districtelor.</li>
+                <li><b>Unitate statistică.</b> Seriile de date și clasificarea europeană (NUTS 3) rămân
+                    neîntrerupte.</li>
+                <li><b>Oficiul județean unic</b>, în fosta reședință: reprezentanța tuturor instituțiilor
+                    regionale, într-un singur loc.</li>
+                <li><b>Puntea constituțională.</b> Până la revizuire, consilierii regionali aleși în județ
+                    formează de drept consiliul lui, iar prefectul rămâne numit pe județ.</li>
+            </ul>
+            <p>Ce nu mai are: consiliu cu aparat propriu, președinte ales separat, buget propriu și instituții
+                subordonate. Acestea trec la regiune și la district.</p>
+
+            <h3>Cele cinci paliere</h3>
+            <table class="tabel-doc">
+                <thead>
+                    <tr><th>Nivel</th><th>Ce e</th><th>Ce face</th><th>Cine conduce</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Satul</th>
+                        <td>Localitate componentă, fără personalitate juridică</td>
+                        <td>Delegat sătesc ales de adunarea sătenilor (Codul administrativ, art. 142) și
+                            <b>fond sătesc</b> — o cotă fixă din bugetul comunei, pe care adunarea satului o
+                            cheltuie cum decide ea (modelul polonez <i>fundusz sołecki</i>)</td>
+                        <td>delegatul sătesc</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Comuna / orașul</th>
+                        <td><b>Singura autoritate aleasă de bază</b>, 5.000–7.000 de locuitori
+                            (7.000–9.000 cu oraș)</td>
+                        <td>Serviciul către cetățean: stare civilă, asistență socială, urbanism curent, drumuri
+                            locale, salubritate, școli. În <b>fiecare fostă comună</b> rămâne un
+                            <b>oficiu multifuncțional</b> cu 2–3 oameni: depunere de acte, încasări, asistență
+                            socială, eliberări — un ghișeu complet, nu o primărie în miniatură.</td>
+                        <td>primar + consiliu local ales, cu <b>un consilier la dublul populației</b> de azi</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Districtul<br><small>(zona metropolitană)</small></th>
+                        <td>Asociere obligatorie a comunelor și orașelor din jurul unui oraș-centru, pe
+                            <b>circumscripția judecătoriei</b> (aceeași ca la notari);
+                            temeiul există — zona metropolitană din Legea 351/2001 și asociația de dezvoltare
+                            intercomunitară din Codul administrativ, art. 89</td>
+                        <td>Două forme, <b>independente una de alta</b>: <b>zona metropolitană</b>, în jurul
+                            unui municipiu, și <b>districtul</b>, în jurul unui oraș. Districtul nu se topește
+                            în zona metropolitană vecină; legătura dintre ele e una de transport, nu
+                            administrativă. <b>Preia atribuțiile consiliului județean</b> pentru teritoriul lui: apă-canal,
+                            salubritate, drumuri județene din zonă, urbanism de scară mare (PUG corelate),
+                            transport public și dezvoltare locală — fiecare district are <b>grupul lui de
+                            acțiune locală</b> și un birou de proiecte (vezi
+                            <a href="#fonduri">Districtul și fondurile europene</a>).
+                            Tot aici coboară front-office-ul serviciilor deconcentrate.</td>
+                        <td><b>consiliul primarilor</b> din district: fiecare primar un vot, ponderat cu
+                            populația cu domiciliul stabil la ultimul recensământ; <b>fără drept de veto</b>
+                            pentru orașul-centru. Districtul <b>nu are alegeri proprii și niciun consilier în
+                            plus</b>: e o structură pur administrativă, condusă de primarii deja aleși în
+                            comunele membre — ceea ce e posibil tocmai pentru că la județ nu mai există consiliu
+                            ales.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Județul</th>
+                        <td>Rămâne ca teritoriu, identitate și circumscripție statistică — <b>fără consiliu
+                            ales</b></td>
+                        <td>Un <b>oficiu unic</b> în fosta reședință de județ: punctul în care agențiile
+                            devenite regionale își țin reprezentanța, după modelul simplificat al agențiilor de
+                            dezvoltare regională de azi. Controlul de legalitate se face <b>digital</b>, pe
+                            hotărârile publicate, cu verificare automată și intervenție umană doar la semnalare.</td>
+                        <td>oficiul unic; județul rămâne circumscripție pentru alegerea consiliului regional</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Regiunea</th>
+                        <td><b>Cele 8 regiuni de dezvoltare existente</b> (Legea 315/2004), cu
+                            <b>București–Ilfov ca Metropolă</b>. Nu se redesenează nimic: limitele sunt cele de
+                            azi, li se adaugă doar consiliul ales și competențele</td>
+                        <td>Spitale, drumuri și transport regional, fonduri europene, strategie de dezvoltare,
+                            învățământ profesional. Agențiile azi județene (mediu, cadastru, fisc, muncă,
+                            sănătate publică) devin <b>regionale</b>, cu reprezentanță în fiecare oficiu
+                            județean și ghișeu în fiecare district.</td>
+                        <td><b>consiliul regional ales</b>, cu locuri pe județe după populație, și un administrator
+                            regional profesionist; prefectura, ca serviciu juridic care verifică automat actele</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="nota">Consiliile județene dispar fără gol administrativ: atribuțiile lor se împart între
+                district (serviciile de proximitate și infrastructura din zonă) și regiune (ce ține de scară
+                mare). Districtul nu are aparat propriu mare: el contractează, coordonează și împarte costul
+                între primăriile membre, cu votul ponderat al consiliului de primari.</p>
+
+            <h3>Metropola București: e posibil?</h3>
+            <p>Da, și e singura regiune care se poate face fără hartă nouă: regiunea de dezvoltare
+                <b>București–Ilfov</b> există din 1998 și e deja unitatea statistică NUTS 2. Ilfovul e, funcțional,
+                periferia Capitalei — navetism aproape integral spre București, fără spital județean comparabil și
+                fără universitate proprie. Varianta curată juridic e regiunea București–Ilfov ca unitate
+                administrativă unică, cu consiliu ales, în care comunele și orașele din Ilfov rămân unități de bază
+                cu primar și consiliu, dar nu mai au deasupra un consiliu județean separat. Precedentul european e
+                Marea Londră. Costul politic e real: Consiliul Județean Ilfov dispare, iar Metropola ajunge la 2,26
+                milioane de locuitori și un PIB pe locuitor de peste trei ori media celorlalte regiuni — de aceea
+                echilibrarea financiară între regiuni devine obligatorie, nu opțională.</p>
+            <p class="nota">Proiectul <b>nu redesenează regiunile</b>. Harta regională propusă e cea existentă;
+                stratul „Regiuni — explorare” de pe hartă e doar un instrument de comparație, pentru cine vrea să
+                vadă ce ar însemna alte desene (8, 12 sau 16 regiuni) — nu face parte din propunere.</p>
+
+</section>
+
+        <section id="guvernanta">
+            <h2>Guvernanța: două voturi, trei mese</h2>
+            <p>Ideea, într-o propoziție: <b>cetățeanul votează de două ori — primarul și consiliul local, apoi
+                consiliul regional — iar între ele nu mai e nimic de ales.</b> Consiliul județean devine consiliu
+                regional, cu consilieri votați în fiecare județ, după populație. Districtul, la mijloc, nu are
+                alegeri: îl conduc primarii deja aleși, neplătiți pentru asta.</p>
+            <div id="guvernanta-cifre"><p class="nota">Se calculează…</p></div>
+
+            <h3>Cele trei mese</h3>
+            <table class="tabel-doc">
+                <thead><tr><th>Masa</th><th>Cine stă la ea</th><th>Cum decide</th><th>Cine execută</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Comuna / orașul</th>
+                        <td>Primarul și consiliul local, aleși direct — singurele mandate plătite</td>
+                        <td>Ca azi, cu un consilier la dublul populației</td>
+                        <td>Aparatul primăriei, plafonat la 30% din veniturile proprii; oficiu de 2–3 oameni
+                            în fiecare fostă comună</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Districtul / zona metropolitană</th>
+                        <td><b>Adunarea primarilor</b>: toți primarii din district, de drept, fără alt scrutin.
+                            Aleg dintre ei un <b>consiliu director</b> de 3–5 membri, cu președinție prin rotație
+                            anuală. Niciunul nu e plătit; se decontează doar deplasarea.</td>
+                        <td>Vot ponderat cu populația cu domiciliul stabil la ultimul recensământ, fără drept de
+                            veto. Pentru buget, plan urbanistic și contracte multianuale: <b>dublă majoritate</b> —
+                            majoritatea populației <i>și</i> cel puțin o treime din primari, ca orașul-centru să nu
+                            poată hotărî singur.</td>
+                        <td>Un <b>director de district</b> angajat prin concurs, cu contract de performanță, și un
+                            aparat tehnic mic: urbanism, achiziții, proiecte europene, drumuri, apă-canal</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Regiunea</th>
+                        <td><b>Consiliul regional</b>, ales direct: ia locul consiliilor județene. Fiecare județ e
+                            o circumscripție și primește locuri după populație.</td>
+                        <td>Ca un consiliu județean de azi, la scara regiunii: buget, strategie, spitale, drumuri
+                            regionale, fonduri europene</td>
+                        <td>Un <b>administrator regional</b> profesionist și agențiile regionale. <b>Prefectura
+                            devine serviciu juridic</b>: actele se verifică automat, iar câțiva juriști se uită
+                            doar la anomalii</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Șapte reguli care o fac să funcționeze singură</h3>
+            <ol>
+                <li><b>La district, politicul nu e plătit; execuția e profesionistă.</b> Primarii hotărăsc
+                    direcția, fără indemnizație; directorul de district și administratorul regional răspund de
+                    rezultat, cu contract și indicatori publici. Așa dispare motivul pentru care se înmulțesc
+                    funcțiile.</li>
+                <li><b>Niciun mandat în plus.</b> Consiliul regional ia locul celor 41 de consilii județene, cu de
+                    câteva ori mai puțini consilieri; districtul nu adaugă niciunul. Dacă un primar își pierde
+                    mandatul, își pierde automat și locul din district.</li>
+                <li><b>Greutate după populație, protecție prin dublă majoritate.</b> Votul ponderat respectă
+                    oamenii; a doua cheie respectă comunele mici. Nimeni nu are veto, nimeni nu decide singur.</li>
+                <li><b>Județul rămâne circumscripție.</b> Fiecare județ își alege consilierii regionali, în
+                    număr proporțional cu populația — nicio regiune nu e condusă doar de orașul ei mare.</li>
+                <li><b>Bani pe cotă, nu pe negociere.</b> Districtul nu are impozite proprii: trăiește din
+                    cotizația comunelor membre, proporțională cu populația, și din fondurile pe care le atrage.
+                    Cotizația se fixează o dată pe mandat, ca să nu se renegocieze anual.</li>
+                <li><b>Totul la vedere.</b> Hotărârile, contractele și execuția bugetară se publică în format
+                    deschis în ziua adoptării; legalitatea se verifică automat, iar serviciul juridic al prefecturii
+                    se uită doar la anomalii. Opacitatea e singurul lucru care costă.</li>
+                <li><b>Plafon de cost și clauză de ieșire.</b> Aparatul tehnic al districtului are plafon în lei pe
+                    locuitor; o comună poate cere mutarea în districtul vecin o dată pe perioadă de
+                    programare europeană (șapte ani), cu votul consiliului local și acordul districtului primitor —
+                    competiție între districte, nu captivitate. Nu mai des: strategia de dezvoltare locală se
+                    aprobă pe un teritoriu fix.</li>
+            </ol>
+
+            <h3>Pachetul legislativ</h3>
+            <p>Legile nu sunt aici constrângeri, ci lista de lucru: modelul se scrie întâi, iar legea se
+                potrivește după el. Mecanismul de pornire există deja — asociațiile de dezvoltare intercomunitară
+                din Codul administrativ (art. 89–91) sunt conduse de o adunare generală a reprezentanților
+                unităților membre și de un consiliu director, adică exact structura de mai sus. Ce se modifică:</p>
+            <ul>
+                <li><b>Codul administrativ</b>: asocierea în district devine obligatorie și cu teritoriu fix;
+                    votul devine ponderat cu populația; districtul preia atribuțiile consiliului județean
+                    (art. 173); scara consilierilor locali se dublează (art. 112); pragul minorităților se mută
+                    la nivelul localității (art. 94).</li>
+                <li><b>Legea 351/2001</b>: pragurile de rang și definiția zonei metropolitane se rescriu pe
+                    districte; <b>Legea 2/1968</b>: noua împărțire pe comune.</li>
+                <li><b>Legea 315/2004</b>: regiunea de dezvoltare capătă consiliu ales și atribuții
+                    administrative.</li>
+                <li><b>Constituția</b> (art. 3, 122, 123): consiliul județean dispare, prefectul devine regional.
+                    E singura piesă care cere revizuire; până atunci, modelul poate porni cu consiliile județene
+                    reduse la rolul de oficiu, prin transfer de atribuții.</li>
+            </ul>
+            <p class="nota">Riscul principal al modelului e supraîncărcarea primarilor: trei mese înseamnă timp.
+                De aceea adunările se întrunesc trimestrial, iar între ședințe lucrează consiliul director și
+                executivul profesionist — primarul hotărăște, nu administrează districtul. Întâlnirea
+                <b>lunară</b> e alta: cea de lucru, dintre biroul de proiecte al districtului și fiecare primărie.</p>
+        </section>
+
+        <section id="zonare">
+            <h2>O singură zonare</h2>
+            <p>Azi, aceeași comună ține de alt oraș pentru fiecare lucru: de o judecătorie, de un grup de
+                acțiune locală, de o asociație de apă, de alta de deșeuri, de o zonă metropolitană, de un spital,
+                de un birou fiscal. Hărțile nu se suprapun și nimeni nu le știe pe toate. Propunerea e ca
+                <b>districtul să fie o singură hartă pentru toate</b> — și nu una nouă, ci una pe care oamenii o
+                folosesc deja.</p>
+            <p>Desenul de pornire e <b>circumscripția judecătoriei</b>. E singura împărțire sub județ fixată
+                oficial, localitate cu localitate, și folosită de mai multe instituții deodată: instanța,
+                parchetul și <b>birourile notariale</b> — un notar lucrează în circumscripția judecătoriei în care
+                își are sediul, iar numărul de posturi se stabilește pe aceeași circumscripție. Cine a făcut o
+                succesiune știe deja de ce oraș ține.</p>
+            <table class="tabel-doc">
+                <thead><tr><th>Zonarea de azi</th><th>Cum e făcută</th><th>Ce devine</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Judecătorie, parchet, notari</th><td>Circumscripție fixată oficial, pe localități</td>
+                        <td><b>Desenul districtului</b></td></tr>
+                    <tr><th scope="row">Grup de acțiune locală</th><td>Asociere liberă, peste județe; comune rămase pe dinafară</td>
+                        <td>Unul pe district, pe același teritoriu</td></tr>
+                    <tr><th scope="row">Asociații de comune (apă, deșeuri, drumuri)</th><td>Câte una pe fiecare serviciu, cu membri diferiți</td>
+                        <td>Districtul, ca singură asociere; operatorii regionali rămân</td></tr>
+                    <tr><th scope="row">Zonă metropolitană</th><td>Asociere în jurul unui municipiu, cu contur propriu</td>
+                        <td>Districtul al cărui oraș e municipiu</td></tr>
+                    <tr><th scope="row">Spital, liceu, poliție, fisc</th><td>Fiecare cu arondarea lui</td>
+                        <td>Arondate pe district; fiecare district are spital și liceu</td></tr>
+                    <tr><th scope="row">Carte de identitate, pașaport, permis, înmatriculare</th>
+                        <td>Trei servicii: unul la primărie, două la prefectul județului</td>
+                        <td><b>Un ghișeu de documente pe district</b></td></tr>
+                </tbody>
+            </table>
+            <h3>Un singur ghișeu: actele de identitate și mașina</h3>
+            <p>Cartea de identitate, pașaportul, permisul de conducere și numerele de înmatriculare țin toate de
+                Ministerul Afacerilor Interne — dar omul le face în trei locuri, la trei cozi, cu trei rânduri de
+                poze și amprente:</p>
+            <table class="tabel-doc">
+                <thead><tr><th>Documentul</th><th>Unde se face azi</th><th>Cine conduce serviciul</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Carte de identitate</th>
+                        <td>Serviciul local de evidență a persoanelor, la primărie</td>
+                        <td>Consiliul local; ministerul doar coordonează (OG 84/2001, OUG 97/2005)</td></tr>
+                    <tr><th scope="row">Pașaport</th>
+                        <td>Serviciul de pașapoarte, unul pe județ</td>
+                        <td>Prefectul (OG 83/2001, Legea 248/2005)</td></tr>
+                    <tr><th scope="row">Permis de conducere, înmatriculare, numere</th>
+                        <td>Serviciul de permise și înmatriculări, unul pe județ</td>
+                        <td>Prefectul (OG 83/2001, OUG 195/2002)</td></tr>
+                </tbody>
+            </table>
+            <p>În model, prefectura de județ dispare, deci cele două servicii de la prefect rămân oricum fără
+                gazdă. Gazda firească e districtul: <b>un ghișeu de documente în fiecare district</b>, cu o singură
+                preluare a pozei, a amprentelor și a semnăturii, folosită pentru toate cele patru documente. Din 42
+                de puncte pe țară pentru pașapoarte și tot atâtea pentru permise, se ajunge la câte unul în fiecare
+                district. Tot ce nu cere prezența omului — plata, programarea, dosarul — se face online; ghișeul
+                rămâne pentru biometrie și pentru cei care nu lucrează pe internet.</p>
+
+            <h3>Ghișeul districtului, pe cele opt evenimente de viață</h3>
+            <p>Ghișeul nu se organizează pe instituții, ci pe ce i se întâmplă omului. Măsura europeană e
+                <b>evenimentul de viață</b>: Comisia Europeană evaluează administrația fiecărui stat pe opt
+                astfel de evenimente, urmărind tot drumul omului, de la informare la rezultat, peste toate
+                instituțiile implicate. Sunt aceleași opt pe care se punctează România în clasamentul european.</p>
+            <table class="tabel-doc">
+                <thead><tr><th>Evenimentul de viață</th><th>Ce cuprinde</th><th>Unde se rezolvă azi</th>
+                    <th>La ghișeul districtului</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Înființarea unei firme</th>
+                        <td>Înregistrare, autorizații, înregistrare fiscală</td>
+                        <td>Registrul comerțului, în reședința de județ; fisc; primărie</td>
+                        <td>Identificare și depunere asistată; restul, online</td></tr>
+                    <tr><th scope="row">Activitatea curentă a firmei</th>
+                        <td>Declarații, taxe, angajați, TVA</td>
+                        <td>Fisc, inspectoratul de muncă, primărie pentru taxele locale</td>
+                        <td>Un singur punct fiscal: taxe locale și de stat</td></tr>
+                    <tr><th scope="row">Familia</th>
+                        <td>Naștere, căsătorie, divorț, deces, alocații, <b>pașaport</b></td>
+                        <td>Stare civilă la primărie; pașaport la județ; alocații la agenția județeană</td>
+                        <td>Stare civilă, pașaport și drepturi, dintr-o singură cerere</td></tr>
+                    <tr><th scope="row">Pierderea și găsirea unui loc de muncă</th>
+                        <td>Șomaj, indemnizații, mediere, cursuri</td>
+                        <td>Agenția județeană de ocupare</td>
+                        <td>Birou de ocupare în district</td></tr>
+                    <tr><th scope="row">Studiile</th>
+                        <td>Înscriere, burse, acte de studii, echivalări</td>
+                        <td>Școală, inspectorat județean, universitate</td>
+                        <td>Acte și burse, depuse o singură dată</td></tr>
+                    <tr><th scope="row">Mutarea</th>
+                        <td>Schimbarea domiciliului, <b>carte de identitate</b>, anunțarea celorlalte instituții</td>
+                        <td>Evidența persoanelor, la primărie</td>
+                        <td>Carte de identitate nouă; fiscul, casa de sănătate și registrul auto află singure</td></tr>
+                    <tr><th scope="row">Mașina</th>
+                        <td><b>Permis, înmatriculare, numere</b>, impozit, amenzi</td>
+                        <td>Serviciul de permise și înmatriculări al județului; impozitul, la primărie</td>
+                        <td>Permis, înmatriculare, numere și impozit, la același ghișeu</td></tr>
+                    <tr><th scope="row">Procesul pentru o sumă mică</th>
+                        <td>De la informare la hotărâre și apel</td>
+                        <td>Judecătoria</td>
+                        <td>E chiar instanța districtului — de aceea districtul e circumscripția ei</td></tr>
+                </tbody>
+            </table>
+            <p class="nota">Trei liste poartă același nume și nu trebuie amestecate. Cele <b>opt evenimente</b> de mai
+                sus sunt ale evaluării europene a guvernării electronice (din 2020 s-a adăugat al nouălea,
+                sănătatea). Regulamentul (UE) 2018/1724 al portalului digital unic are <b>șapte</b> evenimente și 21
+                de proceduri care trebuie să se poată face integral online. România și-a propus, în politica de
+                e-guvernare din 2021, <b>36</b> de evenimente de viață. Ghișeul districtului se organizează pe cele
+                opt, fiindcă pe ele se măsoară rezultatul; lista de 36 spune ce servicii intră sub fiecare.</p>
+            <p class="nota">Ce se schimbă în lege: serviciile de pașapoarte și de permise trec de la prefect la
+                ghișeul districtului (OG 83/2001); evidența persoanelor trece de la consiliul local la același
+                ghișeu (OG 84/2001); datele biometrice se preiau o singură dată, cu acordul omului, pentru toate
+                documentele. Regulile europene pentru cartea de identitate și pentru pașaport cer personal calificat
+                la preluarea datelor biometrice, nu un anumit fel de ghișeu.</p>
+
+            <h3>Pachetul districtului: ce are deja fiecare</h3>
+            <div id="zonare-cifre"><p class="nota">Se calculează…</p></div>
+            <p class="nota">Sursa circumscripțiilor: paginile „Circumscripții” ale judecătoriilor de pe portalul
+                instanțelor (Hotărârea 102/2021); competența teritorială a notarilor: Legea 36/1995. Lista
+                oficială e pe sate; aici e urcată la UAT, cu votul majorității satelor lui. Evenimentele de viață:
+                evaluarea europeană a guvernării electronice (eGovernment Benchmark, Comisia Europeană).</p>
+        </section>
+
+        <section id="fonduri">
+            <h2>Districtul și fondurile europene</h2>
+            <p>Ideea: <b>fiecare district are un grup de acțiune locală</b>, legat de regiune, care face proiecte,
+                se vede lunar cu primăriile și îi consiliază pe primari. E ideea corectă — dar patru detalii ale ei
+                nu se potrivesc cu regulile europene așa cum sunt formulate, și se corectează mai jos.</p>
+
+            <h3>Districtul nu e un mamut: poli mici de dezvoltare</h3>
+            <p>Dacă tot districtul ar avea un singur grup de acțiune locală, orașul mare ar aduna tot — iar Sibiul
+                nu are cum să ridice Tălmaciul sau Ocna Sibiului mai bine decât ar face-o ele singure. De aceea
+                districtul e doar cadrul: <b>în interiorul lui, fiecare oraș e un pol</b>, cu comunele care ajung
+                cel mai repede la el. Polul și comunele lui formează o <b>microregiune</b>, iar microregiunea are
+                grupul ei de acțiune locală, strategia ei și banii ei. Trei reguli:</p>
+            <ol>
+                <li><b>Un district, unul sau mai multe grupuri — niciodată un grup în două districte.</b></li>
+                <li><b>Fiecare grup are un oraș ca pol.</b> Orașul mic e ținta investiției, nu anexa municipiului.</li>
+                <li><b>Fiecare grup stă în pragurile LEADER</b>, socotite pe locuitorii eligibili: polul care nu
+                    strânge 10.000 se unește cu polul vecin din același district; grupul care trece de 150.000 se
+                    împarte, iar cea mai mare localitate a lui devine al doilea pol.</li>
+            </ol>
+            <div id="gal-cifre"><p class="nota">Se calculează…</p></div>
+
+            <h3>Districtul rural, cu statutul zonei metropolitane</h3>
+            <p>Grupul de acțiune locală aduce bani mici. Banii mari — drumuri, școli, mobilitate, servicii — vin
+                azi doar spre orașe, fiindcă doar ele au o formă recunoscută: zona metropolitană. Districtul din
+                jurul unui oraș mic nu are niciuna. Propunerea: <b>districtul rural primește același statut ca
+                zona metropolitană</b> și, cu el, aceleași uși.</p>
+            <table class="tabel-doc">
+                <thead><tr><th></th><th>Zona metropolitană</th><th>Districtul rural</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Polul</th><td>Un municipiu</td><td>Un oraș</td></tr>
+                    <tr><th scope="row">Temeiul</th><td>Legea 246/2022</td>
+                        <td>Aceeași lege, extinsă la districtele fără municipiu</td></tr>
+                    <tr><th scope="row">Venit propriu</th>
+                        <td>O cotă din impozitul pe venit al localităților membre</td><td>Aceeași cotă</td></tr>
+                    <tr><th scope="row">Strategia</th>
+                        <td>Strategia de dezvoltare urbană și planul de mobilitate</td>
+                        <td>Strategia teritorială integrată a districtului și planul de mobilitate rurală</td></tr>
+                    <tr><th scope="row">Banii mari</th>
+                        <td>Dezvoltarea urbană durabilă: cel puțin 8% din fondul regional, rezervat orașelor și
+                            zonelor lor</td>
+                        <td>Dezvoltarea integrată a zonelor neurbane, prin același instrument teritorial; din
+                            2028, ținta rurală de 10% din planul național</td></tr>
+                    <tr><th scope="row">Banii mici</th>
+                        <td>LEADER, pe microregiunile din jurul municipiului</td>
+                        <td>LEADER, pe fiecare microregiune</td></tr>
+                    <tr><th scope="row">Reperul european</th>
+                        <td>Zona urbană funcțională</td>
+                        <td>Zona rurală funcțională: orașul-târg cu împrejurimile lui, cel puțin 25.000 de
+                            locuitori — perechea rurală a celei urbane, definită de Comisia Europeană</td></tr>
+                </tbody>
+            </table>
+            <div id="statut-cifre"><p class="nota">Se calculează…</p></div>
+            <p><b>Niciun district nu rămâne sub 25.000 de locuitori.</b> Cel prea mic nu e înghițit de vecin: își
+                păstrează orașul ca pol și primește, de la districtul vecin mai mare, comuna care ajunge cel mai
+                repede la el. Doar dacă nimeni nu are de unde da se unește cu vecinul. Pentru comunele mutate
+                astfel, circumscripția judecătoriei se corectează după district.</p>
+            <p class="nota">Regulile europene de azi permit deja asta: fondul regional finanțează dezvoltarea
+                integrată „în alte zone decât cele urbane” prin aceleași trei instrumente teritoriale ca la orașe
+                (Regulamentul (UE) 2021/1058, art. 3, și Regulamentul (UE) 2021/1060, art. 28). Ce lipsește e
+                forma românească a beneficiarului; districtul o dă.</p>
+
+            <h3>Se pot schimba în timp</h3>
+            <p>Treptele administrative sunt făcute să dureze. Cele funcționale sunt făcute să se poată mișca, fără
+                lege nouă de fiecare dată:</p>
+            <ol>
+                <li><b>Statutul urmează polul.</b> Când orașul unui district rural devine municipiu, districtul
+                    devine zonă metropolitană, de drept.</li>
+                <li><b>Limitele se revizuiesc o dată pe perioadă de programare</b>, la șapte ani, cu aceleași
+                    criterii. Între revizii harta e fixă, ca strategiile și banii să aibă pe ce sta.</li>
+                <li><b>Microregiunile se pot uni sau despărți</b> la aceeași revizie, cât rămân în pragurile
+                    LEADER și în districtul lor.</li>
+                <li><b>O comună poate cere alt district</b>, cu votul consiliului local și acordul celui care o
+                    primește.</li>
+                <li><b>Comuna și regiunea nu se mișcă</b> odată cu ele: se schimbă doar felul în care sunt
+                    grupate comunele, nu comunele.</li>
+            </ol>
+
+            <h3>Cum sunt împărțite GAL-urile azi</h3>
+            <ul>
+                <li><b>246 de grupuri de acțiune locală</b> finanțate în 2023–2027: 209 cu strategii din două
+                    fonduri (agricol și social) și 37 doar din fondul agricol; circa 425 de milioane de euro din
+                    FEADR și 150 de milioane din FSE+.</li>
+                <li>Se formează <b>de jos în sus, prin asociere liberă</b>: nu urmează nicio limită
+                    administrativă, trec peste județe, iar o comună poate rămâne în afara oricărui grup.</li>
+                <li>Teritoriul eligibil: <b>10.000–150.000 de locuitori</b>, comune și orașe mici de cel mult
+                    20.000 de locuitori; un UAT stă într-un singur grup.</li>
+                <li>Sunt <b>parteneriate public–private</b>: primării, firme, fermieri, asociații. Niciun grup de
+                    interese nu poate controla decizia.</li>
+                <li>Le selectează Ministerul Agriculturii și le plătește AFIR. <b>Agențiile de dezvoltare
+                    regională nu au nicio legătură cu ele</b>: ele gestionează programele regionale, din alt fond.</li>
+                <li>Finanțează proiecte mici. Drumurile, apa și canalizarea nu se fac din LEADER.</li>
+            </ul>
+
+            <h3>Ce se potrivește și ce se corectează</h3>
+            <table class="tabel-doc">
+                <thead><tr><th>Ideea</th><th>Ce spune regula europeană</th><th>Cum se așază în model</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Grupul de acțiune locală e consiliul primarilor</th>
+                        <td><b>Nu se poate.</b> Grupul e un parteneriat de interese publice și private în care
+                            niciun grup de interese nu controlează decizia (Regulamentul (UE) 2021/1060, art. 31).</td>
+                        <td>Două organe pe același teritoriu: <b>adunarea primarilor</b> conduce districtul
+                            (drumuri, urbanism, transport), iar <b>grupul de acțiune locală</b> are primarii pe
+                            locurile publice, sub jumătate din voturi, alături de firme, fermieri și asociații.
+                            Un singur birou tehnic le deservește pe amândouă.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Grupul stă sub agenția de dezvoltare regională</th>
+                        <td><b>Azi nu.</b> LEADER e în planul agricol, la minister și AFIR; agenția regională
+                            gestionează doar programul regional. Regulamentul permite însă strategii din mai
+                            multe fonduri, cu un fond principal (art. 31).</td>
+                        <td>E o decizie națională, nu una pe care o poate lua districtul: din 2028, strategia
+                            districtului se finanțează din planul regional, cu <b>agenția ca organism care
+                            selectează și plătește</b>. Propunerea Comisiei pentru 2028–2034 unește oricum
+                            coeziunea și agricultura în planuri naționale și regionale — fără alocarea minimă
+                            garantată pentru LEADER, deci locul trebuie negociat.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Districtul face proiectele și îi consiliază pe primari</th>
+                        <td><b>Se poate, cu o separare.</b> Animarea și sprijinul pentru cei care depun proiecte
+                            sunt sarcini ale grupului (art. 33), plătite în limita a 25% din strategie (art. 34).
+                            Dar cine scrie un proiect nu îl poate și selecta: procedura trebuie să evite conflictul
+                            de interese.</td>
+                        <td><b>Biroul de proiecte</b> al districtului pregătește proiectele primăriilor și ține
+                            întâlnirea lunară; <b>comitetul de selecție</b> al grupului e separat de el. Proiectele
+                            mari ale primăriilor merg la agenția regională, nu la grup.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Un grup în jurul fiecărui oraș</th>
+                        <td><b>Doar unde încape în prag.</b> Un oraș de peste 20.000 de locuitori nu e eligibil
+                            la LEADER; el are strategia lui urbană, finanțată din programul regional.</td>
+                        <td>Microregiunea cu oraș mare are <b>două instrumente</b>: strategia urbană pentru oraș,
+                            LEADER pentru comunele din jur. Harta verifică pragul pe fiecare microregiune și arată
+                            unde nu se încadrează.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Orașul sub 25.000 de locuitori preia UAT-urile mici din jur</th>
+                        <td><b>Se poate, cu o limită.</b> LEADER acoperă comunele și orașele de cel mult 20.000 de
+                            locuitori; o comună preluată de un oraș mai mare iese din aria eligibilă.</td>
+                        <td>Un oraș de cel mult 20.000 de locuitori <b>nu trece prin comasare peste acest prag</b>.
+                            Cele între 20.000 și 25.000 pot prelua, dar comunele lor se finanțează de atunci prin
+                            strategia urbană a orașului; câte sunt, mai sus.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Districtul administrează apa și canalizarea</th>
+                        <td><b>Nu ca operator.</b> Finanțarea europeană a apei cere operatori regionali, pe arii
+                            mari, cu plan de investiții; fărâmițarea pe districte ar pierde eligibilitatea.</td>
+                        <td>Operatorul regional rămâne. Districtul <b>planifică, cofinanțează și urmărește
+                            indicatorii</b>, și reprezintă comunele în fața operatorului, cu vot ponderat.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Indicatori pe fiecare UAT</th>
+                        <td><b>Se potrivește exact.</b> Fondurile se plătesc pe indicatori comuni de realizare și
+                            de rezultat (kilometri de rețea, locuitori racordați, locuri în școli), iar
+                            canalizarea devine obligatorie de la 1.000 de locuitori echivalenți până în 2035
+                            (Directiva (UE) 2024/3019).</td>
+                        <td>Indicatorii din <a href="#infrastructura">secțiunea următoare</a> se definesc la fel ca
+                            cei din cererile de finanțare, ca aceeași cifră să servească și raportării, și
+                            proiectului.</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Comunele își aleg districtul</th>
+                        <td><b>Se poate, cu un termen.</b> Împărțirea administrativă e treaba fiecărui stat, dar
+                            strategia unui grup se aprobă pe un teritoriu fix, pentru toată perioada.</td>
+                        <td>Etapa voluntară se închide <b>înainte de selecția strategiilor 2028–2034</b>; după
+                            aceea, mutările se fac o dată pe perioadă.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Ce se pregătește pentru 2028–2034</h3>
+            <p>Regulile de mai sus sunt ale perioadei care se încheie. Cele care vin schimbă jocul, iar harta
+                trebuie să fie gata pentru ele:</p>
+            <ul>
+                <li><b>Un singur plan pe țară</b>, „național și regional de parteneriat”, în locul celor 14
+                    programe de azi: coeziunea, agricultura și dezvoltarea rurală în același document, cu capitole
+                    regionale. România îl depune în a doua jumătate a lui 2027; se vorbește de peste 60 de
+                    miliarde de euro nerambursabili.</li>
+                <li><b>Bani pe rezultate</b>: plățile se fac pe jaloane și ținte atinse, nu pe facturi decontate.
+                    Cine nu are indicatori măsurați de la început nu are cum să dovedească ținta.</li>
+                <li><b>LEADER rămâne obligatoriu, dar fără bani rezervați.</b> Minimul de 5% dispare din
+                    propunerea Comisiei. În schimb apare o <b>țintă rurală de 10%</b> din fiecare plan; Parlamentul
+                    European cere un minim distinct pentru LEADER, iar Consiliul și-a fixat doar un mandat
+                    parțial. Locul grupurilor de acțiune locală se hotărăște deci în fiecare țară.</li>
+                <li><b>Proiecte mici, pe sume fixe</b>: până la 20.000 de euro ca sumă forfetară și până la 100.000
+                    pentru firme mici, cu costurile de funcționare ale grupului plătite simplificat.</li>
+                <li><b>Strategii teritoriale integrate</b>, în care grupul de acțiune locală lucrează alături de
+                    investițiile mari ale aceluiași teritoriu, sub un singur cadru.</li>
+            </ul>
+            <p>Concluzia e simplă: <b>câștigă teritoriile care vin cu strategia făcută, cu indicatorii măsurați și
+                cu cine semnează deja stabilit</b>. Districtul e exact asta.</p>
+
+            <h3>Formele de asociere: care pentru ce</h3>
+            <table class="tabel-doc">
+                <thead><tr><th>Forma</th><th>Ce e</th><th>La ce e bună</th><th>Unde se oprește</th><th>Locul ei în model</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Asociația de dezvoltare intercomunitară</th>
+                        <td>Asociere doar de primării (Codul administrativ, art. 89–91)</td>
+                        <td>Beneficiar pentru investiții mari: drumuri, transport, școli, servicii sociale; pune la
+                            comun cofinanțarea</td>
+                        <td>Azi e facultativă și câte una pe fiecare serviciu</td>
+                        <td><b>Districtul însuși</b>: o singură asociere, obligatorie, pe tot teritoriul</td></tr>
+                    <tr><th scope="row">Zona metropolitană</th>
+                        <td>Asociere în jurul unui municipiu (Legea 246/2022), cu strategie și plan de mobilitate
+                            proprii</td>
+                        <td>Are venit propriu, din impozitul pe venit al localităților membre; ia fondurile de
+                            dezvoltare urbană</td>
+                        <td>Doar în jurul municipiilor</td>
+                        <td>Forma districtului al cărui oraș e municipiu; <b>statutul ei se extinde la districtele
+                            rurale</b></td></tr>
+                    <tr><th scope="row">Grupul de acțiune locală</th>
+                        <td>Parteneriat public–privat, cu strategie proprie</td>
+                        <td>Proiecte mici, repede, pentru firme, fermieri și asociații; animarea teritoriului</td>
+                        <td>Nu face infrastructură mare; nu poate fi condus de primari</td>
+                        <td>Câte unul în fiecare microregiune, în jurul unui oraș</td></tr>
+                    <tr><th scope="row">Strategia teritorială integrată</th>
+                        <td>Un singur document care leagă mai multe fonduri pe același teritoriu</td>
+                        <td>Aduce împreună banii urbani, rurali și sociali; e instrumentul pe care îl cere noul plan</td>
+                        <td>Azi există doar în câteva zone (Delta Dunării, Valea Jiului și altele)</td>
+                        <td><b>Una pe fiecare district</b>: leagă strategiile grupurilor, a orașului și planul de apă</td></tr>
+                    <tr><th scope="row">Consorțiul administrativ</th>
+                        <td>Primării care își împart specialiștii</td>
+                        <td>Arhitect-șef, auditor, achiziții, jurist — oameni pe care o comună singură nu și-i permite</td>
+                        <td>Nu ia fonduri; e o formă de lucru, nu de finanțare</td>
+                        <td>Aparatul tehnic al districtului</td></tr>
+                    <tr><th scope="row">Operatorul regional de apă</th>
+                        <td>Societate a asociației de apă-canal, pe o arie mare</td>
+                        <td>Singura formă prin care se finanțează european apa și canalizarea</td>
+                        <td>Fărâmițat, pierde eligibilitatea</td>
+                        <td>Rămâne; districtul îl reprezintă pe fiecare primar în fața lui</td></tr>
+                    <tr><th scope="row">Gruparea europeană de cooperare teritorială</th>
+                        <td>Persoană juridică peste graniță (Regulamentul (CE) 1082/2006)</td>
+                        <td>Proiecte comune cu vecinii, pe programele de cooperare</td>
+                        <td>Are sens doar la frontieră</td>
+                        <td>Pentru districtele de graniță</td></tr>
+                </tbody>
+            </table>
+            <p><b>Pachetul recomandat, pe fiecare district:</b> districtul ca asociere unică a primăriilor — zonă
+                metropolitană unde orașul e municipiu; câte un grup de acțiune locală în fiecare microregiune; o
+                singură strategie teritorială integrată, care le leagă; aparatul tehnic pus la comun. Patru piese,
+                un singur teritoriu, o singură hartă.</p>
+            <p><b>Calendarul care contează:</b> strategiile districtelor trebuie să existe înainte ca planul
+                național să plece la Bruxelles, adică până la mijlocul lui 2027. Un district care apare după aceea
+                așteaptă șapte ani.</p>
+
+            <h3>Ce face biroul de proiecte, lună de lună</h3>
+            <ol>
+                <li><b>Întâlnirea lunară</b> cu fiecare primărie: ce apeluri se deschid, ce proiecte sunt în
+                    lucru, ce indicatori au rămas în urmă.</li>
+                <li><b>Portofoliu comun</b>: un singur studiu de fezabilitate pentru drumul care trece prin trei
+                    comune, nu trei.</li>
+                <li><b>Cofinanțare pusă la comun</b>, din cotizația districtului, pentru comunele care singure
+                    n-ar putea-o acoperi.</li>
+                <li><b>Tabloul de bord public</b>: indicatorii fiecărei comune, actualizați anual din datele
+                    INS și din execuția bugetară.</li>
+            </ol>
+            <p class="nota">Sursele pentru starea de azi a grupurilor: Regulamentul (UE) 2021/1060, art. 31–34;
+                cifrele pe 2023–2027 și schimbările anunțate pentru 2028–2034 sunt cele comunicate public în
+                februarie 2026 și trebuie verificate la Ministerul Agriculturii înainte de a fi citate oficial.</p>
+        </section>
+
+        <section id="institutii">
+            <h2>Instituțiile județene devin regionale</h2>
+            <p>Fiecare județ are, pe lângă primării și consiliul județean, câteva zeci de instituții ale statului:
+                o direcție, o agenție, un inspectorat pentru aproape fiecare minister. Fiecare cu sediu, director,
+                contabilitate și parc auto — de 42 de ori. Unele ministere au făcut deja pasul la regiune, fiecare
+                cu harta lui. Propunerea le așază pe toate pe aceeași hartă: <b>conducerea și munca de birou la
+                regiune, omul la ghișeul districtului</b>, iar în fosta reședință de județ, un singur oficiu.</p>
+            <div id="institutii-cifre"><p class="nota">Se calculează…</p></div>
+
+            <h3>Județ cu județ: de unde plecăm și unde ajungem</h3>
+            <p>Oameni și bani, pe cele trei părți ale administrației din fiecare județ: aparatul primăriilor,
+                aparatul consiliului județean și instituțiile statului.</p>
+            <div id="personal-cifre"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="infrastructura">
+            <h2>Infrastructura esențială, pe fiecare formă</h2>
+            <p>Fiecare UAT are patru grupe de indicatori — <b>drumuri, apă și canalizare, educație, cultură</b> —
+                iar fiecare formă nouă (comuna comasată, districtul, regiunea) îi moștenește însumați. Stocul vine
+                din INS, banii din execuția bugetară a fiecărei primării.</p>
+            <div id="infrastructura-cifre"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="voluntar">
+            <h2>Etapa voluntară și criteriile</h2>
+            <p>Harta de pornire — circumscripțiile judecătoriilor — nu e impusă din prima zi. Fiecare UAT are o <b>perioadă în care alege singur</b>
+                cu cine se comasează și în ce district intră. Alegerea e liberă, cu o singură condiție: rezultatul
+                trebuie să treacă aceleași criterii ca harta calculată. Cine nu alege până la termen primește
+                varianta calculată.</p>
+            <table class="tabel-doc">
+                <thead><tr><th>Pentru comuna sau orașul nou</th><th>Pentru district</th></tr></thead>
+                <tbody>
+                    <tr><td>Cel puțin 5.000 de locuitori (7.000 cu oraș), azi și în proiecția la 2050; un oraș sub
+                            25.000 de locuitori poate prelua UAT-urile mici din jur care altfel rămân sub prag</td>
+                        <td>Reședința e oraș sau municipiu</td></tr>
+                    <tr><td>Niciun sat la peste 30 de minute de reședință; 45, limita absolută</td>
+                        <td>Orașul și cel puțin o comună asociată</td></tr>
+                    <tr><td>Teritoriu dintr-o bucată</td>
+                        <td>Cel puțin 25.000 de locuitori — pragul zonei rurale funcționale</td></tr>
+                    <tr><td>O unitate fără oraș nu trece de 15.000 de locuitori</td>
+                        <td>Teritoriu dintr-o bucată</td></tr>
+                    <tr><td>Aparatul administrativ sub 30% din veniturile proprii, în trei ani</td>
+                        <td>Nicio reședință de comună la peste 60 de minute de centrul districtului</td></tr>
+                    <tr><td>Dreptul minorităților de peste 20% se păstrează la nivelul localității</td>
+                        <td>Încadrare în pragurile europene: 10.000–150.000 de locuitori eligibili la LEADER</td></tr>
+                </tbody>
+            </table>
+            <h3>Calendarul</h3>
+            <ol>
+                <li><b>Luna 0:</b> se publică harta calculată și criteriile; fiecare consiliu local vede dosarul
+                    unității lui.</li>
+                <li><b>Lunile 1–12:</b> hotărâri de consiliu local pentru comasare și pentru district. Alegerile
+                    se înregistrează pe hartă, iar criteriile se verifică pe loc — o alegere care lasă un vecin
+                    sub prag se vede imediat.</li>
+                <li><b>Luna 12:</b> ce a rămas nealocat intră în varianta calculată; unitățile care nu trec
+                    criteriile primesc derogare scrisă sau comasare forțată.</li>
+                <li><b>Alegerile locale din 2028</b> se țin pe noile unități, iar strategiile de dezvoltare locală
+                    2028–2034 se scriu pe noile districte.</li>
+            </ol>
+            <p class="nota">În hartă, butonul „Reorganizează districtele” face exact asta: alegi orașul, dai clic pe
+                comunele care trec la el, salvezi. Alegerile se țin în <code>date/corectii-districte.json</code> și
+                intră în toate cifrele acestui raport. Un detaliu de calcul: o comună prea mică pentru a rămâne
+                singură își ia cu ea unitatea în care a fost comasată.</p>
+        </section>
+
+        <section id="impact">
+            <h2>Impactul financiar</h2>
+            <p>Execuția bugetelor locale pe 2025, pe toate primăriile din țară: cât se duce azi pe
+                administrație, cât pe investiții, și ce se schimbă.</p>
+            <div id="impact-financiar"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="transport">
+            <h2>Transportul: descentralizare pe trei paliere</h2>
+            <p>Reorganizarea mută primăria mai departe de sat; fără transport, reforma pică la primul drum la
+                ghișeu. Azi transportul județean de persoane e într-o zonă gri: consiliile județene au preluat
+                atribuția, dar multe trasee au rămas neatribuite, iar satele mici au rămas fără nicio cursă.
+                Modelul îl așază pe aceleași trei paliere ca administrația.</p>
+            <table class="tabel-doc">
+                <thead><tr><th>Palier</th><th>Ce acoperă</th><th>Cine organizează</th><th>Cum se finanțează</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Transport de district</th>
+                        <td>Satele și comunele &rarr; orașul-centru al districtului. Curse cadențate, corelate
+                            cu programul ghișeului, al școlii și al spitalului.</td>
+                        <td>Districtul, ca autoritate de transport: licitează contracte de serviciu public pe
+                            pachete de trasee — operatori privați sau o companie a districtului</td>
+                        <td>Cotă din bugetele comunelor membre, proporțional cu populația deservită, plus
+                            biletul; compensație de serviciu public după Regulamentul (CE) 1370/2007</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Legătura district – zonă metropolitană</th>
+                        <td>Orașul-centru al fiecărui district &rarr; municipiul zonei metropolitane vecine:
+                            legătura care ține loc de absorbție. Districtul rămâne independent, dar e la un
+                            drum cadențat de spital, universitate și locurile de muncă din municipiu.</td>
+                        <td>În comun, districtul și zona metropolitană, prin contract de serviciu public cu
+                            cost împărțit după populația deservită</td>
+                        <td>Cote din bugetele celor două, plus biletul; prioritate la fondurile europene de
+                            mobilitate, fiind o legătură urban–rural</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Transport regional</th>
+                        <td>Orașele-centru de district &rarr; capitala regiunii, și între municipiile mari ale
+                            regiunii. Legătura cu trenul, acolo unde există.</td>
+                        <td>Regiunea, printr-o autoritate regională de transport care integrează și trenul
+                            regional, prin contract cu operatorul feroviar</td>
+                        <td>Buget regional și fonduri europene pentru material rulant; un singur titlu de
+                            călătorie valabil pe tot lanțul</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Transport interregional</th>
+                        <td>Între capitalele de regiune și spre Capitală</td>
+                        <td>Statul, prin contracte-cadru; piață liberă pentru operatorii rutieri</td>
+                        <td>Bilet, fără subvenție, cu obligații de serviciu public doar pe rutele nerentabile</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Trei reguli care fac diferența</h3>
+            <ol>
+                <li><b>Un bilet, un orar.</b> Titlu de călătorie unic pe district și pe regiune, orar publicat
+                    în format deschis (GTFS), obligatoriu pentru orice operator cu contract public. Fără asta,
+                    integrarea rămâne pe hârtie.</li>
+                <li><b>Cadență garantată, nu „curse”.</b> Fiecare sat cu peste 200 de locuitori are cel puțin o
+                    legătură dimineața și una după-amiaza spre reședința de comună sau de district; sub acest
+                    prag, transport la cerere, cu microbuz pe rezervare — mai ieftin decât o cursă goală.</li>
+                <li><b>Plata pe kilometru efectuat și pe punctualitate</b>, nu pe traseu atribuit administrativ.
+                    Contractul se reziliază automat sub 90% curse realizate — regula care lipsește azi.</li>
+            </ol>
+        </section>
+
+        <section id="comparatie">
+            <h2>Comparația, reper cu reper</h2>
+            <p class="nota">Fiecare rând are reperul, cifra de azi, cifra propusă și sursa. Unde intervine o
+                ipoteză de calcul (costul aparatului după comasare), ipoteza e scrisă în clar.</p>
+            <div id="comparatie-tabel"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="repere">
+            <h2>România față de alte țări</h2>
+            <p>Reperele sunt alese dintre țările care au făcut reforma, nu dintre cele care au amânat-o.</p>
+            <div id="repere-tabel"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section id="riscuri">
+            <h2>Ce pierdem, ce riscăm</h2>
+            <ol>
+                <li><b>Drumul la primărie se lungește.</b> Timpul mediu crește de la circa 2 la circa 6 minute,
+                    iar satele aflate la peste 30 de minute de reședință se înmulțesc. Compensarea e în model:
+                    delegat sătesc cu fond propriu, punct de lucru, funcționar itinerant — și limita absolută de
+                    45 de minute, dincolo de care comasarea nu se face.</li>
+                <li><b>Reprezentarea scade.</b> Numărul aleșilor se reduce de câteva ori. E efectul dorit, dar
+                    are preț: cine locuiește într-un sat mic nu mai are „omul lui” în consiliu. De aceea
+                    delegatul sătesc trebuie să fie o funcție reală, cu buget, nu una decorativă.</li>
+                <li><b>Minoritățile.</b> Pragul de 20% din Codul administrativ e legat azi de UAT; comasarea îl
+                    poate șterge. Modelul îl mută la nivelul localității componente — dar asta cere modificarea
+                    art. 94, altfel comasările respective rămân blocate.</li>
+                <li><b>Reversibilitatea politică.</b> Republica Moldova a făcut reforma regională în 1999 și a
+                    anulat-o în 2003, la schimbarea guvernului. O reformă care nu e însoțită de reguli
+                    permanente — plafonul de cost, pragul de serviciu — se poate întoarce la fel de repede.</li>
+                <li><b>Ordinea legilor.</b> Constituția se modifică ultima, nu prima: districtul pornește ca
+                    asociere obligatorie, pe Codul administrativ, iar regiunea capătă consiliu ales prin lege organică.
+                    Riscul nu e că legea nu permite, ci că pachetul se votează pe bucăți și rămâne la jumătate.</li>
+                <li><b>Fondurile europene nu urmează automat harta.</b> Locul grupurilor de acțiune locală în
+                    planurile 2028–2034 se negociază; dacă districtele apar după selecția strategiilor, pierd o
+                    perioadă întreagă.</li>
+            </ol>
+        </section>
+
+        <section id="riscuri-europa">
+            <h2>Cum a rezolvat Europa aceleași șase lucruri</h2>
+            <p>Niciunul dintre riscuri nu e nou. Fiecare a fost întâlnit de țările care au făcut reforma, iar
+                soluțiile lor se pot lua ca atare.</p>
+            <table class="tabel-doc">
+                <thead><tr><th>Riscul</th><th>Cine l-a avut și ce a făcut</th><th>Ce luăm în model</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Drumul la primărie se lungește</th>
+                        <td><b>Franța</b> a pus ghișee „France Services”: 2.865 de puncte, fiecare cu cel puțin 24
+                            de ore pe săptămână și 12 instituții ale statului la același birou; 95% din francezi au
+                            unul la sub 30 de minute. <b>Danemarca</b>, după ce a trecut de la 271 la 98 de comune, a
+                            făcut serviciul digital regula și ghișeul excepția.</td>
+                        <td>Oficiul din fiecare fostă comună și ghișeul districtului, cu aceeași regulă: program
+                            minim garantat și toate instituțiile la un singur birou</td></tr>
+                    <tr><th scope="row">Reprezentarea scade</th>
+                        <td><b>Polonia</b> are satul cu sfat ales și fond propriu, garantat prin lege din bugetul
+                            comunei. <b>Franța</b> păstrează, în comunele comasate, „comuna delegată” cu primarul ei
+                            delegat și primăria-anexă. <b>Portugalia</b> și <b>Anglia</b> au parohii alese sub
+                            comună.</td>
+                        <td>Delegatul sătesc cu fond propriu, scris în lege ca procent din buget, nu lăsat la
+                            bunăvoința consiliului</td></tr>
+                    <tr><th scope="row">Minoritățile</th>
+                        <td><b>Finlanda</b>: comuna e bilingvă de la 8% sau 3.000 de vorbitori și rămâne așa până
+                            sub 6%; după o comasare, dreptul nu se pierde. <b>Voivodina</b>: limba minorității e
+                            oficială în localitatea în care minoritatea are 25%, chiar dacă pe toată comuna nu
+                            ajunge la prag. Două tratate la care România e parte spun același lucru: noile
+                            împărțiri administrative nu au voie să stânjenească folosirea limbii (Carta limbilor
+                            regionale, art. 7) și nici să schimbe proporțiile ca să restrângă drepturi
+                            (Convenția-cadru, art. 16).</td>
+                        <td>Pragul se socotește pe localitate, ca în Voivodina, și un drept deja câștigat nu se
+                            pierde prin comasare, ca în Finlanda</td></tr>
+                    <tr><th scope="row">Reversibilitatea politică</th>
+                        <td><b>Estonia</b> (213 → 79 de comune, în 2017): întâi o perioadă de comasare voluntară,
+                            cu bani pentru cine se unește, apoi propunerea guvernului pentru restul; Curtea
+                            Supremă a respins contestațiile. <b>Danemarca</b>: prag de 20.000 de locuitori, fiecare
+                            comună și-a ales singură partenerii, iar alegerile pe noua hartă s-au ținut înainte ca
+                            reforma să intre în vigoare.</td>
+                        <td>Etapa voluntară cu criterii, apoi harta calculată; alegerile din 2028 pe noua hartă.
+                            O hartă pe care oamenii au ales-o și pe care s-a votat nu se mai întoarce</td></tr>
+                    <tr><th scope="row">Ordinea legilor</th>
+                        <td><b>Polonia</b> a votat toate legile reformei în același an, 1998, a ținut alegerile
+                            pe noile unități în toamnă și a pornit la 1 ianuarie 1999. <b>Danemarca</b> a trecut
+                            tot pachetul prin parlament într-o singură sesiune, în 2005. <b>Franța</b> a redus
+                            regiunile de la 22 la 13 printr-o singură lege, fără să atingă constituția.</td>
+                        <td>O lege-cadru cu dată fixă și cu toate transferurile enumerate; constituția, la urmă</td></tr>
+                    <tr><th scope="row">Fondurile nu urmează automat harta</th>
+                        <td><b>Polonia</b> a făcut din regiunile create în 1999 autorități de management pentru
+                            propriile programe. <b>Ungaria, Polonia și Lituania</b> și-au redesenat în 2018
+                            regiunile statistice anume ca să păstreze finanțarea zonelor rămase în urmă.
+                            <b>Letonia</b> și-a pus reforma în 2021, exact la începutul perioadei de programare.</td>
+                        <td>Reforma se leagă de începutul perioadei 2028–2034; județele rămân unități statistice,
+                            deci nu se pierde nicio serie de date și nicio eligibilitate</td></tr>
+                </tbody>
+            </table>
+            <p class="nota">Cifrele despre Franța, Estonia, Danemarca, Finlanda și Voivodina sunt verificate din
+                surse publice; calendarul polonez și redesenarea regiunilor statistice din 2018 sunt cunoscute, dar
+                merită citate din sursa oficială înainte de a fi folosite într-un document public.</p>
+        </section>
+
+        <section id="viziune">
+            <h2>Viziunea: statul care răspunde în 24 de ore</h2>
+            <p>Reorganizarea nu e un scop. Scopul e un stat în care cetățeanul și întreprinzătorul obțin ce au
+                nevoie <b>repede, într-un singur loc și fără să demonstreze ce statul știe deja</b>. Harta e
+                doar infrastructura acestui lucru.</p>
+
+            <h3>Cum arată, concret</h3>
+            <ul>
+                <li><b>Cetățeanul</b> intră la oficiul din satul lui — 2–3 oameni, multifuncționali — sau în
+                    aplicație, și rezolvă acolo tot ce ține de stat: stare civilă, taxe, ajutoare, autorizații
+                    simple. Nu i se mai cere niciun document emis de altă instituție a statului.</li>
+                <li><b>Actele de identitate și mașina</b> se fac la ghișeul districtului: carte de identitate,
+                    pașaport, permis și numere, cu o singură poză și un singur rând de amprente.</li>
+                <li><b>Întreprinzătorul</b> depune o singură cerere, iar termenul e ferm: răspuns în 24 de ore
+                    la cererile standard, 30 de zile la cele cu avize, iar tăcerea înseamnă aprobare.
+                    Autorizația de construire se eliberează pe baza PUG-ului digital al districtului, nu pe
+                    interpretarea unui funcționar.</li>
+                <li><b>Primarul</b> nu mai administrează o primărie cu 12 angajați pentru 1.200 de locuitori,
+                    ci o unitate care își permite un arhitect-șef, un jurist și un om de achiziții — exact
+                    oamenii fără de care nu se atrag fonduri.</li>
+                <li><b>Statul</b> verifică legalitatea automat, pe hotărârile publicate în format deschis, și
+                    intervine doar unde verificarea semnalează. Prefectura devine serviciu, nu aparat.</li>
+            </ul>
+
+            <h3>Ce probleme vechi rezolvă</h3>
+            <table class="tabel-doc">
+                <thead><tr><th>Problema de azi</th><th>Ce o rezolvă în model</th></tr></thead>
+                <tbody>
+                    <tr><td>Nouă din zece primării cheltuiesc pe propriul aparat peste 30% din veniturile proprii</td>
+                        <td>Unități de 5.000–7.000 de locuitori, plus plafonul legal de 30% verificat anual din execuția publicată</td></tr>
+                    <tr><td>Absorbție slabă de fonduri: unitățile mici nu au oameni pentru proiecte</td>
+                        <td>Biroul de proiecte al districtului le pregătește pentru toți membrii, iar grupul de acțiune locală le finanțează pe cele mici; pragurile europene sunt verificate încă de la desenul hărții</td></tr>
+                    <tr><td>Servicii deconcentrate dublate: fiecare județ cu zeci de agenții, fiecare cu sediu și director</td>
+                        <td>Agenții regionale, cu un singur oficiu în fosta reședință de județ și ghișeu în fiecare district</td></tr>
+                    <tr><td>Drumuri, apă și canalizare fragmentate pe zeci de UAT-uri</td>
+                        <td>Districtul le planifică unitar, cu indicatori publici pe fiecare comună; drumurile le administrează el, apa rămâne la operatorul regional</td></tr>
+                    <tr><td>Hârtii cerute de la un ghișeu pentru altul</td>
+                        <td>Principiul „o singură dată”, deja obligatoriu prin Regulamentul (UE) 2018/1724</td></tr>
+                    <tr><td>Sate rămase fără transport după desființarea curselor</td>
+                        <td>Autoritate de transport la nivel de district, cu cadență garantată și transport la cerere</td></tr>
+                    <tr><td>Reforme anulate la schimbarea guvernului, ca în Republica Moldova în 2003</td>
+                        <td>Reguli permanente — plafon de cost, prag de serviciu — care lucrează fără o nouă lege de reorganizare</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Ce rămâne de demonstrat</h3>
+            <p>Două lucruri trebuie testate înainte de lege: <b>capacitatea administrativă</b> a unităților noi
+                în primii doi ani — de aceea tranziția e bugetată la jumătate din economia primului an — și
+                <b>acceptarea politică</b> a desființării consiliilor județene, singura schimbare care atinge
+                direct o categorie de aleși. Restul e inginerie.</p>
+        </section>
+
+        <section id="surse-raport">
+            <h2>Cum s-au calculat cifrele</h2>
+            <div id="ipoteze"><p class="nota">Se calculează…</p></div>
+            <p class="nota">Sursele datelor sunt listate în <a href="metodologie.html#surse">metodologie</a>.
+                Execuția bugetară pe primării vine de la <a href="https://executii-bugetare.g4d.ro/">executii-bugetare.g4d.ro</a>
+                (date ANAF/Forexebug republicate ca JSON), dotările de pe
+                <a href="https://data.gov.ro/">data.gov.ro</a> (Ministerul Sănătății, Poșta Română, CNAS).</p>
+        </section>
+        </div>
+        </div>
+    </main>
+
+    <script src="js/adp-topologie.js"></script>
+    <script src="js/adp-reorganizare.js"></script>
+    <script src="js/adp-regionalizare.js"></script>
+    <script src="js/adp-infrastructura.js"></script>
+    <script src="js/adp-explorator.js"></script>
+    <script src="js/adp-raport.js"></script>
+    <script>
+        // compunerea paginii: singurul loc care leagă modulele între ele
+        document.addEventListener("DOMContentLoaded", () => AdpRaport.porneste({
+            topologie: AdpTopologie,
+            reorganizare: AdpReorganizare,
+            regionalizare: AdpRegionalizare,
+            infrastructura: AdpInfrastructura,
+            explorator: AdpExplorator
+        }));
+    </script>
+</body>
+
+</html>
