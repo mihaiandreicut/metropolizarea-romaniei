@@ -62,7 +62,7 @@
                 <li><a href="#regiune">Consiliile județene și prefecturile</a></li>
                 <li><a href="#fonduri">Regulile pentru fonduri</a></li>
                 <li><a href="#plan">Planul de lucru</a></li>
-                <li><a href="#decizii">Deciziile deschise</a></li>
+                <li><a href="#decizii">Deciziile</a></li>
             </ol>
         </nav>
 
@@ -152,35 +152,37 @@
 
         <section id="reguli">
             <h2>Regulile de comasare</h2>
-            <p>Setul de reguli, versiunea 1. Fiecare are un prag, o sursă de date din care se verifică și o
-                urmare dacă nu e îndeplinită. Toate sunt deja în calculul din hartă, în afară de regula 7.</p>
+            <p>Setul de reguli, versiunea 1, înghețat la 19 octombrie 2026. Fiecare are un prag, o sursă de date din
+                care se verifică, o urmare dacă nu e îndeplinită și cifra care îl motivează, calculată pe toată țara
+                (3.181 de UAT, cu alegerile voluntare de pe hartă). Toate sunt în calculul din hartă; regula 7 a
+                intrat în calcul la 19 octombrie 2026.</p>
             <div class="tabel-derulant"><table class="tabel-doc">
-                <thead><tr><th>Nr.</th><th>Regula</th><th>Pragul</th><th>Din ce date</th><th>Dacă nu e îndeplinită</th></tr></thead>
+                <thead><tr><th>Nr.</th><th>Regula</th><th>Pragul</th><th>Din ce date</th><th>Dacă nu e îndeplinită</th><th>Cifra care îl motivează</th></tr></thead>
                 <tbody>
                     <tr><td>1</td><th scope="row">Populația de azi</th><td>cel puțin 5.000; 7.000 cu oraș; ținta 7.000</td>
-                        <td>Recensământul 2021</td><td>Comasare cu vecinul</td></tr>
+                        <td>Recensământul 2021</td><td>Comasare cu vecinul</td><td>3.181 → 1.208 de unități; sub 5.000 de locuitori: 2.501 → 71; mediana 2.894 → 9.857. Costul pe locuitor se așază de la 5.000 (curba de mai sus)</td></tr>
                     <tr><td>2</td><th scope="row">Populația peste 25 de ani</th><td>același prag, în proiecția la 2050</td>
-                        <td>Populația de domiciliu 2011–2024</td><td>Comasare, chiar dacă azi trece pragul</td></tr>
+                        <td>Populația de domiciliu 2011–2024</td><td>Comasare, chiar dacă azi trece pragul</td><td>Unități sub prag în 2050: 163 fără regulă, 87 cu ea; costă 58 de unități comasate în plus (1.266 → 1.208)</td></tr>
                     <tr><td>3</td><th scope="row">Drumul până la reședință</th><td>cel mult 30 de minute pentru orice sat de peste 50 de locuitori; 45, limita absolută</td>
-                        <td>Rețeaua rutieră, calcul pe drum real</td><td>Comasarea nu se face; unitatea rămâne cu derogare</td></tr>
+                        <td>Rețeaua rutieră, calcul pe drum real</td><td>Comasarea nu se face; unitatea rămâne cu derogare</td><td>Sate de peste 50 de locuitori la peste 30 de minute: 85 azi, 384 după comasare; la 20 de minute ar fi 1.928, la 45 de minute 22</td></tr>
                     <tr><td>4</td><th scope="row">Teritoriu dintr-o bucată</th><td>fără enclave</td>
-                        <td>Limitele UAT-urilor</td><td>Comasarea nu se face</td></tr>
+                        <td>Limitele UAT-urilor</td><td>Comasarea nu se face</td><td>Condiție, nu prag; fără cifră</td></tr>
                     <tr><td>5</td><th scope="row">Comunele între ele, întâi</th><td>orașul sub 25.000 preia doar UAT-urile mici rămase; cel de cel mult 20.000 nu trece astfel de 20.000</td>
-                        <td>Rangul localității, populația</td><td>Comuna caută alt vecin rural</td></tr>
+                        <td>Rangul localității, populația</td><td>Comuna caută alt vecin rural</td><td>62 de orașe preiau 129 de comune. Fără plafonul de 20.000, 5 orașe (Brad, Comănești, Turnu Măgurele, Ocna Mureș, Motru) ar trece de 20.000 și 21 de comune ar ieși din LEADER; plafonul costă 0,02 mld. lei pe an</td></tr>
                     <tr><td>6</td><th scope="row">Nici prea mare</th><td>o unitate fără oraș, cel mult 15.000</td>
-                        <td>Populația</td><td>Se oprește creșterea</td></tr>
+                        <td>Populația</td><td>Se oprește creșterea</td><td>Fără prag, 169 de unități rurale ar depăși 15.000 (1.073 de unități în total); cu el, 49</td></tr>
                     <tr><td>7</td><th scope="row">Se poate întreține</th><td>aparatul, cel mult 30% din veniturile proprii, în trei ani</td>
-                        <td>Execuția bugetară anuală</td><td><b>De introdus în calcul</b>: azi e doar test, nu regulă</td></tr>
+                        <td>Execuția bugetară anuală</td><td>Nu blochează comasarea: unitatea peste prag are trei ani să coboare sub el</td><td>Azi 2.801 din 3.126 de primării (90%) cheltuiesc peste 30% din veniturile proprii; după comasare, 582 din 1.204 (48%) — 622 trec, 582 primesc termen. Ținta de 800 lei pe locuitor, unde se așază curba costului: 33% dintre primării o ating azi, 81% dintre unitățile noi</td></tr>
                     <tr><td>8</td><th scope="row">Reședința</th><td>orașul, dacă e unul; altfel localitatea cu cel mai mic drum mediu și cu dotări</td>
-                        <td>Timpi de drum, școli, servicii</td><td>—</td></tr>
+                        <td>Timpi de drum, școli, servicii</td><td>—</td><td>Regulă de alegere; fără prag</td></tr>
                     <tr><td>9</td><th scope="row">Minoritățile</th><td>pragul de 20% se socotește pe localitate</td>
-                        <td>Recensământul 2021</td><td>Dreptul rămâne la localitate</td></tr>
+                        <td>Recensământul 2021</td><td>Dreptul rămâne la localitate</td><td>Dacă ar bloca comasarea: 167 de unități sub prag, în loc de 71; cu derogare la localitate, 140 de unități își păstrează dreptul</td></tr>
                     <tr><td>10</td><th scope="row">O singură adresă</th><td>comuna întreagă într-o microregiune, un district, un județ</td>
-                        <td>Circumscripțiile judecătoriilor</td><td>Două comune din districte diferite nu se comasează</td></tr>
-                    <tr><td>11</td><th scope="row">Întâi de bunăvoie</th><td>12 luni în care fiecare își alege partenerii, în limitele regulilor 1–10</td>
-                        <td>Alegerile înregistrate pe hartă</td><td>Se aplică harta calculată</td></tr>
+                        <td>Circumscripțiile judecătoriilor</td><td>Două comune din districte diferite nu se comasează</td><td>169 de circumscripții de judecătorie → 168 de districte; 7 sub 25.000 de locuitori înainte de ajustare, niciunul după (cel mai mic: 25.942)</td></tr>
+                    <tr><td>11</td><th scope="row">Întâi de bunăvoie</th><td>etapă voluntară 2028–2030, în care fiecare își alege partenerii, în limitele regulilor 1–10</td>
+                        <td>Alegerile înregistrate pe hartă</td><td>Se aplică harta calculată</td><td>Termen de procedură; 6 alegeri de district și 4 comasări înregistrate până acum (Sibiu)</td></tr>
                     <tr><td>12</td><th scope="row">Derogarea</th><td>doar scrisă și motivată, pentru izolare</td>
-                        <td>Dosarul unității</td><td>—</td></tr>
+                        <td>Dosarul unității</td><td>—</td><td>421 de unități din 1.208 au cel puțin o derogare scrisă în dosar</td></tr>
                 </tbody>
             </table></div>
             <p class="nota">Indicatorii de infrastructură — apă, canalizare, drumuri, școli, spitale — nu sunt reguli
@@ -240,55 +242,92 @@
                 <tbody>
                     <tr><th scope="row">1. Înghețăm regulile</th>
                         <td>Hotărâm fiecare prag din setul de mai sus, pe baza curbei costului și a deciziilor
-                            deschise de mai jos</td>
-                        <td>Setul de reguli, versiunea 1, cu fiecare prag motivat de o cifră</td></tr>
+                            de mai jos</td>
+                        <td>Setul de reguli, versiunea 1, cu fiecare prag motivat de o cifră —
+                            <b>făcut</b> la 19 octombrie 2026</td></tr>
                     <tr><th scope="row">2. Regula financiară intră în calcul</th>
                         <td>Aparatul sub 30% din veniturile proprii devine regulă de comasare, nu doar test; se
                             adaugă costul pe locuitor ca țintă</td>
-                        <td>Harta recalculată; câte unități trec testul după comasare</td></tr>
+                        <td>Harta recalculată; câte unități trec testul după comasare — <b>făcut</b> la 19 octombrie
+                            2026: 622 din 1.204 trec, 582 primesc termen de trei ani</td></tr>
                     <tr><th scope="row">3. Județ cu județ</th>
                         <td>Rulăm cele 41 de județe și trecem prin excepții: unitățile sub prag, drumurile peste
                             30 de minute, alegerile de mână</td>
-                        <td>41 de fișe de județ, fiecare cu lista derogărilor</td></tr>
+                        <td>41 de fișe de județ, fiecare cu lista derogărilor — <b>făcut</b> la 19 octombrie 2026,
+                            în <a href="raport.html#judete">raport</a>: 541 de derogări, 135 de unități sub pragul lor,
+                            384 de sate la peste 30 de minute, 10 alegeri de mână</td></tr>
                     <tr><th scope="row">4. Mutarea la regiune</th>
                         <td>Pentru fiecare județ: ce atribuție a consiliului județean merge unde, câți oameni și
                             câți bani; aceeași fișă pentru prefectură și pentru fiecare instituție a statului</td>
-                        <td>Tabelul de transfer, pe județ și pe regiune</td></tr>
+                        <td>Tabelul de transfer, pe județ și pe regiune — <b>făcut</b> la 19 octombrie 2026 pentru
+                            consiliile județene, în <a href="raport.html#transfer">raport</a>: 40,4 mld. lei cheltuiți pe
+                            an, din care 30,4 mld. la regiune, 7,5 mld. la district și 2,4 mld. aparatul. Prefectura și
+                            instituțiile statului rămân cu estimarea de 20%, până la statele de funcții</td></tr>
                     <tr><th scope="row">5. Fondurile</th>
                         <td>Pentru fiecare district: strategia, grupurile de acțiune locală, planul de acțiuni din
                             indicatori, sursa de finanțare</td>
-                        <td>168 de fișe de district, gata de pus în planul regional</td></tr>
+                        <td>168 de fișe de district, gata de pus în planul regional — <b>făcut</b> la 19 octombrie 2026,
+                            în <a href="raport.html#plan-regional">raport</a>: 527 de acțiuni, 283 de grupuri de acțiune
+                            locală (toate în pragurile LEADER), fișele pe cele opt regiuni și descărcabile ca tabel.
+                            Sumele nu sunt estimate, fiindcă nu există devize</td></tr>
                     <tr><th scope="row">6. Legile</th>
                         <td>Legea-cadru, harta, modificările Codului administrativ, actele de reorganizare</td>
-                        <td>Pachetul legislativ, în ordinea votării</td></tr>
+                        <td>Pachetul legislativ, în ordinea votării — <b>structura făcută</b> la 19 octombrie 2026, în
+                            <a href="principii.html#tranzitie">principii</a>: opt acte cu ce conține și de ce depinde fiecare,
+                            în varianta în două trepte, aleasă. Textele actelor se redactează cu un jurist</td></tr>
                 </tbody>
             </table></div>
         </section>
 
         <section id="decizii">
-            <h2>Deciziile deschise</h2>
-            <p>Ca să înghețăm regulile, trebuie hotărâte acestea. Lângă fiecare, ce recomandă datele.</p>
+            <h2>Deciziile</h2>
+            <p>Pentru înghețarea regulilor (19 octombrie 2026) s-au luat valorile pe care le recomandau datele.
+                Cinci sunt înghețate; trei rămân ipoteze sau cazuri de confirmat, fiindcă depind de date pe care
+                azi nu le avem.</p>
             <div class="tabel-derulant"><table class="tabel-doc">
-                <thead><tr><th>Decizia</th><th>Azi în calcul</th><th>Ce spun datele</th></tr></thead>
+                <thead><tr><th>Decizia</th><th>Hotărât</th><th>Ce spun datele</th><th>Stare</th></tr></thead>
                 <tbody>
-                    <tr><th scope="row">Pragul minim al comunei</th><td>5.000</td>
-                        <td>Costul se așază de la 5.000; testul de 30% se trece de la 7.000. Recomandare: 5.000
-                            minim, 7.000 țintă — cum e acum</td></tr>
-                    <tr><th scope="row">Regula financiară, ca regulă</th><td>doar test</td>
-                        <td>După comasare, circa jumătate din unități încă depășesc 30%. Recomandare: regulă cu
-                            termen de trei ani, nu condiție la comasare</td></tr>
-                    <tr><th scope="row">Ce lasă în urmă primăria desființată</th><td>un sfert din aparat</td>
-                        <td>E ipoteza care mișcă cel mai mult economia. De verificat pe două–trei comasări reale</td></tr>
-                    <tr><th scope="row">Orașul care preia comune</th><td>sub 25.000 de locuitori</td>
-                        <td>Șase orașe trec astfel de 20.000 și scot 13 comune din LEADER. Recomandare: pragul la
-                            20.000, sau acceptăm pierderea</td></tr>
-                    <tr><th scope="row">Cât rămâne din aparatul consiliului județean</th><td>jumătate</td>
-                        <td>Fără date pe atribuții. De stabilit la pasul 4, județ cu județ</td></tr>
-                    <tr><th scope="row">Reducerea din instituțiile statului</th><td>20%</td>
-                        <td>Ipoteză. De înlocuit cu statele de funcții ale instituțiilor, la pasul 4</td></tr>
-                    <tr><th scope="row">Districtele sub 25.000 de locuitori</th><td>primesc comune de la vecin</td>
-                        <td>Șapte cazuri; mută câteva comune față de circumscripția judecătoriei. De confirmat
-                            caz cu caz</td></tr>
+                    <tr><th scope="row">Pragul minim al comunei</th><td>5.000 minim, 7.000 țintă</td>
+                        <td>Costul pe locuitor se așază de la 5.000; testul de 30% se trece, în medie, de la 7.000.
+                            Cu ele, cele 2.501 de unități sub 5.000 devin 71</td>
+                        <td>Înghețat</td></tr>
+                    <tr><th scope="row">Regula financiară, ca regulă</th>
+                        <td>Regulă cu termen de trei ani, nu condiție la comasare</td>
+                        <td>După comasare, 582 din 1.204 de unități (48%) încă depășesc 30%: ca condiție, aproape
+                            jumătate din unitățile noi ar fi respinse</td>
+                        <td>Înghețat; în calcul din 19 octombrie 2026</td></tr>
+                    <tr><th scope="row">Ce lasă în urmă primăria desființată</th><td>Un sfert din aparat, ca ipoteză</td>
+                        <td>Economia la primării e 4,3 mld. lei pe an dacă rămâne 15%, 3,8 mld. dacă rămâne 25%,
+                            3,3 mld. dacă rămâne 35%: fiecare zece puncte mută circa 0,5 mld. De verificat pe
+                            două–trei comasări reale</td>
+                        <td>Ipoteză păstrată</td></tr>
+                    <tr><th scope="row">Orașul care preia comune</th>
+                        <td>Orașul sub 25.000 de locuitori preia; cel de cel mult 20.000 nu trece peste 20.000</td>
+                        <td>Fără plafon, 5 orașe (Brad, Comănești, Turnu Măgurele, Ocna Mureș, Motru) ar trece de
+                            20.000 și 21 de comune ar ieși din LEADER; plafonul costă 0,02 mld. lei pe an</td>
+                        <td>Înghețat; era deja în calcul</td></tr>
+                    <tr><th scope="row">Cât rămâne din aparatul consiliului județean</th><td>Jumătate, ca ipoteză</td>
+                        <td>Aparatul e 2,4 din cei 40,4 mld. lei pe care îi cheltuiesc consiliile județene (6%); restul
+                            sunt servicii (spitale 47%, drumuri 15%, asistență socială 13%) care se mută întregi, cu
+                            banii lor. Jumătatea rămâne ipoteză, de verificat pe statele de funcții</td>
+                        <td>Ipoteză păstrată; datele pe atribuții sunt în raport</td></tr>
+                    <tr><th scope="row">Reducerea din instituțiile statului</th><td>20%, ca ipoteză</td>
+                        <td>De înlocuit cu statele de funcții ale instituțiilor: statistica nu le are pe instituții</td>
+                        <td>Deschis</td></tr>
+                    <tr><th scope="row">Calendarul pachetului</th>
+                        <td>Varianta în două trepte: districtul și transferul atribuțiilor până în iunie 2027, comasarea
+                            comunelor până în iunie 2031</td>
+                        <td>Etapa voluntară de 12 luni nu mai încape înaintea alegerilor din 2028 (limita e iunie 2027, cu
+                            un an înainte de alegeri). Variantele respinse: totul pentru 2028, totul pentru 2032</td>
+                        <td>Înghețat; vezi <a href="principii.html#tranzitie">principii</a></td></tr>
+                    <tr><th scope="row">Districtele sub 25.000 de locuitori</th><td>Primesc comune de la vecin</td>
+                        <td>7 districte din circumscripțiile judecătoriilor sunt sub 25.000: Hârșova 24.941, Săliște
+                            24.676, Agnita 23.944, Întorsura Buzăului 20.217, Moldova Nouă 20.095, Orșova 15.009,
+                            Baia de Aramă 14.935. Șase primesc 7 comune (Cristian la Săliște, Roșia la Agnita, Nicolae
+                            Bălcescu la Hârșova, Malovăț la Orșova, Coronini și Răcășdia la Moldova Nouă, Ozun la
+                            Întorsura Buzăului), iar Baia de Aramă se alipește Strehaiei. Rezultat: 168 de districte,
+                            cel mai mic cu 25.942 de locuitori</td>
+                        <td>Înghețat ca regulă; cazurile se confirmă unul câte unul</td></tr>
                 </tbody>
             </table></div>
         </section>

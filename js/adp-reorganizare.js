@@ -87,6 +87,15 @@ window.AdpReorganizare = function() {
     const NF = new Intl.NumberFormat("ro-RO");
     const NF1 = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 1 });
 
+    // regula 7 din sinteza.html (se poate întreține): aparatul, cel mult 30% din veniturile proprii.
+    // Nu blochează comasarea: unitatea care o depășește are trei ani să o atingă.
+    const REGULA_FINANCIARA = {
+        prag: 30,            // % din veniturile proprii (testul Republicii Moldova)
+        termenAni: 3,
+        tinta: 800,          // lei pe locuitor pe an, aparatul: de aici se așază curba costului
+        cotaBirouri: 0.25    // din aparatul unei primării desființate, rămas pe biroul local (ca în raport)
+    };
+
     /** Coadă cu priorități minimă (heap binar) pe [cost, ...]. */
     function Coada() {
         const a = [];
@@ -149,10 +158,47 @@ window.AdpReorganizare = function() {
     }
 
     /**
+     * Testul financiar al unei unități noi, din execuția bugetară a membrilor ei: unitatea păstrează
+     * aparatul primăriei-reședință și o cotă din al fiecărei primării desființate.
+     * @param lista      UAT-urile membre (indecși)
+     * @param sediu      UAT-ul reședință
+     * @param populatie  populația unității
+     * @param executie   Map UAT (index) -> înregistrare din execuția bugetară; fără date, întoarce null
+     */
+    function testFinanciar(lista, sediu, populatie, executie) {
+        const ale = lista.map(i => executie.get(i)).filter(Boolean);
+        if (!ale.length) return null;
+        const alSediului = executie.get(sediu);
+        const aparatul = e => e.cheltuieliAparat || 0;
+        const aparat = (alSediului ? aparatul(alSediului) : Math.max(...ale.map(aparatul))) +
+            REGULA_FINANCIARA.cotaBirouri * ale.filter(e => e !== alSediului).reduce((a, e) => a + aparatul(e), 0);
+        const venituri = ale.reduce((a, e) => a + (e.venituriProprii || 0), 0);
+        return {
+            aparat: aparat,
+            venituri: venituri,
+            pondere: venituri > 0 ? 100 * aparat / venituri : null,
+            peLocuitor: populatie > 0 ? aparat / populatie : null
+        };
+    }
+
+    /** Câte unități trec testul financiar și câte primesc termenul de trei ani. */
+    function sumarFinanciar(grupuri) {
+        const cu = grupuri.filter(g => g.financiar && g.financiar.pondere !== null);
+        if (!cu.length) return null;
+        return {
+            unitati: cu.length,
+            trec: cu.filter(g => g.financiar.pondere <= REGULA_FINANCIARA.prag).length,
+            termen: cu.filter(g => g.financiar.pondere > REGULA_FINANCIARA.prag).length,
+            subTinta: cu.filter(g => g.financiar.peLocuitor <= REGULA_FINANCIARA.tinta).length
+        };
+    }
+
+    /**
      * @param date     romania-uat.json (obiectul întreg)
      * @param vecini   AdpTopologie.vecini(topo) — vecinii fiecărui UAT (indecși)
      * @param ex       date/judete/<judet>.json (accesibilitatea localităților)
-     * @param optiuni  parametri (vezi PARAMETRI_IMPLICITI)
+     * @param optiuni  parametri (vezi PARAMETRI_IMPLICITI); `executie` (Map UAT -> execuția bugetară)
+     *                 adaugă regula financiară în condițiile fiecărei unități
      */
     function calculeaza(date, vecini, ex, optiuni) {
         const P = Object.assign({}, PARAMETRI_IMPLICITI, optiuni || {});
@@ -715,6 +761,7 @@ window.AdpReorganizare = function() {
             });
             const subPrag = pRef(lista) < pragUnitate(lista);
             const motive = subPrag ? motiveSubPrag(id, lista) : [];
+            const fin = P.executie ? testFinanciar(lista, s, pTot, P.executie) : null;
 
             // --- dosarul: jurnalul deciziilor + reședința aleasă + derogările
             const ev = evalueazaSedii(lista);
@@ -741,25 +788,27 @@ window.AdpReorganizare = function() {
                 });
             });
             const derogari = [];
+            const tipuriDerogari = [];  // câte un cod pe fiecare derogare, în aceeași ordine
+            const deroga = (tip, text) => { derogari.push(text); tipuriDerogari.push(tip); };
             if (depasiri.length) {
-                derogari.push(`${cate(depasiri.length, "sat", "sate")} la peste ${P.tMax} min de reședință ` +
+                deroga("drum", `${cate(depasiri.length, "sat", "sate")} la peste ${P.tMax} min de reședință ` +
                     `(${depasiri.slice(0, 3).map(x => `${x.n} ${NF1.format(x.tNou)} min`).join(", ")}` +
                     `${depasiri.length > 3 ? " ș.a." : ""}) — birou local obligatoriu.`);
             }
             if (!urban(s) && pTot > P.pMaxRural) {
-                derogari.push(`Unitate rurală de ${NF.format(pTot)} loc., peste maximul de ${NF.format(P.pMaxRural)}: ` +
+                deroga("rural-mare", `Unitate rurală de ${NF.format(pTot)} loc., peste maximul de ${NF.format(P.pMaxRural)}: ` +
                     `ar trebui declarată oraș (Legea 351/2001).`);
             }
             if (urban(s) && pTot < pragAutonomie(s)) {
-                derogari.push(`${nume(s)} rămâne sub pragul rangului de ${date.uat[s].t} ` +
+                deroga("rang", `${nume(s)} rămâne sub pragul rangului de ${date.uat[s].t} ` +
                     `(${NF.format(pTot)} din ${NF.format(pragAutonomie(s))} loc.), chiar și cu comunele preluate.`);
             }
             if (urban(s) && lista.length > 1 && pTot > PRAG_ORAS_LEADER) {
-                derogari.push(`Unitate cu oraș, de ${NF.format(pTot)} loc.: peste ${NF.format(PRAG_ORAS_LEADER)} de locuitori, ` +
+                deroga("leader", `Unitate cu oraș, de ${NF.format(pTot)} loc.: peste ${NF.format(PRAG_ORAS_LEADER)} de locuitori, ` +
                     `comunele preluate ies din aria LEADER și se finanțează prin strategia urbană a orașului.`);
             }
             if (riscMinoritate.length) {
-                derogari.push(riscMinoritate.map(r => `${nume(r.uat)}: minoritatea ${r.etnie.toLowerCase()} scade de la ` +
+                deroga("minoritate", riscMinoritate.map(r => `${nume(r.uat)}: minoritatea ${r.etnie.toLowerCase()} scade de la ` +
                     `${NF1.format(r.inainte)}% la ${NF1.format(r.dupa)}% — sub pragul de ${P.pragMinoritate}% din Codul administrativ.`).join(" ") +
                     (P.regimMinoritati === "localitate"
                         ? ` Dreptul la limba maternă se păstrează la nivelul ${riscMinoritate.length === 1
@@ -768,13 +817,20 @@ window.AdpReorganizare = function() {
                         : ""));
             }
             if (subPrag) {
-                derogari.push(`Unitatea rămâne sub prag (${NF.format(pRef(lista))} loc. de referință): ` +
+                deroga("sub-prag", `Unitatea rămâne sub prag (${NF.format(pRef(lista))} loc. de referință): ` +
                     (motive.includes("minoritate")
                         ? "orice comasare ar coborî o minoritate sub pragul de 20%."
                         : motive.includes("fără vecini") ? "nu are vecini disponibili în județ."
                             : "comasarea e blocată de regulile active."));
             }
             derogari.forEach(t => dosar.push({ regula: "Derogare", text: t }));
+            if (fin && fin.pondere !== null && fin.pondere > REGULA_FINANCIARA.prag) {
+                dosar.push({
+                    regula: "Termen",
+                    text: `Aparatul costă ${NF1.format(fin.pondere)}% din veniturile proprii, peste ${REGULA_FINANCIARA.prag}%: ` +
+                        `unitatea are ${REGULA_FINANCIARA.termenAni} ani să coboare sub prag; comasarea nu e condiționată de asta.`
+                });
+            }
 
             const conditii = [
                 {
@@ -811,6 +867,14 @@ window.AdpReorganizare = function() {
                             ? "păstrat" : "nu e cazul"),
                     prag: `≥ ${P.pragMinoritate}%`, stare: riscMinoritate.length ? "derogare" : "ok"
                 },
+                ...(fin ? [{
+                    nume: "Se poate întreține",
+                    valoare: `${fin.pondere === null ? "—" : NF1.format(fin.pondere) + "%"}, ` +
+                        `${fin.peLocuitor === null ? "—" : NF.format(Math.round(fin.peLocuitor))} lei/loc.`,
+                    prag: `aparat ≤ ${REGULA_FINANCIARA.prag}% din veniturile proprii, în ${REGULA_FINANCIARA.termenAni} ani; ` +
+                        `țintă ≤ ${NF.format(REGULA_FINANCIARA.tinta)} lei/loc.`,
+                    stare: fin.pondere === null ? "info" : fin.pondere <= REGULA_FINANCIARA.prag ? "ok" : "termen"
+                }] : []),
                 {
                     nume: "Birouri locale", valoare: NF.format(birouri.length),
                     prag: `fosta reședință la peste ${P.tBirou} min`, stare: "info"
@@ -836,10 +900,12 @@ window.AdpReorganizare = function() {
                 subPrag: subPrag,
                 motive: motive,
                 riscMinoritate: riscMinoritate,
+                financiar: fin,
                 istorice: Array.from(new Set(lista.map(i => date.uat[i].ist))),
                 dosar: dosar,
                 conditii: conditii,
-                derogari: derogari
+                derogari: derogari,
+                tipuriDerogari: tipuriDerogari
             };
         }).sort((a, b) => b.populatie - a.populatie);
 
@@ -877,6 +943,7 @@ window.AdpReorganizare = function() {
             proiectat: proiectat,  // Map UAT -> populația proiectată la anProiectie
             inainte: inainte,
             dupa: dupa,
+            financiar: sumarFinanciar(grupuri),
             populatieJudet: pAzi(uatJud)
         };
     }
@@ -1512,6 +1579,7 @@ window.AdpReorganizare = function() {
             inainte: indicatori(date.uat.filter((u, i) => !zona || zona.has(i)).map(u =>
                 ({ populatie: u.p21 || 0, populatieProiectata: proiecteaza(u, P.anProiectie) })), "tAcum"),
             dupa: indicatori(grupuri.concat(rest), "tNou"),
+            financiar: sumarFinanciar(grupuri),
             judete: rezultate.map(r => ({ judet: r.judet, inainte: r.inainte, dupa: r.dupa, grupuri: r.grupuri.length }))
         };
     }
@@ -1520,6 +1588,8 @@ window.AdpReorganizare = function() {
         PARAMETRI_IMPLICITI: PARAMETRI_IMPLICITI,
         ritmAnual: ritmAnual,
         PARAMETRI_DISTRICT: PARAMETRI_DISTRICT,
+        REGULA_FINANCIARA: REGULA_FINANCIARA,
+        testFinanciar: testFinanciar,
         calculeaza: calculeaza,
         calculeazaDistrict: calculeazaDistrict,
         calculeazaNational: calculeazaNational,

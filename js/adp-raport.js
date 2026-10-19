@@ -25,6 +25,7 @@ window.AdpRaport = function() {
     const CALE_GAL = "date/gal-uat.json";
     const CALE_INSTITUTII_JUDETENE = "date/institutii-judetene.json";
     const CALE_PERSONAL = "date/personal-judete.json";
+    const CALE_CJ = "date/cj-destinatii.json";
     // costul unui salariat pentru angajator: câștigul brut plus contribuția asiguratorie pentru muncă
     const COST_ANGAJATOR = 1.0225;
     // ipoteză pentru instituțiile statului din județ: conducerea și funcțiile de suport (economic,
@@ -277,14 +278,24 @@ window.AdpRaport = function() {
                 ${NF1.format(r.dupa.timpMediu)} minute.</p>`;
     }
 
-    function randeazaDiagnostic(c) {
+    function randeazaDiagnostic(c, r, date, executie, regula) {
         const procent = c.pestePrag.inainte / c.cuDate * 100;
+        // regula financiară (regula 7 din sinteză): azi, pe primării; după, pe unitățile noi
+        let aziTrec = 0, aziSubTinta = 0;
+        executie.forEach((e, i) => {
+            if (e.pondere !== null && e.pondere <= regula.prag) aziTrec++;
+            const p = date.uat[i].p21;
+            if (p > 0 && (e.cheltuieliAparat || 0) / p <= regula.tinta) aziSubTinta++;
+        });
+        const f = r.financiar;
         $("#diagnostic-cifre").innerHTML = `
             <table class="tabel-doc tabel-numeric">
                 <thead><tr><th></th><th>azi</th><th>propus</th><th></th></tr></thead>
                 <tbody>
                     ${randPereche("Primării cu date de execuție (2025)", NF.format(c.cuDate), NF.format(c.cuDateDupa), "unități comparabile")}
                     ${randPereche(`Peste pragul de ${PRAG_ADMINISTRATIE}%`, NF.format(c.pestePrag.inainte), NF.format(c.pestePrag.dupa), "aparatul administrativ raportat la veniturile proprii")}
+                    ${f ? randPereche(`Trec testul de ${regula.prag}%`, `${NF.format(aziTrec)} (${NF.format(Math.round(100 * aziTrec / c.cuDate))}%)`, `${NF.format(f.trec)} (${NF.format(Math.round(100 * f.trec / f.unitati))}%)`, `restul primesc ${regula.termenAni} ani, nu sunt oprite din comasare`) : ""}
+                    ${f ? randPereche(`Aparat sub ${NF.format(regula.tinta)} lei pe locuitor`, `${NF.format(aziSubTinta)} (${NF.format(Math.round(100 * aziSubTinta / c.cuDate))}%)`, `${NF.format(f.subTinta)} (${NF.format(Math.round(100 * f.subTinta / f.unitati))}%)`, "ținta pe locuitor: de aici se așază curba costului") : ""}
                     ${randPereche("Aparatul administrativ, în total", lei(c.aparat.inainte), lei(c.aparat.dupa), "capitolele „Autorități executive” și „Alte servicii publice generale”")}
                     ${randPereche("Venituri proprii, în total", lei(c.venituriProprii), lei(c.venituriProprii), "neschimbate: aceleași impozite, alte unități")}
                     ${randPereche("Cât din veniturile proprii", NF1.format(c.pondere.inainte) + "%", NF1.format(c.pondere.dupa) + "%", `pragul moldovenesc: ${PRAG_ADMINISTRATIE}%`)}
@@ -296,7 +307,8 @@ window.AdpRaport = function() {
                 să stabilească dacă o unitate se poate întreține. La nivelul întregii țări, administrația locală
                 consumă ${NF1.format(c.pondere.inainte)}% din veniturile proprii ale primăriilor. După comasare,
                 cu ipoteza de cost de mai jos, raportul coboară la ${NF1.format(c.pondere.dupa)}%, iar numărul
-                unităților peste prag scade la ${NF.format(c.pestePrag.dupa)}.</p>`;
+                unităților peste prag scade la ${NF.format(c.pestePrag.dupa)}.${f ? ` Regula nu oprește nicio comasare:
+                cele ${NF.format(f.termen)} de unități peste prag au ${regula.termenAni} ani să coboare sub ${regula.prag}%.` : ""}</p>`;
     }
 
     function randeazaImpact(c) {
@@ -642,6 +654,128 @@ window.AdpRaport = function() {
         return { acum: acum, dupa: dupa, economie: acum - dupa };
     }
 
+    // tipurile de acțiune din planul districtului, pentru tabelul regiunii
+    const TIPURI_ACTIUNE = [
+        ["apa", "Apă potabilă"],
+        ["canal", "Canalizare"],
+        ["sanatate", "Sănătate"],
+        ["educatie", "Educație"],
+        ["strazi", "Străzi orășenești"],
+        ["drumuri", "Drumuri comunale"],
+        ["cultura", "Cultură"]
+    ];
+
+    /**
+     * Strategia unui district, dedusă din golurile și instrumentele lui: primele trei priorități (în ordinea
+     * urgenței din adp-infrastructura.js), fondurile din care se plătesc și instrumentul european.
+     * @param d        districtul din calcul (praguriUE, microregiuni)
+     * @param actiuni  planul de acțiuni al districtului (AdpInfrastructura.actiuni)
+     */
+    function strategieDistrict(d, actiuni) {
+        const fonduri = [];
+        actiuni.forEach(a => { if (!fonduri.includes(a.fond)) fonduri.push(a.fond); });
+        const micro = d.microregiuni || [];
+        // registrul drumurilor comunale e o lipsă de date, nu o investiție: rămâne în planul de acțiuni, nu în priorități
+        const prioritare = actiuni.filter(a => a.tip !== "drumuri");
+        return {
+            prioritati: prioritare.slice(0, 3).map(a => ({ text: a.text, fond: a.fond, populatie: a.populatie })),
+            maiMulte: Math.max(0, prioritare.length - 3),
+            fonduri: fonduri,
+            instrument: d.praguriUE.instrument === "mixt"
+                ? "LEADER pentru comune și orașele mici, strategia urbană pentru oraș" : "LEADER",
+            microregiuni: micro.length,
+            microInBanda: micro.filter(m => m.inBanda).length
+        };
+    }
+
+    /**
+     * Planul regional (pasul 5 din sinteza.html): cele 168 de fișe de district adunate pe regiuni, cu ce e de
+     * făcut, din ce fonduri și de către ce grupuri de acțiune locală; plus exportul fișelor ca tabel.
+     */
+    function randeazaPlanRegional(dateDistricte, date) {
+        const cont = $("#plan-regional-cifre");
+        if (!cont) return;
+        const districte = dateDistricte.districte;
+        const numeJudet = new Map(date.judete.map(j => [j.c, j.n]));
+        const numeRegiune = a => a.n === "București-Ilfov" ? "București–Ilfov" : a.n;
+        const regiuni = date.adr.map(a => ({ a: a, ale: districte.filter(d => d.adr === a.c)
+            .sort((p, q) => q.populatie - p.populatie) })).filter(x => x.ale.length);
+        const suma = (lista, fn) => lista.reduce((t, d) => t + fn(d), 0);
+        const randTip = (ale, tip, nume) => {
+            const cu = ale.map(d => d.actiuni.find(x => x.tip === tip)).filter(Boolean);
+            if (!cu.length) return "";
+            return `<tr><th scope="row">${esc(nume)}</th><td class="num">${NF.format(cu.length)}</td>
+                <td class="num">${cu.some(x => x.populatie) ? NF.format(suma(cu, x => x.populatie || 0)) : "—"}</td>
+                <td><small>${esc(cu[0].fond)}</small></td></tr>`;
+        };
+        const fisaRegiune = x => `<details class="strat serie-${((x.a.c - 1) % 8) + 1}" id="plan-${x.a.c}">
+            <summary>${esc(numeRegiune(x.a))}
+                <small>${NF.format(x.ale.length)} districte · ${NF.format(suma(x.ale, d => d.populatie))} loc. ·
+                ${NF.format(suma(x.ale, d => d.microregiuni.length))} microregiuni (grupuri de acțiune locală) ·
+                ${NF.format(suma(x.ale, d => d.actiuni.length))} acțiuni</small></summary>
+            <div class="strat-continut">
+                <h4>Ce e de făcut în regiune</h4>
+                <div class="tabel-derulant"><table class="tabel-doc tabel-harta">
+                    <thead><tr><th>Acțiunea</th><th>Districte</th><th>Locuitori vizați</th><th>Din ce fond</th></tr></thead>
+                    <tbody>${TIPURI_ACTIUNE.map(([tip, nume]) => randTip(x.ale, tip, nume)).join("")}</tbody>
+                </table></div>
+                <h4>Districtele regiunii</h4>
+                <div class="tabel-derulant"><table class="tabel-doc tabel-harta">
+                    <thead><tr><th>Districtul</th><th>Județul</th><th>Locuitori</th><th>Microregiuni în prag</th><th>Priorități</th></tr></thead>
+                    <tbody>${x.ale.map(d => `<tr>
+                        <th scope="row">${esc(d.nume)}</th>
+                        <td>${esc(numeJudet.get(d.judet) || "")}</td>
+                        <td class="num">${NF.format(d.populatie)}</td>
+                        <td class="num">${NF.format(d.strategie.microInBanda)} din ${NF.format(d.strategie.microregiuni)}</td>
+                        <td><small>${d.strategie.prioritati.length
+                            ? esc(d.strategie.prioritati.map(p => p.text).join("; ")) + (d.strategie.maiMulte ? ` și încă ${d.strategie.maiMulte}` : "")
+                            : "nimic de semnalat"}</small></td>
+                    </tr>`).join("")}</tbody>
+                </table></div>
+            </div>
+        </details>`;
+
+        cont.innerHTML = `
+            <div class="carduri">
+                <div class="card-cifra"><span class="card-eticheta">Fișe de district</span>
+                    <strong>${NF.format(districte.length)}</strong><small>în ${NF.format(regiuni.length)} regiuni</small></div>
+                <div class="card-cifra"><span class="card-eticheta">Acțiuni în plan</span>
+                    <strong>${NF.format(suma(districte, d => d.actiuni.length))}</strong><small>deduse din golurile de infrastructură</small></div>
+                <div class="card-cifra"><span class="card-eticheta">Grupuri de acțiune locală propuse</span>
+                    <strong>${NF.format(suma(districte, d => d.strategie.microregiuni))}</strong>
+                    <small>${NF.format(suma(districte, d => d.strategie.microInBanda))} în pragurile LEADER</small></div>
+            </div>
+            <p><button type="button" id="plan-export" class="buton">Descarcă fișele de district (tabel CSV)</button></p>
+            ${regiuni.map(fisaRegiune).join("")}
+            <p class="nota">Fișa completă a fiecărui district — criteriile, comunele, grupurile de acțiune locală de azi și
+                strategia — se deschide din <a href="#tablou">tabloul cu filtre</a>. Prioritățile sunt primele trei din
+                planul de acțiuni, în ordinea urgenței: apă, canalizare, sănătate, educație, străzi, cultură; registrul
+                drumurilor comunale e o lipsă de date și rămâne doar în listă. Sursa de finanțare e cea din programele 2021–2027; sumele nu sunt estimate, fiindcă nu există devize.</p>`;
+        $("#plan-export").addEventListener("click", () => exportaFise(dateDistricte, date));
+    }
+
+    /** Fișele de district ca tabel CSV (separator „;”, cu BOM, ca să se deschidă corect în Excel). */
+    function exportaFise(dateDistricte, date) {
+        const numeJudet = new Map(date.judete.map(j => [j.c, j.n]));
+        const numeRegiune = new Map(date.adr.map(a => [a.c, a.n]));
+        const celula = v => `"${String(v === null || v === undefined ? "" : v).replace(/"/g, '""')}"`;
+        const antet = ["Regiunea", "Județul", "Districtul", "Reședința", "Tipul", "Locuitori", "UAT-uri", "Unități după comasare",
+            "Microregiuni", "Microregiuni în pragurile LEADER", "Instrument", "Acțiuni", "Prioritatea 1", "Prioritatea 2",
+            "Prioritatea 3", "Fonduri", "Aparatul azi (lei)", "Aparatul după (lei)"];
+        const randuri = dateDistricte.districte.slice().sort((p, q) => p.adr - q.adr || q.populatie - p.populatie).map(d => [
+            numeRegiune.get(d.adr), numeJudet.get(d.judet), d.nume, d.resedinta, d.tip, d.populatie, d.nrUat, d.nrUnitati,
+            d.strategie.microregiuni, d.strategie.microInBanda, d.strategie.instrument, d.actiuni.length,
+            ...[0, 1, 2].map(k => d.strategie.prioritati[k] ? d.strategie.prioritati[k].text : ""),
+            d.strategie.fonduri.join("; "), Math.round(d.costAcum), Math.round(d.costDupa)
+        ]);
+        const continut = "﻿" + [antet].concat(randuri).map(r => r.map(celula).join(";")).join("\r\n");
+        const legatura = document.createElement("a");
+        legatura.href = URL.createObjectURL(new Blob([continut], { type: "text/csv;charset=utf-8" }));
+        legatura.download = "fise-district.csv";
+        legatura.click();
+        URL.revokeObjectURL(legatura.href);
+    }
+
     /**
      * Rândurile tabloului interactiv (adp-explorator.js): câte unul pentru fiecare district, cu
      * tot ce se filtrează, se sortează și se arată în fișa lui.
@@ -656,6 +790,7 @@ window.AdpRaport = function() {
             const unitati = d.unitati.map(u => dupaSediu.get(u)).filter(Boolean);
             const indecsi = unitati.flatMap(g => g.membri);
             const a = agrega(indecsi);
+            const actiuniDistrict = a ? I.actiuni(a, numeUat) : [];
             const cost = costUnitati(unitati, executie);
             const galuri = new Map();
             indecsi.forEach(i => {
@@ -673,7 +808,8 @@ window.AdpRaport = function() {
                 canalPop: a ? a.canal.populatie : null,
                 faraCanal: a ? a.faraPop.canal : 0,
                 spitale: a ? a.spitalePublice : null,
-                actiuni: a ? I.actiuni(a, numeUat) : [],
+                actiuni: actiuniDistrict,
+                strategie: strategieDistrict(d, actiuniDistrict),
                 gal: Array.from(galuri).sort((x, y) => y[1] - x[1])
                     .map(([g, n]) => ({ nume: numeGal.get(g) || String(g), uat: n })),
                 faraGal: gal && gal.uat ? indecsi.filter(i => gal.uat[date.uat[i].s] === undefined).length : 0,
@@ -1082,6 +1218,301 @@ window.AdpRaport = function() {
                 propunere de pornire, de negociat în fiecare regiune.</p>`;
     }
 
+    // Atribuțiile consiliului județean și unde se mută (pasul 4 din sinteza.html). Gruparea e o propunere,
+    // așezată pe tabelul de mutări din sinteză; destinațiile (clasificația funcțională din execuția
+    // bugetară) se potrivesc după început. `sector`: secțiunea din statistica de personal al cărei câștig
+    // mediu dă numărul de oameni.
+    const ATRIBUTII_CJ = [
+        { cod: "aparat", nume: "Aparatul consiliului județean", merge: "aparat", sector: "O",
+            prefixe: ["autoritati executive", "alte servicii publice generale"] },
+        { cod: "evidenta", nume: "Evidența persoanelor", merge: "district", sector: "O",
+            prefixe: ["servicii publice comunitare de evidenta"] },
+        { cod: "drumuri", nume: "Drumuri județene și transport local", merge: "district", sector: "O",
+            prefixe: ["drumuri si poduri", "alte cheltuieli in domeniul transporturilor", "transport in comun"] },
+        { cod: "mediu", nume: "Mediu, utilități, protecție civilă, ordine publică", merge: "district", sector: "O",
+            prefixe: ["colectarea, tratarea", "salubritate", "alimentare cu apa", "alimantare cu gaze", "canalizarea",
+                "reducerea si controlul poluarii", "alte servicii in domeniul protectiei mediului", "protectia biosferei",
+                "alte servicii in domeniile locuintelor", "intretinere gradini", "iluminat public",
+                "dezvoltarea sistemului de locuinte", "protectie civila", "aparare nationala", "politie locala",
+                "alte cheltuieli in domeniul ordinii publice", "prevenire si combatere inundatii"] },
+        { cod: "sanatate", nume: "Spitale și sănătate", merge: "regiune", sector: "Q",
+            prefixe: ["spitale", "alte institutii si actiuni sanitare", "servicii de sanatate publica",
+                "unitati de asistenta medico-sociale", "unitati medico-sociale"] },
+        { cod: "social", nume: "Asistență socială și protecția copilului", merge: "regiune", sector: "Q",
+            prefixe: ["asistenta sociala", "asistenta acordata persoanelor in varsta",
+                "alte cheltuieli in domeniul asigurarilor si asistentei sociale", "ajutor social",
+                "transferuri din bugetele consiliilor judetene pentru finantarea centrelor pentru protectia copilului"] },
+        { cod: "cultura", nume: "Cultură, sport, tineret, turism", merge: "regiune", sector: "O",
+            prefixe: ["muzee", "institutii publice de spectacole", "biblioteci", "centre culturale",
+                "centre pentru conservarea", "scoli populare de arta", "alte servicii culturale",
+                "alte servicii in domeniile culturii", "consolidarea si restaurarea", "servicii religioase", "sport",
+                "tineret", "turism", "edituri", "presa"] },
+        { cod: "invatamant", nume: "Învățământ", merge: "regiune", sector: "P",
+            prefixe: ["invatamant", "alte cheltuieli in domeniul invatamantului", "internate si cantine"] },
+        { cod: "aeroporturi", nume: "Aeroporturi și aviație civilă", merge: "regiune", sector: "O",
+            prefixe: ["aeroporturi", "aviatia civila"] },
+        { cod: "dezvoltare", nume: "Dezvoltare economică și regională", merge: "regiune", sector: "O",
+            prefixe: ["alte actiuni economice", "alte cheltuieli pentru actiuni generale economice",
+                "programe de dezvoltare regionala", "proiecte de dezvoltare multifunctionale",
+                "alte cheltuieli in domeniul agriculturii", "protectia plantelor", "zone libere"] },
+        { cod: "datorie", nume: "Datoria publică și împrumuturile", merge: "regiune", sector: "O",
+            prefixe: ["tranzactii privind datoria publica"] }
+    ];
+    const ATRIBUTIE_NEPLASATA = { cod: "alte", nume: "Alte destinații (de stabilit)", merge: "de stabilit", sector: "O" };
+
+    /** Atribuția unei destinații bugetare, după începutul denumirii (fără diacritice în sursă). */
+    function atributieDestinatiei(nume) {
+        const t = nume.replace(/\s+/g, " ").trim().toLowerCase();
+        return ATRIBUTII_CJ.find(a => a.prefixe.some(p => t.startsWith(p))) || ATRIBUTIE_NEPLASATA;
+    }
+
+    /**
+     * Ce mută fiecare consiliu județean: pe atribuții, cu banii și oamenii (estimați din cheltuiala de personal,
+     * la câștigul mediu al județului în sectorul atribuției). Banii se mută odată cu atribuția; economia
+     * vine doar din aparat.
+     */
+    function mutariCJ(date, cj, personal) {
+        return date.judete.map(j => {
+            const c = cj.judete[j.c];
+            if (!c) return null;
+            const castig = ((personal && personal.judete && personal.judete[j.c]) || {}).castigBrut || {};
+            const grupuri = new Map([...ATRIBUTII_CJ, ATRIBUTIE_NEPLASATA].map(a => [a.cod, { a: a, lei: 0, personal: 0, oameni: 0 }]));
+            c.destinatii.forEach(d => {
+                const g = grupuri.get(atributieDestinatiei(d.nume).cod);
+                g.lei += d.total;
+                g.personal += d.personal;
+                const cost = castig[g.a.sector] ? castig[g.a.sector] * 12 * COST_ANGAJATOR : null;
+                if (cost) g.oameni += d.personal / cost;
+            });
+            const dupaDestinatie = merge => Array.from(grupuri.values()).filter(g => g.a.merge === merge)
+                .reduce((t, g) => ({ lei: t.lei + g.lei, oameni: t.oameni + g.oameni }), { lei: 0, oameni: 0 });
+            return {
+                cod: j.c, nume: j.n, adr: date.uat.find(u => u.j === j.c).adr, total: c.total, grupuri: grupuri,
+                aparat: dupaDestinatie("aparat"), district: dupaDestinatie("district"),
+                regiune: dupaDestinatie("regiune"), neplasat: dupaDestinatie("de stabilit")
+            };
+        }).filter(Boolean);
+    }
+
+    function randeazaTransfer(date, cj, personal) {
+        const cont = $("#transfer-cifre");
+        if (!cont) return;
+        if (!cj || !cj.judete) {
+            cont.innerHTML = `<p class="nota">Lipsesc cheltuielile consiliilor județene. Rulează <code>python unelte/cj_destinatii.py</code>.</p>`;
+            return;
+        }
+        const judete = mutariCJ(date, cj, personal);
+        const oameni = v => NF.format(Math.round(v));
+        const parte = x => `${lei(x.lei)}<br><small>${oameni(x.oameni)} oameni</small>`;
+        const suma = (lista, parteaCJ, camp) => lista.reduce((a, x) => a + x[parteaCJ][camp], 0);
+        const aduna = lista => ({
+            total: lista.reduce((a, x) => a + x.total, 0),
+            aparat: { lei: suma(lista, "aparat", "lei"), oameni: suma(lista, "aparat", "oameni") },
+            district: { lei: suma(lista, "district", "lei"), oameni: suma(lista, "district", "oameni") },
+            regiune: { lei: suma(lista, "regiune", "lei"), oameni: suma(lista, "regiune", "oameni") },
+            neplasat: { lei: suma(lista, "neplasat", "lei"), oameni: suma(lista, "neplasat", "oameni") }
+        });
+        const celule = x => `
+            <td>${parte(x.district)}</td>
+            <td>${parte(x.regiune)}</td>
+            <td>${lei(x.aparat.lei)} → <b>${lei(x.aparat.lei * COTA_CJ_PASTRATA)}</b><br>
+                <small>${oameni(x.aparat.oameni)} → ${oameni(x.aparat.oameni * COTA_CJ_PASTRATA)} oameni</small></td>
+            <td>${lei(x.total)}</td>`;
+        const tara = aduna(judete);
+
+        // pe atribuții, toată țara: ce intră în fiecare și unde merge
+        const peAtributii = [...ATRIBUTII_CJ, ATRIBUTIE_NEPLASATA].map(a => ({
+            a: a,
+            lei: judete.reduce((t, j) => t + j.grupuri.get(a.cod).lei, 0),
+            oameni: judete.reduce((t, j) => t + j.grupuri.get(a.cod).oameni, 0)
+        })).filter(x => x.lei > 0);
+        const randAtributie = x => `<tr>
+            <th scope="row">${esc(x.a.nume)}</th>
+            <td>${x.a.merge === "aparat" ? "jumătate rămâne, jumătate dispare" : esc(x.a.merge)}</td>
+            <td class="num">${lei(x.lei)}</td>
+            <td class="num">${NF1.format(100 * x.lei / tara.total)}%</td>
+            <td class="num">${oameni(x.oameni)}</td>
+        </tr>`;
+
+        const regiuni = date.adr.map(a => {
+            const ale = judete.filter(x => x.adr === a.c).sort((p, q) => p.nume.localeCompare(q.nume, "ro"));
+            if (!ale.length) return "";
+            return `<tr class="rand-district"><th scope="row">${esc(a.n === "București-Ilfov" ? "București–Ilfov" : a.n)}</th>${celule(aduna(ale))}</tr>` +
+                ale.map(x => `<tr><th scope="row">${esc(x.nume)}</th>${celule(x)}</tr>`).join("");
+        }).join("");
+
+        cont.innerHTML = `
+            <div class="carduri">
+                <div class="card-cifra"><span class="card-eticheta">Cheltuielile celor 41 de consilii județene, ${esc(String(cj.anExecutie))}</span>
+                    <strong>${lei(tara.total)}</strong><small>aparatul propriu e doar ${NF1.format(100 * tara.aparat.lei / tara.total)}% din ele</small></div>
+                <div class="card-cifra"><span class="card-eticheta">Se mută la regiune</span>
+                    <strong>${lei(tara.regiune.lei)}</strong><small>${oameni(tara.regiune.oameni)} de oameni, estimat</small></div>
+                <div class="card-cifra"><span class="card-eticheta">Se mută la district</span>
+                    <strong>${lei(tara.district.lei)}</strong><small>${oameni(tara.district.oameni)} de oameni, estimat</small></div>
+                <div class="card-cifra bun"><span class="card-eticheta">Dispare odată cu aparatul</span>
+                    <strong>${lei(tara.aparat.lei * (1 - COTA_CJ_PASTRATA))}</strong><small>singura economie din această tabelă</small></div>
+            </div>
+
+            <h3>Atribuție cu atribuție</h3>
+            <div class="tabel-derulant"><table class="tabel-doc tabel-harta">
+                <thead><tr><th>Atribuția</th><th>Merge la</th><th>Bani pe an</th><th>Din total</th><th>Oameni (estimat)</th></tr></thead>
+                <tbody>${peAtributii.map(randAtributie).join("")}
+                    <tr class="rand-total"><th scope="row">Total</th><td></td><td class="num">${lei(tara.total)}</td><td class="num">100%</td>
+                        <td class="num">${oameni(peAtributii.reduce((a, x) => a + x.oameni, 0))}</td></tr></tbody>
+            </table></div>
+
+            <h3>Județ cu județ</h3>
+            <div class="tabel-derulant"><table class="tabel-doc tabel-numeric tabel-harta">
+                <thead><tr><th>Județul</th><th>La district</th><th>La regiune</th><th>Aparatul, azi → după</th><th>Total azi</th></tr></thead>
+                <tbody>${regiuni}
+                    <tr class="rand-total"><th scope="row">Total, fără București</th>${celule(tara)}</tr></tbody>
+            </table></div>
+            <p class="nota"><b>Cum se citește.</b> Banii se mută odată cu atribuția: spitalul județean, protecția copilului
+                sau drumul județean costă la fel la regiune sau la district ca la consiliul județean. Economia vine doar din
+                aparat, unde rămâne ipoteza că jumătate trece la personalul tehnic al districtelor și regiunii.
+                Gruparea pe atribuții și destinația lor sunt o propunere; cheltuielile sunt cele din execuția bugetară
+                ${esc(String(cj.anExecutie))}, pe destinații. Numărul de oameni e dedus din cheltuiala de personal a
+                fiecărei destinații, la câștigul mediu brut al județului în sectorul ei (sănătate și asistență socială,
+                învățământ, administrație publică), deci e o estimare. Prefectura și instituțiile statului nu sunt aici:
+                statistica nu are statele lor de funcții, iar estimarea lor e în <a href="#institutii">secțiunea despre
+                instituțiile județene</a>.</p>`;
+    }
+
+
+    // derogările, în ordinea în care se arată în fișa județului (codurile vin din adp-reorganizare.js)
+    const TIPURI_DEROGARE = [
+        ["sub-prag", "sub prag"],
+        ["drum", "drum peste prag"],
+        ["minoritate", "minoritate"],
+        ["rang", "sub rangul legal"],
+        ["rural-mare", "rurală mare"],
+        ["leader", "iese din LEADER"]
+    ];
+
+    /**
+     * Fișele de județ (pasul 3 din sinteza.html): pentru fiecare județ, ce devin UAT-urile lui, lista
+     * derogărilor unitate cu unitate și alegerile de mână. Deasupra, tabelul celor 41 de județe.
+     */
+    function randeazaFiseJudet(date, r, executie, alegeri, regula) {
+        const cont = $("#judete-cifre");
+        if (!cont) return;
+        const pMin = r.parametri.pMin;
+        const dupaSiruta = new Map(date.uat.map((u, i) => [u.s, i]));
+        const alegeriJudet = (lista, camp, cod) => (lista || []).filter(a => {
+            const i = dupaSiruta.get(a[camp]);
+            return i !== undefined && date.uat[i].j === cod;
+        });
+        const fise = date.judete.map(j => {
+            const grupuri = r.grupuri.filter(g => date.uat[g.sediu].j === j.c);
+            const ind = r.judete.find(x => x.judet === j.c);
+            // Bucureștiul nu intră în comasare
+            if (!grupuri.length || !ind) return null;
+            const uat = date.uat.map((u, i) => i).filter(i => date.uat[i].j === j.c);
+            const derogari = [];
+            grupuri.forEach(g => (g.tipuriDerogari || []).forEach((tip, k) => derogari.push({ tip: tip, g: g, text: g.derogari[k] })));
+            const cuTermen = grupuri.filter(g => g.financiar && g.financiar.pondere !== null && g.financiar.pondere > regula.prag).length;
+            const pesteAzi = uat.filter(i => executie.get(i) && executie.get(i).pondere !== null && executie.get(i).pondere > regula.prag).length;
+            return {
+                j: j, adr: date.uat[uat[0]].adr, grupuri: grupuri, ind: ind, nrUat: uat.length,
+                subPragAzi: uat.filter(i => (date.uat[i].p21 || 0) < pMin).length,
+                derogari: derogari, cuTermen: cuTermen, pesteAzi: pesteAzi,
+                aparat: costUnitati(grupuri, executie),
+                districte: (r.districte || []).filter(d => date.uat[d.sediu].j === j.c).length,
+                corectii: alegeriJudet(alegeri && alegeri.corectii, "uat", j.c),
+                comasari: alegeriJudet(alegeri && alegeri.comasari, "uat", j.c)
+            };
+        }).filter(Boolean);
+
+        const nrTip = (f, tip) => f.derogari.filter(d => d.tip === tip).length;
+        const randTabel = (eticheta, azi, dupa) => `<tr><th scope="row">${eticheta}</th><td>${azi}</td><td><b>${dupa}</b></td></tr>`;
+        const fisa = f => {
+            const rand = TIPURI_DEROGARE.map(([tip, nume]) => f.derogari.filter(d => d.tip === tip).map(d => ({ nume: nume, d: d })))
+                .reduce((a, b) => a.concat(b), []);
+            const derogari = rand.length ? `<div class="tabel-derulant"><table class="tabel-doc tabel-harta">
+                    <thead><tr><th>Unitatea</th><th>Locuitori</th><th>Derogarea</th></tr></thead>
+                    <tbody>${rand.map(x => `<tr>
+                        <th scope="row">${esc(x.d.g.nume)}</th>
+                        <td class="num">${NF.format(x.d.g.populatie)}</td>
+                        <td><span class="eticheta-stare atentie">${esc(x.nume)}</span> ${esc(x.d.text)}</td>
+                    </tr>`).join("")}</tbody>
+                </table></div>` : `<p class="nota">Nicio unitate din județ nu cere derogare.</p>`;
+            const alese = f.corectii.map(a => `${a.nume} (district)`).concat(f.comasari.map(a => `${a.nume} (comasare)`));
+            return `<details class="strat serie-${((f.adr - 1) % 8) + 1}" id="judet-${esc(f.j.auto)}">
+                <summary>${esc(f.j.n)}
+                    <small>${NF.format(f.nrUat)} UAT → ${NF.format(f.grupuri.length)} unități ·
+                    ${NF.format(f.derogari.length)} ${f.derogari.length === 1 ? "derogare" : "derogări"} ·
+                    ${NF.format(f.ind.dupa.pesteTMax)} sate la peste ${r.parametri.tMax} min</small></summary>
+                <div class="strat-continut">
+                    <div class="tabel-derulant"><table class="tabel-doc tabel-numeric">
+                        <thead><tr><th></th><th>azi</th><th>propus</th></tr></thead>
+                        <tbody>
+                            ${randTabel("UAT / unități", NF.format(f.nrUat), NF.format(f.grupuri.length))}
+                            ${randTabel(`Sub ${NF.format(pMin)} de locuitori`, NF.format(f.subPragAzi), NF.format(f.ind.dupa.subPrag))}
+                            ${randTabel("Populația mediană a unei unități", NF.format(f.ind.inainte.mediana), NF.format(f.ind.dupa.mediana))}
+                            ${randTabel("Timp mediu sat → reședință", NF1.format(f.ind.inainte.timpMediu) + " min", NF1.format(f.ind.dupa.timpMediu) + " min")}
+                            ${randTabel(`Sate (≥ ${r.parametri.pSatMin} loc.) la peste ${r.parametri.tMax} min`, NF.format(f.ind.inainte.pesteTMax), NF.format(f.ind.dupa.pesteTMax))}
+                            ${randTabel("Aparatul primăriilor", lei(f.aparat.acum), lei(f.aparat.dupa))}
+                            ${randTabel(`Peste ${regula.prag}% din veniturile proprii`, NF.format(f.pesteAzi), NF.format(f.cuTermen) + ` <small>(${regula.termenAni} ani să coboare)</small>`)}
+                            ${randTabel("Districte", "—", NF.format(f.districte))}
+                        </tbody>
+                    </table></div>
+                    <h4>Derogări</h4>
+                    ${derogari}
+                    <h4>Alegeri de mână</h4>
+                    ${alese.length ? `<ul>${alese.map(t => `<li>${esc(t)}</li>`).join("")}</ul>`
+                        : `<p class="nota">Nicio alegere înregistrată pe hartă pentru acest județ.</p>`}
+                </div>
+            </details>`;
+        };
+
+        // rândul din tabelul de sus: câte un număr pe coloană, la fel pentru județ și pentru total
+        const randCifre = f => ({
+            uat: f.nrUat, unitati: f.grupuri.length, derogari: f.derogari.length, subPrag: nrTip(f, "sub-prag"),
+            peAzi: f.ind.inainte.pesteTMax, peDupa: f.ind.dupa.pesteTMax, termen: f.cuTermen,
+            alegeri: f.corectii.length + f.comasari.length
+        });
+        const celule = v => `
+            <td>${NF.format(v.uat)} → <b>${NF.format(v.unitati)}</b></td>
+            <td>${NF.format(v.derogari)}</td>
+            <td>${NF.format(v.subPrag)}</td>
+            <td>${NF.format(v.peAzi)} → <b>${NF.format(v.peDupa)}</b></td>
+            <td>${NF.format(v.termen)}</td>
+            <td>${NF.format(v.alegeri)}</td>`;
+        const cifre = fise.map(randCifre);
+        const total = Object.keys(cifre[0]).reduce((t, k) => { t[k] = cifre.reduce((a, v) => a + v[k], 0); return t; }, {});
+        const regiuni = date.adr.map(a => {
+            const ale = fise.filter(f => f.adr === a.c).sort((p, q) => p.j.n.localeCompare(q.j.n, "ro"));
+            return ale.length ? { a: a, ale: ale } : null;
+        }).filter(Boolean);
+        const tabel = regiuni.map(x => `<tr class="rand-district"><th scope="row" colspan="7">${esc(x.a.n === "București-Ilfov" ? "București–Ilfov" : x.a.n)}</th></tr>` +
+            x.ale.map(f => `<tr><th scope="row"><a href="#judet-${esc(f.j.auto)}">${esc(f.j.n)}</a></th>${celule(randCifre(f))}</tr>`).join("")).join("");
+
+        cont.innerHTML = `
+            <div class="tabel-derulant"><table class="tabel-doc tabel-numeric tabel-harta">
+                <thead><tr><th>Județul</th><th>UAT → unități</th><th>Derogări</th><th>din care sub pragul unității</th>
+                    <th>Sate la peste ${r.parametri.tMax} min, azi → după</th><th>Peste ${regula.prag}%, cu termen</th>
+                    <th>Alegeri de mână</th></tr></thead>
+                <tbody>${tabel}
+                    <tr class="rand-total"><th scope="row">Total, fără București</th>${celule(total)}</tr>
+                </tbody>
+            </table></div>
+            <p class="nota"><b>Cum se citește.</b> „Derogări” numără derogările, nu unitățile: o unitate cu două motive apare
+                de două ori. „Sub pragul unității” e 5.000 de locuitori, sau 7.000 pentru o unitate cu oraș. Fișa fiecărui județ se deschide din tabel și arată, unitate cu unitate, ce
+                derogare are și de ce.</p>
+            ${regiuni.map(x => `<h3>${esc(x.a.n === "București-Ilfov" ? "București–Ilfov" : x.a.n)}</h3>${x.ale.map(fisa).join("")}`).join("")}`;
+        window.addEventListener("hashchange", deschideFisa);
+        deschideFisa();
+    }
+
+    /** Un link spre `#judet-XX` deschide și fișa județului, nu doar derulează până la ea. */
+    function deschideFisa() {
+        const tinta = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+        if (tinta && tinta.matches("details.strat")) {
+            tinta.open = true;
+            tinta.scrollIntoView();
+        }
+    }
+
     /**
      * Organizarea administrativă și cea funcțională, treaptă cu treaptă, cu numărul fiecăreia și cu
      * verificarea încastrării: nicio treaptă nu taie una de deasupra ei.
@@ -1284,29 +1715,29 @@ window.AdpRaport = function() {
         infasoaraTabele();
         urmaresteCuprinsul();
         try {
-            const [date, index, finante, dotari, institutii, infra, alegeri, judecatorii, gal, institutiiJudetene, personal] = await Promise.all([
+            const [date, index, finante, dotari, institutii, infra, alegeri, judecatorii, gal, institutiiJudetene, personal, cj] = await Promise.all([
                 json(CALE_UAT, true), json(CALE_INDEX, true),
                 json(CALE_FINANTE), json(CALE_DOTARI), json(CALE_INSTITUTII),
                 json(CALE_INFRA), json(CALE_CORECTII), json(CALE_JUDECATORII), json(CALE_GAL),
-                json(CALE_INSTITUTII_JUDETENE), json(CALE_PERSONAL)
+                json(CALE_INSTITUTII_JUDETENE), json(CALE_PERSONAL), json(CALE_CJ)
             ]);
             const topo = dependente.topologie.decodeaza(date);
             const vecini = dependente.topologie.vecini(topo);
             const exemple = await Promise.all(index.judete.map(j => json("date/" + j.fisier, true)));
+            const executie = indexeazaExecutia(date, finante);
             const r = dependente.reorganizare.calculeazaNational(date, vecini, exemple, {
-                districte: true, dotari: dotari && dotari.localitati,
+                districte: true, dotari: dotari && dotari.localitati, executie: executie,
                 // districtele pornesc de la circumscripțiile judecătoriilor; alegerile voluntare
                 // făcute pe hartă trec înaintea lor și intră și în cifrele raportului
                 corectii: dependente.reorganizare.alegeriCuCircumscriptii(judecatorii, (alegeri && alegeri.corectii) || []),
                 comasari: (alegeri && alegeri.comasari) || []
             });
-            const executie = indexeazaExecutia(date, finante);
             const c = costuri(date, r, executie, finante);
             const regional = institutii ? regionalizeaza(date, vecini, institutii, dependente) : null;
             const s = structura(date, r, regional);
 
             randeazaRezumat(r, c, s);
-            randeazaDiagnostic(c);
+            randeazaDiagnostic(c, r, date, executie, dependente.reorganizare.REGULA_FINANCIARA);
             randeazaImpact(c);
             randeazaGuvernanta(r, c, s);
             randeazaComparatie(r, c, s, dotari);
@@ -1318,16 +1749,20 @@ window.AdpRaport = function() {
             randeazaGal(date, r, gal);
             randeazaOrganizare(date, r, s, gal);
             randeazaStatut(r);
+            randeazaFiseJudet(date, r, executie, alegeri, dependente.reorganizare.REGULA_FINANCIARA);
             randeazaInstitutii(date, r, institutii, institutiiJudetene);
             randeazaPersonal(date, r, executie, finante, personal);
+            randeazaTransfer(date, cj, personal);
+            const dateDistricte = dateExplorator(date, r, executie, infra, finante, I, gal);
             if (dependente.explorator) {
-                dependente.explorator.porneste(dateExplorator(date, r, executie, infra, finante, I, gal));
+                dependente.explorator.porneste(dateDistricte);
             }
+            randeazaPlanRegional(dateDistricte, date);
             randeazaSumarHarta(date, r, c, s, infra && I ? formeInfrastructura(date, r, infra, finante, I) : null);
             infasoaraTabele();
         } catch (e) {
             console.error(`[ro-adp] Raportul nu a putut fi calculat (${e.message}).`);
-            document.querySelectorAll("#rezumat-cifre, #diagnostic-cifre, #comparatie-tabel, #repere-tabel, #ipoteze, #infrastructura-cifre, #sumar-harta-cifre, #tabel-districte, #gal-cifre, #institutii-cifre, #organizare-cifre, #statut-cifre, #personal-cifre")
+            document.querySelectorAll("#rezumat-cifre, #diagnostic-cifre, #comparatie-tabel, #repere-tabel, #ipoteze, #infrastructura-cifre, #sumar-harta-cifre, #tabel-districte, #gal-cifre, #institutii-cifre, #organizare-cifre, #statut-cifre, #personal-cifre, #transfer-cifre, #plan-regional-cifre, #judete-cifre")
                 .forEach(el => {
                     el.innerHTML = `<p class="nota">Cifrele nu au putut fi calculate: ${esc(e.message)}.
                         Pagina trebuie servită prin HTTP, iar datele generate cu scripturile din <code>unelte/</code>.</p>`;

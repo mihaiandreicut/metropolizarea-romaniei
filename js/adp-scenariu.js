@@ -180,6 +180,17 @@ window.AdpScenariu = function() {
         return D.topologie.coloreaza(r.grupuri.map(g => g.sediu), g => Array.from(ad.get(g)), perecheBuna, 8);
     }
 
+    /** Execuția bugetară pe UAT (index în romania-uat.json), pentru regula financiară; null fără date. */
+    function executiePeUat() {
+        if (!finante || !finante.executieUat) return null;
+        const m = new Map();
+        D.date.uat.forEach((u, i) => {
+            const e = finante.executieUat[u.s];
+            if (e) m.set(i, e);
+        });
+        return m;
+    }
+
     function parametri() {
         return {
             // banda de praguri: comuna crește spre minim + 2.000, unitatea cu oraș
@@ -199,6 +210,7 @@ window.AdpScenariu = function() {
             respectaIstorice: $("#sc-istorice").checked,
             regimMinoritati: $("#sc-minoritati").value,
             dotari: dotari && dotari.localitati,
+            executie: executiePeUat(),
             // desenul de pornire al districtelor; alegerile de mână trec înaintea lui
             corectii: $("#sc-baza").value === "judecatorii" ? D.reorganizare.alegeriCuCircumscriptii(judecatorii, corectii)
                 : $("#sc-baza").value === "gal" ? D.reorganizare.alegeriCuGal(D.date, gal, corectii) : corectii,
@@ -605,7 +617,7 @@ window.AdpScenariu = function() {
             <tr class="${c.stare === "derogare" ? "c-derogare" : ""}">
                 <th scope="row">${D.esc(c.nume)}</th>
                 <td>${D.esc(String(c.valoare))}</td>
-                <td><small>${c.stare === "derogare" ? `<span class="eticheta-stare atentie">derogare</span> ` : ""}${D.esc(String(c.prag))}</small></td>
+                <td><small>${c.stare === "derogare" ? `<span class="eticheta-stare atentie">derogare</span> ` : ""}${c.stare === "termen" ? `<span class="eticheta-stare atentie">în 3 ani</span> ` : ""}${D.esc(String(c.prag))}</small></td>
             </tr>`).join("");
         const pasi = g.dosar.map(e =>
             `<li><b>${D.esc(e.regula)}</b> — ${D.esc(e.text)}</li>`).join("");

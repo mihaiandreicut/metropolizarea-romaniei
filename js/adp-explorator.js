@@ -232,7 +232,19 @@ window.AdpExplorator = function() {
         const criterii = d.criterii.map(c => `<li class="${c.stare === "ok" ? "" : "neindeplinit"}">
             <span class="eticheta-stare ${c.stare === "ok" ? "bun" : "atentie"}">${c.stare === "ok" ? "da" : "nu"}</span>
             ${esc(c.nume)}: <b>${esc(c.valoare)}</b> <small>(${esc(c.prag)})</small></li>`).join("");
+        const s = d.strategie;
+        const strategie = `<div><h4>Strategia districtului</h4><ul>
+                <li><b>Priorități:</b> ${s.prioritati.length
+                    ? esc(s.prioritati.map(p => p.text).join("; ")) + (s.maiMulte ? ` și încă ${NF.format(s.maiMulte)}` : "")
+                    : "nimic de semnalat din datele disponibile"}</li>
+                <li><b>Instrumente:</b> ${esc(s.instrument)}; ${NF.format(s.microregiuni)}
+                    ${s.microregiuni === 1 ? "microregiune" : "microregiuni"} (grupuri de acțiune locală),
+                    ${NF.format(s.microInBanda)} în pragurile LEADER</li>
+                <li><b>Din ce fonduri:</b> ${esc(s.fonduri.join("; ") || "—")}</li>
+                <li><b>Cine o duce:</b> biroul de proiecte al districtului, la ${esc(d.resedinta)}</li>
+            </ul></div>`;
         return `<div class="fisa-district">
+            ${strategie}
             <div class="fisa-coloane">
                 <div><h4>Criteriile districtului</h4><ul class="lista-criterii">${criterii}</ul>
                     <p class="nota">Aparatul primăriilor: ${lei(d.costAcum)} azi → ${lei(d.costDupa)} după comasare.</p></div>
