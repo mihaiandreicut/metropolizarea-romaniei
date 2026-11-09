@@ -68,32 +68,36 @@
         <aside id="panou" class="panou" aria-label="Panou de control">
             <section>
                 <h2>Metropolizarea României</h2>
-                <p class="nota">Două lucruri deodată: comasarea UAT-urilor pe baza atributelor localităților
-                    componente — timp rutier real (OSRM), populație, dotări, minorități — și
-                    <b>eliminarea formelor administrative redundante, care fac puțin și cheltuie bine</b>:
-                    consiliile județene, aparatele paralele ale prefecturilor și agențiile dublate pe județ.
-                    Se poate rula pe un județ, pe o regiune sau pe toată țara. Metoda:
-                    <a href="metodologie.html#metoda">metodologie</a>.</p>
-                <div class="formular-scenariu">
-                    <label>Nivelul hărții</label>
-                    <div id="sc-nivele" class="straturi" role="radiogroup" aria-label="Nivelul hărții">
-                        <label><input type="radio" name="nivel" value="regiuni" checked><span>Regiuni</span></label>
-                        <label><input type="radio" name="nivel" value="judete"><span>Județe</span></label>
-                        <label><input type="radio" name="nivel" value="districte"><span>Zone metropolitane și districte</span></label>
-                        <label><input type="radio" name="nivel" value="comune"><span>Comune comasate</span></label>
+                <p class="nota">Comunele se comasează după reguli publice, verificabile pe date, iar consiliile
+                    județene și prefecturile urcă la regiune. Încearcă pe un județ, în trei pași. Metoda:
+                    <a href="metodologie.html#metoda">metodologie</a>; cifrele pe toată țara: <a href="raport.html">raport</a>.</p>
+
+                <div id="pp" class="pas-cu-pas">
+                    <ol class="pp-pasi">
+                        <li data-pas="1" aria-current="step"><button type="button" data-mergi="1"><span class="pp-numar">1</span>Județul</button></li>
+                        <li data-pas="2"><button type="button" data-mergi="2" disabled><span class="pp-numar">2</span>Regulile</button></li>
+                        <li data-pas="3"><button type="button" data-mergi="3" disabled><span class="pp-numar">3</span>Înainte și după</button></li>
+                    </ol>
+
+                    <div class="pp-pas" data-pas="1">
+                        <h3>Alege județul</h3>
+                        <div class="formular-scenariu">
+                            <label for="pp-judet" class="vizual-ascuns">Județul</label>
+                            <select id="pp-judet" class="buton"><option value="">— alege județul —</option></select>
+                        </div>
+                        <p class="nota">sau dă clic pe un județ, pe hartă.</p>
+                        <div id="pp-azi" aria-live="polite"></div>
+                        <div class="butoane">
+                            <button id="pp-spre-reguli" class="buton principal" type="button" disabled>Mai departe: regulile</button>
+                        </div>
                     </div>
-                    <p class="nota"><b>Administrativ</b> — cine e ales și are buget: regiunea și comuna.
-                        <b>Funcțional</b> — pe ce teritoriu se dau serviciile și fondurile: districtul și
-                        microregiunea. Județul rămâne limită și circumscripție.</p>
-                    <label for="sc-regiune">Teritoriul</label>
-                    <div class="cascada">
-                        <select id="sc-regiune" class="buton" aria-label="Regiunea"></select>
-                        <select id="sc-judet" class="buton" aria-label="Județul"></select>
-                        <select id="sc-zona" class="buton" aria-label="Zona metropolitană sau districtul"></select>
-                        <select id="sc-comuna" class="buton" aria-label="Comuna comasată"></select>
-                    </div>
-                    <select id="sc-exemplu" hidden style="display:none" aria-hidden="true" tabindex="-1"></select>
-                    <div id="sc-regiuni" class="regiuni-scurtaturi" hidden></div>
+
+                    <div class="pp-pas" data-pas="2" hidden>
+                        <h3>Alege regulile</h3>
+                        <p class="nota">Pornești de la regulile propuse (v2): comuna are cel puțin 3.000 de locuitori,
+                            orașul ajunge la 10.000, niciun sat nu ajunge la mai mult de 30 de minute de primărie.
+                            Schimbă-le dacă vrei să vezi alt scenariu.</p>
+                        <div class="formular-scenariu">
                     <label for="sc-pmin">Banda de populație: <b id="sc-pmin-val"></b></label>
                     <input id="sc-pmin" type="range" min="1500" max="10000" step="500" value="3000">
                     <label for="sc-oras">Pragul orașului: <b id="sc-oras-val"></b> loc.</label>
@@ -127,6 +131,54 @@
                     </select>
                         </div>
                     </details>
+                        </div>
+                        <div class="butoane">
+                            <button id="pp-genereaza" class="buton principal" type="button">Generează reorganizarea</button>
+                            <button class="buton" type="button" data-mergi="1">Înapoi</button>
+                        </div>
+                    </div>
+
+                    <div class="pp-pas" data-pas="3" hidden>
+                        <h3 id="pp-titlu">Înainte și după</h3>
+                        <div class="straturi" role="radiogroup" aria-label="Ce arată harta">
+                            <label><input type="radio" name="pp-harta" value="inainte"><span>Harta de azi</span></label>
+                            <label><input type="radio" name="pp-harta" value="dupa" checked><span>Harta propusă</span></label>
+                        </div>
+                        <div id="pp-raport" aria-live="polite"></div>
+                        <div class="butoane">
+                            <button class="buton" type="button" data-mergi="2">Schimbă regulile</button>
+                            <button class="buton" type="button" data-mergi="1">Alt județ</button>
+                            <button id="pp-descarca" class="buton" type="button">Descarcă tabelul</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="sc-dosar" class="detalii" hidden aria-live="polite"></div>
+            </section>
+
+            <details id="explorare" class="pliant pliant-mare">
+                <summary>Explorare liberă: regiuni, districte, toată țara, harta finală</summary>
+            <section>
+                <div class="formular-scenariu">
+                    <label>Nivelul hărții</label>
+                    <div id="sc-nivele" class="straturi" role="radiogroup" aria-label="Nivelul hărții">
+                        <label><input type="radio" name="nivel" value="regiuni" checked><span>Regiuni</span></label>
+                        <label><input type="radio" name="nivel" value="judete"><span>Județe</span></label>
+                        <label><input type="radio" name="nivel" value="districte"><span>Zone metropolitane și districte</span></label>
+                        <label><input type="radio" name="nivel" value="comune"><span>Comune comasate</span></label>
+                    </div>
+                    <p class="nota"><b>Administrativ</b> — cine e ales și are buget: regiunea și comuna.
+                        <b>Funcțional</b> — pe ce teritoriu se dau serviciile și fondurile: districtul și
+                        microregiunea. Județul rămâne limită și circumscripție.</p>
+                    <label for="sc-regiune">Teritoriul</label>
+                    <div class="cascada">
+                        <select id="sc-regiune" class="buton" aria-label="Regiunea"></select>
+                        <select id="sc-judet" class="buton" aria-label="Județul"></select>
+                        <select id="sc-zona" class="buton" aria-label="Zona metropolitană sau districtul"></select>
+                        <select id="sc-comuna" class="buton" aria-label="Comuna comasată"></select>
+                    </div>
+                    <select id="sc-exemplu" hidden style="display:none" aria-hidden="true" tabindex="-1"></select>
+                    <div id="sc-regiuni" class="regiuni-scurtaturi" hidden></div>
+                    <p class="nota">Regulile (pragurile) sunt cele de la pasul 2, mai sus.</p>
                     <div class="butoane">
                         <button id="sc-ruleaza" class="buton principal" type="button">Arată scenariul</button>
                         <button id="sc-final" class="buton" type="button">Harta finală</button>
@@ -151,9 +203,9 @@
                         <button id="sc-descarca" class="buton" type="button">Descarcă fișierul</button>
                     </div>
                 </div>
-                <div id="sc-dosar" class="detalii" hidden aria-live="polite"></div>
                 <div id="sc-rezultat" aria-live="polite"></div>
             </section>
+            </details>
 
             <details class="pliant pliant-mare">
                 <summary>Straturi informative, căutare și afișare</summary>

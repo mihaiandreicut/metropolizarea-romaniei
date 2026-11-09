@@ -36,9 +36,8 @@ window.AdpRaport = function() {
     const FUNCTII_PE_INSTITUTIE = 2;
     const NF = new Intl.NumberFormat("ro-RO");
     const NF1 = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 1 });
-    // Codul administrativ, art. 112: consilieri locali, după populație
-    const CONSILIERI_LOCALI = [[1500, 9], [3000, 11], [5000, 13], [10000, 15], [20000, 17],
-        [50000, 19], [100000, 21], [200000, 23], [400000, 27], [Infinity, 31]];
+    // Codul administrativ, art. 112: consilieri locali, după populație (scara e în adp-reorganizare.js)
+    const CONSILIERI_LOCALI = window.AdpReorganizare.CONSILIERI_LOCALI;
     // Codul administrativ, art. 171: consilieri județeni (plus președintele)
     const CONSILIERI_JUDETENI = [[350000, 30], [500000, 32], [650000, 34], [Infinity, 36]];
     // ipoteza de cost: unitatea nouă păstrează aparatul reședinței, plus un sfert din
@@ -46,7 +45,7 @@ window.AdpRaport = function() {
     const COTA_BIROURI = 0.25;
     const PRAG_ADMINISTRATIE = 30;   // % din veniturile proprii (Republica Moldova)
     // propunerea de reducere a reprezentării: dublarea populației pentru un consilier
-    const FACTOR_CONSILIERI = 2;
+    const FACTOR_CONSILIERI = window.AdpReorganizare.FACTOR_CONSILIERI;
     // anul 1 se duce pe tranziție (alegeri, sedii, sisteme, plăți compensatorii)
     const COTA_TRANZITIE = 0.5;
     const ANI_PROIECTIE = [1, 3, 5, 9, 15, 25];
@@ -1468,6 +1467,8 @@ window.AdpRaport = function() {
                             ${randTabel("Districte", "—", NF.format(f.districte))}
                         </tbody>
                     </table></div>
+                    <p class="nota"><a href="index.html#judet=${f.j.c}">Pe hartă, pas cu pas</a>: același județ,
+                        cu regulile tale, și harta de azi lângă cea propusă.</p>
                     <h4>Derogări</h4>
                     ${derogari}
                     <h4>Alegeri de mână</h4>

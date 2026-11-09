@@ -692,6 +692,138 @@ a {
     margin-top: 12px;
 }
 
+/* ------------------------------------------------------------------ pas cu pas */
+.vizual-ascuns {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.pas-cu-pas {
+    margin-top: 12px;
+}
+
+.pp-pasi {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    counter-reset: none;
+}
+
+.pp-pasi button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: 6px 2px;
+    border: 0;
+    border-top: 3px solid var(--margine);
+    background: none;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 12.5px;
+    line-height: 1.25;
+    text-align: center;
+    cursor: pointer;
+}
+
+.pp-pasi button:disabled {
+    cursor: default;
+    opacity: 0.55;
+}
+
+.pp-numar {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--margine);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.pp-pasi li.facut button {
+    border-top-color: var(--accent);
+    color: var(--text);
+}
+
+.pp-pasi li.facut .pp-numar {
+    border-color: var(--accent);
+    color: var(--accent-text);
+}
+
+.pp-pasi li[aria-current="step"] button {
+    border-top-color: var(--accent);
+    color: var(--accent-text);
+    font-weight: 650;
+}
+
+.pp-pasi li[aria-current="step"] .pp-numar {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--panou);
+}
+
+.pp-pas h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.pp-pas h4 {
+    margin: 16px 0 6px;
+    font-size: 14px;
+}
+
+.pp-pas > .butoane {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.pp-pas > .straturi {
+    margin-bottom: 10px;
+}
+
+.pp-pe-scurt {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tabel-pas td,
+.tabel-pas th {
+    font-variant-numeric: tabular-nums;
+}
+
+.tabel-pas thead th:first-child {
+    text-align: left;
+}
+
+.tabel-pas th[scope="row"] {
+    width: 52%;
+    padding-right: 10px;
+}
+
+.tabel-pas td {
+    vertical-align: top;
+}
+
+.pp-dif {
+    display: block;
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
 .tabel-comparatie th,
 .tabel-comparatie td {
     padding: 4px 6px 4px 0;

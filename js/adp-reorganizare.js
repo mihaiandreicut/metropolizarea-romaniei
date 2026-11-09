@@ -1590,8 +1590,22 @@ window.AdpReorganizare = function() {
         };
     }
 
+    // Codul administrativ, art. 112: consilieri locali, după populație. Propunerea: un consilier
+    // la dublul populației de azi (aceeași scară, cu pragurile înmulțite cu FACTOR_CONSILIERI).
+    const CONSILIERI_LOCALI = [[1500, 9], [3000, 11], [5000, 13], [10000, 15], [20000, 17],
+        [50000, 19], [100000, 21], [200000, 23], [400000, 27], [Infinity, 31]];
+    const FACTOR_CONSILIERI = 2;
+    /** Câți consilieri locali are o unitate de `populatie` locuitori (factor 1: legea de azi). */
+    function consilieriLocali(populatie, factor) {
+        const f = factor || 1;
+        return (CONSILIERI_LOCALI.find(([prag]) => populatie <= prag * f) || CONSILIERI_LOCALI[CONSILIERI_LOCALI.length - 1])[1];
+    }
+
     return {
         PARAMETRI_IMPLICITI: PARAMETRI_IMPLICITI,
+        CONSILIERI_LOCALI: CONSILIERI_LOCALI,
+        FACTOR_CONSILIERI: FACTOR_CONSILIERI,
+        consilieriLocali: consilieriLocali,
         ritmAnual: ritmAnual,
         PARAMETRI_DISTRICT: PARAMETRI_DISTRICT,
         REGULA_FINANCIARA: REGULA_FINANCIARA,
