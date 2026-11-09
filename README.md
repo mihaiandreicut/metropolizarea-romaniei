@@ -4,7 +4,7 @@ Hartă interactivă și raport pentru o propunere de reformă administrativ-teri
 
 Pagini:
 
-- `index.html` — harta: simularea pe un județ, pas cu pas (județul, regulile, raportul înainte și după; legătură directă `index.html#judet=COD`), plus explorarea liberă (regiuni, districte, comune comasate, indicatori pe UAT)
+- `index.html` — harta: simularea pas cu pas pe toată țara, pe o regiune sau pe un județ (teritoriul, regulile, raportul înainte și după, cu țara desfăcută pe regiuni și regiunea pe județe; legături directe `index.html#tara`, `#regiune=N`, `#judet=COD`), plus explorarea liberă (regiuni, districte, comune comasate, indicatori pe UAT)
 - `raport.html` — raportul cu cifre pe județe, costuri și economii
 - `sinteza.html` — sinteza și regulile de comasare
 - `principii.html` — principiile (administrativ vs. funcțional)

@@ -69,23 +69,24 @@
             <section>
                 <h2>Metropolizarea României</h2>
                 <p class="nota">Comunele se comasează după reguli publice, verificabile pe date, iar consiliile
-                    județene și prefecturile urcă la regiune. Încearcă pe un județ, în trei pași. Metoda:
+                    județene și prefecturile urcă la regiune. Încearcă pe un județ, pe o regiune sau pe toată țara, în trei pași. Metoda:
                     <a href="metodologie.html#metoda">metodologie</a>; cifrele pe toată țara: <a href="raport.html">raport</a>.</p>
 
                 <div id="pp" class="pas-cu-pas">
                     <ol class="pp-pasi">
-                        <li data-pas="1" aria-current="step"><button type="button" data-mergi="1"><span class="pp-numar">1</span>Județul</button></li>
+                        <li data-pas="1" aria-current="step"><button type="button" data-mergi="1"><span class="pp-numar">1</span>Teritoriul</button></li>
                         <li data-pas="2"><button type="button" data-mergi="2" disabled><span class="pp-numar">2</span>Regulile</button></li>
                         <li data-pas="3"><button type="button" data-mergi="3" disabled><span class="pp-numar">3</span>Înainte și după</button></li>
                     </ol>
 
                     <div class="pp-pas" data-pas="1">
-                        <h3>Alege județul</h3>
+                        <h3>Alege teritoriul</h3>
                         <div class="formular-scenariu">
-                            <label for="pp-judet" class="vizual-ascuns">Județul</label>
-                            <select id="pp-judet" class="buton"><option value="">— alege județul —</option></select>
+                            <label for="pp-judet" class="vizual-ascuns">Teritoriul: toată țara, o regiune sau un județ</label>
+                            <select id="pp-judet" class="buton"><option value="">— alege teritoriul —</option></select>
                         </div>
-                        <p class="nota">sau dă clic pe un județ, pe hartă.</p>
+                        <p class="nota">Toată țara, una dintre cele 8 regiuni sau un județ; un județ se poate alege
+                            și cu un clic pe hartă.</p>
                         <div id="pp-azi" aria-live="polite"></div>
                         <div class="butoane">
                             <button id="pp-spre-reguli" class="buton principal" type="button" disabled>Mai departe: regulile</button>
@@ -147,7 +148,7 @@
                         <div id="pp-raport" aria-live="polite"></div>
                         <div class="butoane">
                             <button class="buton" type="button" data-mergi="2">Schimbă regulile</button>
-                            <button class="buton" type="button" data-mergi="1">Alt județ</button>
+                            <button class="buton" type="button" data-mergi="1">Alt teritoriu</button>
                             <button id="pp-descarca" class="buton" type="button">Descarcă tabelul</button>
                         </div>
                     </div>

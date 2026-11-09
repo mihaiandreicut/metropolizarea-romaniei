@@ -404,6 +404,7 @@ window.AdpScenariu = function() {
             $("#sc-rezultat").innerHTML = `<p class="nota">Datele județului nu au putut fi încărcate. Rulează <code>python unelte/accesibilitate.py</code>.</p>`;
             return;
         }
+        rezultatCheie = cheie;
         culoareGrup = coloreazaGrupuri(rezultat);
         if (!activ) D.suspendaMod();
         activ = true;
@@ -1206,8 +1207,8 @@ window.AdpScenariu = function() {
         // pasul 1: clicul alege județul (în afara straturilor care au clicul lor);
         // în județul deja ales, clicul arată fișa UAT-ului, ca de obicei
         const mod = document.querySelector("input[name=mod]:checked");
-        if (!activ && pas === 1 && D.date.uat[idx].j !== pasJudet && !(mod && ["tematice", "regiuni"].includes(mod.value))) {
-            alegeJudetPas(D.date.uat[idx].j);
+        if (!activ && pas === 1 && String(D.date.uat[idx].j) !== pasCheie && !(mod && ["tematice", "regiuni"].includes(mod.value))) {
+            alegeTeritoriuPas(String(D.date.uat[idx].j));
             return true;
         }
         if (!activ || !rezultat || vedereInainte) return false;
@@ -1579,22 +1580,42 @@ window.AdpScenariu = function() {
 
     /** @param context de la AdpAplicatie: { date, topo, vecini, harta, topologie, reorganizare, esc, ... } */
     // ------------------------------------------------------------ pas cu pas
-    // Interfața de bază: 1. județul, 2. regulile, 3. înainte și după. Folosește același calcul
-    // ca explorarea liberă (ruleaza), doar că pornește de la un județ și se termină cu raportul
-    // comparativ al lui.
+    // Interfața de bază: 1. teritoriul (țara, o regiune sau un județ), 2. regulile, 3. înainte și
+    // după. Folosește același calcul ca explorarea liberă (ruleaza) și se termină cu raportul
+    // comparativ al teritoriului; țara se desface pe regiuni, regiunea pe județe.
     let pas = 1;                 // pasul afișat
-    let pasJudet = null;         // județul ales la pasul 1 (cod)
+    // teritoriul ales la pasul 1, cu aceeași cheie ca #sc-exemplu: "*" țara, "adr:N" regiunea, "N" județul
+    let pasCheie = null;
+    let rezultatCheie = null;    // teritoriul pe care s-a calculat rezultatul curent
     let vedereInainte = false;   // pasul 3: harta de azi în locul celei propuse
     let dateGata = Promise.resolve();   // finanțele, dotările, judecătoriile, alegerile: încărcate
 
-    const rezultatPas = () => rezultat && !national && rezultat.judet === pasJudet ? rezultat : null;
-    const indeciiJudetului = cod => D.date.uat.map((u, i) => u.j === cod ? i : -1).filter(i => i >= 0);
-    const numeJudetPas = cod => (judete.find(j => j.cod === cod) || {}).nume || D.numeJudet(cod);
+    const rezultatPas = () => rezultat && pasCheie !== null && rezultatCheie === pasCheie ? rezultat : null;
     const esteOras = i => D.date.uat[i].t !== "comună";
+    const tipPas = c => c === TOATA_TARA ? "tara" : c.startsWith(PREFIX_ADR) ? "regiune" : "judet";
+    const codAdrPas = c => Number(c.slice(PREFIX_ADR.length));
+    /** Cheia e una pe care pasul o poate calcula: țara, o regiune, un județ cu date de accesibilitate. */
+    const cheieValida = c => c === TOATA_TARA
+        || (tipPas(c) === "regiune" && D.date.adr.some(a => a.c === codAdrPas(c)))
+        || judete.some(j => String(j.cod) === c);
+    function indeciiPas(c) {
+        const apartine = c === TOATA_TARA ? () => true
+            : tipPas(c) === "regiune" ? u => u.adr === codAdrPas(c) : u => u.j === Number(c);
+        return D.date.uat.map((u, i) => apartine(u) ? i : -1).filter(i => i >= 0);
+    }
+    function numePas(c) {
+        if (c === TOATA_TARA) return "Toată țara";
+        if (tipPas(c) === "regiune") {
+            const a = D.date.adr.find(x => x.c === codAdrPas(c));
+            return "Regiunea " + (a ? numeAdr(a) : "");
+        }
+        return "Județul " + ((judete.find(j => String(j.cod) === c) || {}).nume || D.numeJudet(Number(c)));
+    }
+    const ancoraPas = c => c === TOATA_TARA ? "tara" : tipPas(c) === "regiune" ? "regiune=" + codAdrPas(c) : "judet=" + c;
 
     function arataPas(nou) {
-        if (nou === 3 && !rezultatPas()) nou = pasJudet === null ? 1 : 2;
-        if (nou === 2 && pasJudet === null) nou = 1;
+        if (nou === 3 && !rezultatPas()) nou = pasCheie === null ? 1 : 2;
+        if (nou === 2 && pasCheie === null) nou = 1;
         if (nou !== 3 && vedereInainte) vedere(false);
         pas = nou;
         document.querySelectorAll("#pp .pp-pas").forEach(el => { el.hidden = Number(el.dataset.pas) !== nou; });
@@ -1603,25 +1624,27 @@ window.AdpScenariu = function() {
             if (n === nou) li.setAttribute("aria-current", "step");
             else li.removeAttribute("aria-current");
             li.classList.toggle("facut", n < nou);
-            li.querySelector("button").disabled = n === 2 ? pasJudet === null : n === 3 ? !rezultatPas() : false;
+            li.querySelector("button").disabled = n === 2 ? pasCheie === null : n === 3 ? !rezultatPas() : false;
         });
     }
 
-    /** Pasul 1: județul ales, cu situația lui de azi; harta se oprește pe el. */
-    function alegeJudetPas(cod) {
-        if (!judete.some(j => j.cod === cod)) return;
-        pasJudet = cod;
-        $("#pp-judet").value = String(cod);
+    /** Pasul 1: teritoriul ales, cu situația lui de azi; harta se oprește pe el. */
+    function alegeTeritoriuPas(cheie) {
+        cheie = String(cheie);
+        if (!cheieValida(cheie)) return;
+        pasCheie = cheie;
+        $("#pp-judet").value = cheie;
         if (activ) inchide();
-        const indecsi = indeciiJudetului(cod);
-        D.harta.zoomLa(indecsi, 9);
-        $("#pp-azi").innerHTML = fisaAzi(indecsi);
+        const indecsi = indeciiPas(cheie);
+        if (cheie === TOATA_TARA) D.harta.reseteazaVederea(true);
+        else D.harta.zoomLa(indecsi, tipPas(cheie) === "regiune" ? 8 : 9);
+        $("#pp-azi").innerHTML = fisaAzi(indecsi, cheie);
         $("#pp-spre-reguli").disabled = false;
         arataPas(1);
-        history.replaceState(null, "", "#judet=" + cod);
+        history.replaceState(null, "", "#" + ancoraPas(cheie));
     }
 
-    function fisaAzi(indecsi) {
+    function fisaAzi(indecsi, cheie) {
         const P = parametri();
         const pop = i => D.date.uat[i].pop || 0;
         const tipuri = t => indecsi.filter(i => D.date.uat[i].t === t).length;
@@ -1629,26 +1652,29 @@ window.AdpScenariu = function() {
         const pops = indecsi.map(pop).sort((a, b) => a - b);
         const b = bani(indecsi);
         const rand = (et, val) => `<tr><th scope="row">${et}</th><td>${val}</td></tr>`;
+        const nrJudete = new Set(indecsi.map(i => D.date.uat[i].j)).size;
         return `<table class="tabel-atribute">
+                ${tipPas(cheie) === "judet" ? "" : rand("Județe", cheie === TOATA_TARA ? `${NF.format(nrJudete - 1)} și București` : NF.format(nrJudete))}
                 ${rand("UAT-uri azi", `<b>${NF.format(indecsi.length)}</b>: ${cate(tipuri("municipiu"), "municipiu", "municipii")}, ${cate(tipuri("oraș"), "oraș", "orașe")}, ${cate(tipuri("comună"), "comună", "comune")}`)}
                 ${rand("Populație", NF.format(locuitori))}
                 ${rand("Populația mediană a unui UAT", NF.format(pops[Math.floor(pops.length / 2)]))}
                 ${rand(`UAT-uri sub ${NF.format(P.pMin)} de locuitori`, NF.format(pops.filter(p => p < P.pMin).length))}
                 ${b ? rand("Aparatul primăriilor, pe an", milioane(b.aparat)) : ""}
             </table>
-            <p class="nota">Populația după domiciliu la 1 ianuarie 2026 (INS); banii, din execuția bugetară 2025.</p>`;
+            <p class="nota">Populația după domiciliu la 1 ianuarie 2026 (INS); banii, din execuția bugetară 2025.
+                ${tipPas(cheie) === "judet" ? "" : "Calculul pe mai multe județe durează câteva secunde."}</p>`;
     }
 
-    /** Pasul 2 → 3: calculul pe județul ales, cu regulile din formular. */
+    /** Pasul 2 → 3: calculul pe teritoriul ales, cu regulile din formular. */
     async function genereazaPas() {
-        if (pasJudet === null) return;
+        if (pasCheie === null) return;
         const buton = $("#pp-genereaza");
         buton.disabled = true;
         buton.textContent = "Se calculează…";
         final = false;
         regiuni = null;
         districtAles = null;
-        $("#sc-exemplu").value = String(pasJudet);
+        $("#sc-exemplu").value = pasCheie;
         seteazaNivel("comune");
         try {
             // calculul folosește banii, dotările, circumscripțiile și alegerile voluntare
@@ -1696,7 +1722,7 @@ window.AdpScenariu = function() {
         D.harta.seteazaEtichete([]);
         const indexUat = new Map(D.date.uat.map((u, i) => [u, i]));
         D.harta.linii(D.topologie.plasa(D.topo, u => inJudet.has(indexUat.get(u)) ? indexUat.get(u) : -1, false),
-            { token: "--limita-regiune", weight: 2.6 }).addTo(stratLimite);
+            { token: "--limita-regiune", weight: national ? 1 : 2.6 }).addTo(stratLimite);
         D.harta.linii(D.topologie.plasa(D.topo, u => u.j, false),
             { token: "--limita-judet-culoare", weight: 1.6, dashArray: "6 4" }).addTo(stratLimite);
         D.harta.linii(D.topologie.plasa(D.topo, u => u.adr, false),
@@ -1752,8 +1778,8 @@ window.AdpScenariu = function() {
             { nume: "Primari", azi: a.unitati, dupa: d.unitati },
             { nume: "Consilieri locali", azi: r.uat.reduce((s, i) => s + R.consilieriLocali(pop(i)), 0),
                 dupa: r.grupuri.reduce((s, g) => s + R.consilieriLocali(g.populatie, R.FACTOR_CONSILIERI), 0) },
-            c && { nume: "Aparatul primăriilor, mil. lei pe an", azi: c.acum, dupa: c.dupa,
-                fmt: v => NF1.format(v / 1e6) },
+            c && { nume: `Aparatul primăriilor, ${c.acum >= 1e9 ? "mld." : "mil."} lei pe an`, azi: c.acum, dupa: c.dupa,
+                fmt: v => NF1.format(v / (c.acum >= 1e9 ? 1e9 : 1e6)) },
             executie && { nume: `Aparatul peste ${prag}% din veniturile proprii`, azi: pesteAzi, dupa: pesteDupa,
                 textAzi: `${NF.format(pesteAzi)} din ${NF.format(cuDateAzi.length)}`,
                 textDupa: `${NF.format(pesteDupa)} din ${NF.format(cuDateDupa.length)}` },
@@ -1764,18 +1790,75 @@ window.AdpScenariu = function() {
         ].filter(Boolean);
     }
 
+    /**
+     * Teritoriul desfăcut un nivel mai jos: țara pe regiuni, regiunea pe județe (județul nu se
+     * desface). Fiecare parte cu UAT-urile și unitățile ei, economia și drumul mediu, calculat ca
+     * în AdpReorganizare (media pe sate, ponderată cu populația).
+     */
+    function partiPas(r) {
+        const tip = tipPas(pasCheie);
+        if (tip === "judet") return [];
+        const parti = tip === "tara"
+            ? D.date.adr.map(a => ({ cheie: PREFIX_ADR + a.c, nume: numeAdr(a), apartine: u => u.adr === a.c }))
+            : judeteleAdr(codAdrPas(pasCheie)).map(j => ({ cheie: String(j.cod), nume: j.nume, apartine: u => u.j === j.cod }));
+        return parti.map(p => {
+            const uat = r.uat.filter(i => p.apartine(D.date.uat[i]));
+            if (!uat.length) return null;
+            const grupuri = r.grupuri.filter(g => p.apartine(D.date.uat[g.sediu]));
+            const sate = r.sate.filter(s => p.apartine(D.date.uat[s.uat]));
+            const timp = camp => {
+                let suma = 0, greutate = 0;
+                sate.forEach(s => { const g = Math.max(1, s.p || 0); suma += s[camp] * g; greutate += g; });
+                return greutate ? suma / greutate : null;
+            };
+            const c = costAparat(grupuri);
+            return {
+                cheie: p.cheie, nume: p.nume, uat: uat.length, unitati: grupuri.length,
+                economie: c ? c.economie : null, timpAzi: timp("tAcum"), timpDupa: timp("tNou")
+            };
+        }).filter(Boolean);
+    }
+
     function randeazaPas() {
         const r = rezultatPas();
         if (!r) return;
         const P = r.parametri;
-        const nume = numeJudetPas(pasJudet);
+        const tip = tipPas(pasCheie);
+        const parti = partiPas(r);
         const randuri = randuriComparatie(r);
         const valoare = (x, v, text) => text || (v === null ? "—" : x.fmt ? x.fmt(v) : NF.format(Math.round(v)));
         const c = costAparat(r.grupuri);
         const cuDerogare = r.grupuri.filter(g => g.derogari && g.derogari.length).length;
         const comasate = r.grupuri.filter(g => g.membri.length > 1);
         const neschimbate = r.grupuri.filter(g => g.membri.length === 1);
-        $("#pp-titlu").textContent = `Județul ${nume}: înainte și după`;
+        $("#pp-titlu").textContent = `${numePas(pasCheie)}: înainte și după`;
+        const defalcare = !parti.length ? "" : `
+            <h4>Pe ${tip === "tara" ? "regiuni" : "județe"} <small class="nota">— clic pe un rând: același raport,
+                pentru ${tip === "tara" ? "regiunea" : "județul"} respectiv</small></h4>
+            <div class="tabel-derulant"><table class="tabel-atribute tabel-comparatie tabel-pas tabel-parti">
+                <thead><tr><th scope="col">${tip === "tara" ? "Regiunea" : "Județul"}</th><th scope="col">UAT → unități</th>
+                    <th scope="col">Economie, mil. lei/an</th><th scope="col">Drum mediu, min</th></tr></thead>
+                <tbody>${parti.map(x => `<tr data-cheie="${D.esc(x.cheie)}" tabindex="0">
+                    <th scope="row">${D.esc(x.nume)}</th>
+                    <td>${NF.format(x.uat)} → <b>${NF.format(x.unitati)}</b></td>
+                    <td>${x.economie === null ? "—" : NF1.format(x.economie / 1e6)}</td>
+                    <td>${x.timpAzi === null ? "—" : `${NF1.format(x.timpAzi)} → <b>${NF1.format(x.timpDupa)}</b>`}</td></tr>`).join("")}</tbody>
+            </table></div>
+            ${tip === "tara" || codAdrPas(pasCheie) === (D.date.uat.find(u => u.j === 40) || {}).adr
+                ? `<p class="nota">Bucureștiul rămâne cum e: municipiul nu are date de accesibilitate pe sate și
+                    nu se comasează.</p>` : ""}`;
+        const lista = tip !== "judet" ? "" : `
+            <h4>Cine cu cine se comasează <small class="nota">— clic pentru dosarul unității</small></h4>
+            <ol class="lista-grupuri pp-unitati">${comasate.map(g => `
+                <li data-sediu="${g.sediu}" tabindex="0">
+                    <span class="mostra f-c${culoareGrup.get(g.sediu)}"></span>
+                    <span class="grup-nume">${D.esc(g.nume)}${g.urban ? "" : " <small>(comună)</small>"}</span>
+                    <span class="numar">${NF.format(g.populatie)}</span>
+                    <span class="grup-detalii">${g.membri.map(i => D.esc(D.date.uat[i].n)).join(" + ")}
+                        ${g.derogari && g.derogari.length ? `<span class="eticheta-stare atentie" title="${D.esc(g.derogari.join(" "))}">${cate(g.derogari.length, "derogare", "derogări")}</span>` : ""}</span>
+                </li>`).join("")}</ol>
+            ${neschimbate.length ? `<p class="nota"><b>Rămân cum sunt</b> (${neschimbate.length}):
+                ${neschimbate.map(g => D.esc(g.nume)).join(", ")}.</p>` : ""}`;
         $("#pp-raport").innerHTML = `
             <p class="pp-pe-scurt"><b>${NF.format(r.inainte.unitati)} de UAT-uri devin ${NF.format(r.dupa.unitati)}
                 ${r.dupa.unitati === 1 ? "unitate" : "de unități"}.</b>
@@ -1790,17 +1873,8 @@ window.AdpScenariu = function() {
                     <td><b>${valoare(x, x.dupa, x.textDupa)}</b>
                         <small class="pp-dif">${x.azi === null ? "nou" : diferenta(x.azi, x.dupa, x.fmt)}</small></td></tr>`).join("")}</tbody>
             </table></div>
-            <h4>Cine cu cine se comasează <small class="nota">— clic pentru dosarul unității</small></h4>
-            <ol class="lista-grupuri pp-unitati">${comasate.map(g => `
-                <li data-sediu="${g.sediu}" tabindex="0">
-                    <span class="mostra f-c${culoareGrup.get(g.sediu)}"></span>
-                    <span class="grup-nume">${D.esc(g.nume)}${g.urban ? "" : " <small>(comună)</small>"}</span>
-                    <span class="numar">${NF.format(g.populatie)}</span>
-                    <span class="grup-detalii">${g.membri.map(i => D.esc(D.date.uat[i].n)).join(" + ")}
-                        ${g.derogari && g.derogari.length ? `<span class="eticheta-stare atentie" title="${D.esc(g.derogari.join(" "))}">${cate(g.derogari.length, "derogare", "derogări")}</span>` : ""}</span>
-                </li>`).join("")}</ol>
-            ${neschimbate.length ? `<p class="nota"><b>Rămân cum sunt</b> (${neschimbate.length}):
-                ${neschimbate.map(g => D.esc(g.nume)).join(", ")}.</p>` : ""}
+            ${defalcare}
+            ${lista}
             <p class="nota">Regulile: comuna ${NF.format(P.pMin)}–${NF.format(P.pTinta)} de locuitori, unitatea cu oraș
                 ${NF.format(P.pMinOras)}–${NF.format(P.pTintaOras)}, cel mult ${P.tMax} de minute până la reședință.
                 Populația: după domiciliu la 1 ianuarie 2026 (INS). Costul: execuția bugetară 2025; unitatea nouă
@@ -1808,6 +1882,14 @@ window.AdpScenariu = function() {
                 Codul administrativ, art. 112, cu un consilier la dublul populației în propunere.
                 <a href="#sc-rezultat" id="pp-detalii">Toate detaliile: banii, districtele, satele</a> ·
                 <a href="raport.html#judete">fișele de județ din raport</a>.</p>`;
+        document.querySelectorAll("#pp-raport tr[data-cheie]").forEach(tr => {
+            const coboara = () => {
+                alegeTeritoriuPas(tr.dataset.cheie);
+                genereazaPas();
+            };
+            tr.addEventListener("click", coboara);
+            tr.addEventListener("keydown", e => { if (e.key === "Enter") coboara(); });
+        });
         document.querySelectorAll("#pp-raport li[data-sediu]").forEach(li => {
             const alege = () => {
                 const s = Number(li.dataset.sediu);
@@ -1834,20 +1916,27 @@ window.AdpScenariu = function() {
         const brut = v => v === null || v === undefined ? "" : Math.round(v * 10) / 10;
         const randuri = [["Indicator", "Azi", "Propus"]]
             .concat(randuriComparatie(r).map(x => [x.nume, brut(x.azi), brut(x.dupa)]))
+            .concat(partiPas(r).length ? [[], [tipPas(pasCheie) === "tara" ? "Regiunea" : "Județul", "UAT azi", "Unități propuse",
+                "Economie (lei pe an)", "Drum mediu azi (min)", "Drum mediu propus (min)"]] : [])
+            .concat(partiPas(r).map(x => [x.nume, x.uat, x.unitati, x.economie === null ? "" : Math.round(x.economie),
+                brut(x.timpAzi), brut(x.timpDupa)]))
             .concat([[], ["Unitatea nouă", "Populație", "UAT-uri de azi", "Derogări"]])
             .concat(r.grupuri.map(g => [g.nume, g.populatie, g.membri.map(i => D.date.uat[i].n).join(" + "),
                 (g.derogari || []).join(" ")]));
         const continut = "﻿" + randuri.map(x => x.map(celula).join(";")).join("\r\n");
         const legatura = document.createElement("a");
         legatura.href = URL.createObjectURL(new Blob([continut], { type: "text/csv;charset=utf-8" }));
-        legatura.download = `reorganizare-${D.esc(numeJudetPas(pasJudet)).toLowerCase().replace(/[^a-z0-9ăâîșț]+/g, "-")}.csv`;
+        // numele fișierului fără diacritice: unele browsere le refuză în atributul download
+        const simplu = numePas(pasCheie).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        legatura.download = `reorganizare-${simplu}.csv`;
         document.body.appendChild(legatura);
         legatura.click();
         legatura.remove();
         setTimeout(() => URL.revokeObjectURL(legatura.href), 1000);
     }
 
-    /** După orice calcul: dacă e pe județul ales, raportul pasului 3 se reface. */
+    /** După orice calcul: dacă e pe teritoriul ales, raportul pasului 3 se reface. */
     function actualizeazaPas() {
         if (rezultatPas()) {
             vedereInainte = false;
@@ -1860,32 +1949,32 @@ window.AdpScenariu = function() {
 
     function leagaPasCuPas() {
         const sel = $("#pp-judet");
-        judete.slice().sort((a, b) => a.nume.localeCompare(b.nume, "ro")).forEach(j => {
-            const o = document.createElement("option");
-            o.value = String(j.cod);
-            o.textContent = j.nume;
-            sel.appendChild(o);
-        });
+        const optiune = (v, text) => `<option value="${D.esc(v)}">${D.esc(text)}</option>`;
+        sel.innerHTML = optiune("", "— alege teritoriul —") + optiune(TOATA_TARA, "Toată țara") +
+            `<optgroup label="Regiunile">${D.date.adr.map(a => optiune(PREFIX_ADR + a.c, numeAdr(a))).join("")}</optgroup>` +
+            `<optgroup label="Județele">${judete.slice().sort((a, b) => a.nume.localeCompare(b.nume, "ro"))
+                .map(j => optiune(String(j.cod), j.nume)).join("")}</optgroup>`;
         sel.addEventListener("change", () => {
-            if (sel.value) alegeJudetPas(Number(sel.value));
+            if (sel.value) alegeTeritoriuPas(sel.value);
         });
         $("#pp-spre-reguli").addEventListener("click", () => arataPas(2));
         $("#pp-genereaza").addEventListener("click", genereazaPas);
         $("#pp-descarca").addEventListener("click", descarcaPas);
         document.querySelectorAll("#pp [data-mergi]").forEach(b => b.addEventListener("click", () => {
             const tinta = Number(b.dataset.mergi);
-            // „Alt județ”: harta revine la UAT-urile de azi
+            // „Alt teritoriu”: harta revine la UAT-urile de azi
             if (tinta === 1 && activ) inchide();
             arataPas(tinta);
         }));
         document.querySelectorAll("input[name=pp-harta]").forEach(radio =>
             radio.addEventListener("change", () => vedere(radio.value === "inainte")));
         arataPas(1);
-        // legătura directă, ex. index.html#judet=18 (din fișele de județ ale raportului):
-        // județul ales și raportul calculat cu regulile implicite
-        const m = location.hash.match(/^#judet=(\d+)$/);
-        if (m && judete.some(j => j.cod === Number(m[1]))) {
-            alegeJudetPas(Number(m[1]));
+        // legătura directă: index.html#tara, #regiune=N sau #judet=N (din fișele de județ ale
+        // raportului) — teritoriul ales și raportul calculat cu regulile implicite
+        const m = location.hash.match(/^#(?:(tara)|regiune=(\d+)|judet=(\d+))$/);
+        const cheie = !m ? null : m[1] ? TOATA_TARA : m[2] ? PREFIX_ADR + m[2] : m[3];
+        if (cheie && cheieValida(cheie)) {
+            alegeTeritoriuPas(cheie);
             genereazaPas();
         }
     }
