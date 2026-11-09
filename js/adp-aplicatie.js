@@ -496,7 +496,7 @@ window.AdpAplicatie = function() {
             incarcaLocalitati();
         }).catch(e => {
             console.error(`[e-ro-adp] "${CALE_UAT}" nu a putut fi încărcat (${e.message}).`);
-            $("#incarcare").textContent = "Datele hărții nu au putut fi încărcate. Pagina trebuie servită prin HTTP (vezi STATUS.md).";
+            $("#incarcare").textContent = "Datele hărții nu au putut fi încărcate. Pagina trebuie servită prin HTTP (vezi README.md).";
         });
     }
 

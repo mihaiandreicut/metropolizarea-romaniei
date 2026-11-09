@@ -426,8 +426,10 @@ def principal():
             "Criteriul de capacitate administrativă: Republica Moldova, Legea privind organizarea "
             "administrativ-teritorială — administrația și instituțiile sociale sub 30% din veniturile proprii"
         ],
-        "nota": "Fără exportul pe UAT, criteriul financiar rămâne indisponibil în hartă; "
-                "arieratele pe județe se pot folosi doar ca semnal, nu ca prag."
+        "nota": ("Execuția pe UAT vine din exportul Transparență bugetară; "
+                 if executie_uat else
+                 "Fără exportul pe UAT, criteriul financiar rămâne indisponibil în hartă; ")
+                + "arieratele pe județe se pot folosi doar ca semnal, nu ca prag."
     }
     os.makedirs(os.path.dirname(CALE_IESIRE), exist_ok=True)
     with open(CALE_IESIRE, "w", encoding="utf-8") as f:
