@@ -84,7 +84,7 @@ window.AdpMetodologie = function() {
             etnii.forEach(et => {
                 const n = g.membri.reduce((a, i) => {
                     const e = date.uat[i].et;
-                    return a + (e && e.min === et ? date.uat[i].p21 * e.pmin / 100 : 0);
+                    return a + (e && e.min === et ? date.uat[i].pop * e.pmin / 100 : 0);
                 }, 0);
                 rez.push({ grup: g, etnie: et, pondere: 100 * n / g.populatie, uat: cuPrag.filter(i => date.uat[i].et.min === et) });
             });

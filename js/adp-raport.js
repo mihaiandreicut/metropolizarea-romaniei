@@ -179,7 +179,7 @@ window.AdpRaport = function() {
      */
     function regiuniDezvoltare(date) {
         const pop = new Map();
-        date.uat.forEach(u => pop.set(u.adr, (pop.get(u.adr) || 0) + (u.p21 || 0)));
+        date.uat.forEach(u => pop.set(u.adr, (pop.get(u.adr) || 0) + (u.pop || 0)));
         return date.adr.map(a => ({
             cod: a.c,
             nume: a.n === "București-Ilfov" ? "București–Ilfov (Metropola)" : a.n,
@@ -190,9 +190,9 @@ window.AdpRaport = function() {
 
     function structura(date, r, regional) {
         const uatAcum = date.uat;
-        const consilieriAcum = uatAcum.reduce((a, u) => a + dupaScara(CONSILIERI_LOCALI, u.p21 || 0), 0);
+        const consilieriAcum = uatAcum.reduce((a, u) => a + dupaScara(CONSILIERI_LOCALI, u.pop || 0), 0);
         const popJudet = new Map();
-        uatAcum.forEach(u => popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.p21 || 0)));
+        uatAcum.forEach(u => popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.pop || 0)));
         let judeteni = 0;
         popJudet.forEach(p => { judeteni += dupaScara(CONSILIERI_JUDETENI, p) + 1; });
 
@@ -263,7 +263,7 @@ window.AdpRaport = function() {
                 <tbody>
                     ${randPereche("Unități administrative", NF.format(s.unitati.inainte), NF.format(s.unitati.dupa), scadere(s.unitati.inainte, s.unitati.dupa))}
                     ${randPereche("Populația mediană a unei unități", NF.format(r.inainte.mediana), NF.format(r.dupa.mediana), scadere(r.inainte.mediana, r.dupa.mediana))}
-                    ${randPereche("Unități sub pragul de 5.000 loc.", NF.format(r.inainte.subPrag), NF.format(r.dupa.subPrag), scadere(r.inainte.subPrag, r.dupa.subPrag))}
+                    ${randPereche(`Unități sub pragul de ${NF.format(r.parametri.pMin)} loc.`, NF.format(r.inainte.subPrag), NF.format(r.dupa.subPrag), scadere(r.inainte.subPrag, r.dupa.subPrag))}
                     ${randPereche("Costul aparatului administrativ (an)", lei(c.aparat.inainte), lei(c.aparat.dupa), scadere(c.aparat.inainte, c.aparat.dupa))}
                     ${randPereche("Aleși (primari + consilieri)", NF.format(s.alesi.inainte), NF.format(s.alesi.dupa), scadere(s.alesi.inainte, s.alesi.dupa))}
                     ${randPereche("Sedii administrative", NF.format(s.oficii.inainte), NF.format(s.oficii.dupa), scadere(s.oficii.inainte, s.oficii.dupa))}
@@ -284,7 +284,7 @@ window.AdpRaport = function() {
         let aziTrec = 0, aziSubTinta = 0;
         executie.forEach((e, i) => {
             if (e.pondere !== null && e.pondere <= regula.prag) aziTrec++;
-            const p = date.uat[i].p21;
+            const p = date.uat[i].pop;
             if (p > 0 && (e.cheltuieliAparat || 0) / p <= regula.tinta) aziSubTinta++;
         });
         const f = r.financiar;
@@ -382,9 +382,9 @@ window.AdpRaport = function() {
                 <thead><tr><th>Reper</th><th>azi</th><th>propus</th><th>sursa / ipoteza</th></tr></thead>
                 <tbody>
                     ${randPereche("Unități de bază", NF.format(s.unitati.inainte), NF.format(s.unitati.dupa), "scenariul implicit, calculat în pagină")}
-                    ${randPereche("Populația mediană", NF.format(r.inainte.mediana), NF.format(r.dupa.mediana), "RPL 2021")}
-                    ${randPereche("Unități sub 3.000 loc.", NF.format(r.inainte.sub3000), NF.format(r.dupa.sub3000), "RPL 2021")}
-                    ${randPereche(`Unități sub prag în ${r.parametri.anProiectie}`, NF.format(r.inainte.subPrag2050), NF.format(r.dupa.subPrag2050), "proiecție pe trendul 2011–2024")}
+                    ${randPereche("Populația mediană", NF.format(r.inainte.mediana), NF.format(r.dupa.mediana), "INS, domiciliu 1 ianuarie 2026")}
+                    ${randPereche("Unități sub 3.000 loc.", NF.format(r.inainte.sub3000), NF.format(r.dupa.sub3000), "INS, domiciliu 1 ianuarie 2026")}
+                    ${randPereche(`Unități sub prag în ${r.parametri.anProiectie}`, NF.format(r.inainte.subPrag2050), NF.format(r.dupa.subPrag2050), "proiecție pe trendul 2011–2026 (domiciliu)")}
                     ${randPereche("Primari", NF.format(s.primari.inainte), NF.format(s.primari.dupa), "unul pe unitate")}
                     ${randPereche("Consilieri locali", NF.format(s.consilieriLocali.inainte), NF.format(s.consilieriLocali.dupa), "Codul administrativ, art. 112")}
                     ${randPereche("Consilieri județeni → regionali", NF.format(s.consilieriSuperiori.inainte), NF.format(s.consilieriSuperiori.dupa), "consilieri și președinți (art. 171); consiliul regional ia locul consiliilor județene, cu locuri pe județe după populație")}
@@ -434,7 +434,9 @@ window.AdpRaport = function() {
                 <li><b>Scenariul de comasare</b> e cel implicit din hartă: prag ${NF.format(r.parametri.pMin)}–${NF.format(r.parametri.pTinta)}
                     de locuitori (${NF.format(r.parametri.pMinOras)}–${NF.format(r.parametri.pTintaOras)} cu oraș),
                     maximum ${r.parametri.tMax} de minute până la reședință, limită absolută ${r.parametri.tMaxFortat} de minute,
-                    praguri legale pe rang, prag durabil verificat și în proiecția la ${r.parametri.anProiectie}.
+                    ${r.parametri.praguriLegale ? "praguri legale pe rang"
+                        : `orașul sub ${NF.format(r.parametri.pOrasAutonom)} de locuitori preia comunele din jur până la ${NF.format(r.parametri.pMinOras)}`},
+                    prag durabil verificat și în proiecția la ${r.parametri.anProiectie}.
                     ${NF.format(r.judete.length)} de județe calculate.</li>
                 <li><b>Costul aparatului administrativ</b> = capitolele „Autorități executive” și „Alte servicii
                     publice generale” din execuția bugetară ${NF.format(c.cuDate)} de primării, anul 2025.
@@ -547,7 +549,7 @@ window.AdpRaport = function() {
         const goluri = (r.districte || []).map(d => {
             const lista = d.unitati.flatMap(u => membri.get(u) || []);
             const x = I.agrega(date, infra, finante, lista);
-            const fara = x.fara.canal.reduce((s, i) => s + (date.uat[i].p21 || 0), 0);
+            const fara = x.fara.canal.reduce((s, i) => s + (date.uat[i].pop || 0), 0);
             return { d: d, x: x, fara: fara, judet: numeJudet(date.uat[d.sediu].j) };
         }).sort((p, q) => q.fara - p.fara).slice(0, 10);
         const randuriGoluri = goluri.map(g => `<tr>
@@ -836,6 +838,7 @@ window.AdpRaport = function() {
             judete: date.judete.map(j => ({ cod: j.c, nume: j.n, adr: adrJudet.get(j.c) })),
             districte: districte,
             aniEconomie: ANI_ECONOMIE,
+            praguri: { comuna: r.parametri.pMin, oras: r.parametri.pMinOras },
             inflatie: INFLATIE
         };
     }
@@ -915,17 +918,26 @@ window.AdpRaport = function() {
                 </tbody>
             </table></div>
             ${(() => {
-                // orașele sub 25.000 de locuitori care au preluat UAT-uri mici din jur
-                const cuOras = r.grupuri.filter(g => g.urban && g.membri.length > 1);
+                // orașele care au preluat comune din jur: cele sub pragul orașului, până la el; celelalte
+                // (sub pOrasMic), doar comunele mici rămase, ca ultimă soluție
                 const preluate = g => g.membri.filter(i => date.uat[i].t === "comună");
+                const cuOras = r.grupuri.filter(g => g.urban && preluate(g).length);
                 const peste = cuOras.filter(g => g.populatie > PRAG_ORAS_LEADER);
                 const numar = lista => lista.reduce((a, g) => a + preluate(g).length, 0);
-                return `<p><b>Orașele mici care preiau comune:</b> ${NF.format(cuOras.length)} de orașe sub
-                    ${NF.format(r.parametri.pOrasMic)} de locuitori au preluat ${NF.format(numar(cuOras))} de UAT-uri mici din
-                    jurul lor. Dintre ele, ${NF.format(peste.length)} trec de ${NF.format(PRAG_ORAS_LEADER)} de locuitori
+                // orașele mici fără destule comune în jur, unite (la forțare) cu un oraș vecin
+                const orase = g => g.membri.filter(i => date.uat[i].t !== "comună");
+                const unite = r.grupuri.filter(g => orase(g).length > 1);
+                const numeUnire = g => orase(g).map(i => esc(date.uat[i].n)).join(" cu ");
+                return `<p><b>Orașele care preiau comune:</b> ${NF.format(cuOras.length)} de orașe au preluat
+                    ${NF.format(numar(cuOras))} de comune din jurul lor${r.parametri.absorbtieUrbana && !r.parametri.praguriLegale
+                        ? ` — cele sub ${NF.format(r.parametri.pOrasAutonom)} de locuitori, până la pragul orașului, celelalte doar comunele mici rămase`
+                        : ""}. Dintre ele, ${NF.format(peste.length)} trec de ${NF.format(PRAG_ORAS_LEADER)} de locuitori
                     (${peste.map(g => esc(g.nume)).join(", ")}): cele ${NF.format(numar(peste))} comune ale lor,
-                    cu ${NF.format(peste.reduce((a, g) => a + preluate(g).reduce((x, i) => x + (date.uat[i].p21 || 0), 0), 0))}
-                    de locuitori, ies din aria LEADER și trec pe strategia urbană a orașului.</p>`;
+                    cu ${NF.format(peste.reduce((a, g) => a + preluate(g).reduce((x, i) => x + (date.uat[i].pop || 0), 0), 0))}
+                    de locuitori, ies din aria LEADER și trec pe strategia urbană a orașului.</p>` +
+                    (unite.length ? `<p><b>Orașele unite:</b> ${NF.format(unite.length)} ${unite.length === 1 ? "unitate" : "unități"}
+                    ${unite.length === 1 ? "unește" : "unesc"} un oraș mic, fără destule comune în jur ca să ajungă la pragul
+                    orașului, cu orașul vecin: ${unite.map(numeUnire).join("; ")}. Unirea se face doar la comasarea forțată.</p>` : "");
             })()}
             <p>Pe scurt: azi, un district al judecătoriei e împărțit în medie între
                 <b>${NF1.format(r.districte.reduce((a, d) => a + nrPe(d), 0) / r.districte.length)}</b> grupuri, iar
@@ -998,7 +1010,7 @@ window.AdpRaport = function() {
      */
     function sediiRegionale(date, regional, lista, adr) {
         const resedinte = date.uat.filter(u => u.adr === adr.c && (u.r || u.t === "municipiu" && u.n === "București"))
-            .sort((a, b) => (b.p21 || 0) - (a.p21 || 0));
+            .sort((a, b) => (b.pop || 0) - (a.pop || 0));
         const gazduieste = new Map(resedinte.map(u => [u.s, []]));
         const sistem = cod => ((regional && regional.sisteme) || []).find(s => s.cod === cod);
         const sediul = cod => ((sistem(cod) || {}).sedii || []).map(x => x.siruta).find(s => gazduieste.has(s));
@@ -1175,7 +1187,7 @@ window.AdpRaport = function() {
                     <tbody>${sedii.map(x => `<tr>
                         <th scope="row">${esc(x.uat.n)}</th>
                         <td>${esc(numeJudet(x.uat.j))}</td>
-                        <td class="num">${NF.format(x.uat.p21 || 0)}</td>
+                        <td class="num">${NF.format(x.uat.pop || 0)}</td>
                         <td>${x.azi.length ? esc(x.azi.join(", ")) : "—"}</td>
                         <td>${x.grupuri.length ? x.grupuri.map(g => `<span class="eticheta-stare plin">${esc(g)}</span>`).join(" ")
                             : "<small>doar oficiul județean</small>"}</td>
@@ -1414,7 +1426,7 @@ window.AdpRaport = function() {
             const pesteAzi = uat.filter(i => executie.get(i) && executie.get(i).pondere !== null && executie.get(i).pondere > regula.prag).length;
             return {
                 j: j, adr: date.uat[uat[0]].adr, grupuri: grupuri, ind: ind, nrUat: uat.length,
-                subPragAzi: uat.filter(i => (date.uat[i].p21 || 0) < pMin).length,
+                subPragAzi: uat.filter(i => (date.uat[i].pop || 0) < pMin).length,
                 derogari: derogari, cuTermen: cuTermen, pesteAzi: pesteAzi,
                 aparat: costUnitati(grupuri, executie),
                 districte: (r.districte || []).filter(d => date.uat[d.sediu].j === j.c).length,
@@ -1497,7 +1509,7 @@ window.AdpRaport = function() {
                 </tbody>
             </table></div>
             <p class="nota"><b>Cum se citește.</b> „Derogări” numără derogările, nu unitățile: o unitate cu două motive apare
-                de două ori. „Sub pragul unității” e 5.000 de locuitori, sau 7.000 pentru o unitate cu oraș. Fișa fiecărui județ se deschide din tabel și arată, unitate cu unitate, ce
+                de două ori. „Sub pragul unității” e ${NF.format(pMin)} de locuitori, sau ${NF.format(r.parametri.pMinOras)} pentru o unitate cu oraș. Fișa fiecărui județ se deschide din tabel și arată, unitate cu unitate, ce
                 derogare are și de ce.</p>
             ${regiuni.map(x => `<h3>${esc(x.a.n === "București-Ilfov" ? "București–Ilfov" : x.a.n)}</h3>${x.ale.map(fisa).join("")}`).join("")}`;
         window.addEventListener("hashchange", deschideFisa);
@@ -1641,7 +1653,7 @@ window.AdpRaport = function() {
                             LEADER${voluntare ? `, ${NF.format(voluntare)} sunt constituite și prin alegere voluntară` : ""}</td></tr>
                     <tr><th scope="row">Comune și orașe</th>
                         <td><b>${NF.format(s.unitati.dupa)}</b>, cu populația mediană de ${NF.format(r.dupa.mediana)} loc.</td>
-                        <td>Din ${NF.format(s.unitati.inainte)}; sub pragul de 5.000 de locuitori rămân
+                        <td>Din ${NF.format(s.unitati.inainte)}; sub pragul de ${NF.format(r.parametri.pMin)} de locuitori rămân
                             ${NF.format(r.dupa.subPrag)}, față de ${NF.format(r.inainte.subPrag)}</td></tr>
                     <tr><th scope="row">Sate</th>
                         <td><b>${NF.format(r.sate.length)}</b>, fiecare cu delegat sătesc și fond propriu</td>

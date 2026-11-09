@@ -986,6 +986,16 @@ def main():
         uat=uat_lista,
         culori=culori,
     )
+    # populația de referință (unelte/populatie.py: domiciliul la 1 ianuarie, ultimul an INS),
+    # păstrată la regenerare; fără ea, harta folosește recensământul din 2021
+    cale_pop = os.path.join(a.iesire, "populatie-uat.json")
+    if os.path.exists(cale_pop):
+        with open(cale_pop, encoding="utf-8") as f:
+            pop_ref = json.load(f)
+        for u in uat_lista:
+            u["pop"] = pop_ref["uat"].get(str(u["s"]))
+        topo["populatie"] = {"camp": "pop", "an": pop_ref["an"], "referinta": pop_ref["referinta"],
+                             "sursa": pop_ref["sursa"]}
     cale = os.path.join(a.iesire, "romania-uat.json")
     with open(cale, "w", encoding="utf-8") as f:
         json.dump(topo, f, ensure_ascii=False, separators=(",", ":"))

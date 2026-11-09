@@ -65,7 +65,7 @@ window.AdpTematice = function() {
             const peIstoric = new Map();
             r.membri.forEach(m => {
                 const u = D.date.uat[m.idx];
-                const p = (u.p21 || 0) * m.f;
+                const p = (u.pop || 0) * m.f;
                 peJudet.set(u.j, (peJudet.get(u.j) || 0) + p);
                 peIstoric.set(u.ist, (peIstoric.get(u.ist) || 0) + p);
             });
@@ -201,7 +201,7 @@ window.AdpTematice = function() {
             <div class="tip">${D.esc(tematice.tipuri[r.tip])} · ${insigna(r)}</div>
             ${r.descriere ? `<p class="nota">${D.esc(r.descriere)}</p>` : ""}
             <table class="tabel-atribute">
-                <tr><th scope="row">Populație (RPL 2021)</th><td>${NF.format(r.populatie)}</td></tr>
+                <tr><th scope="row">Populație (2026)</th><td>${NF.format(r.populatie)}</td></tr>
                 <tr><th scope="row">UAT-uri</th><td>${r.membri.length}${partiale.length ? ` (${partiale.length} doar parțial)` : ""}</td></tr>
                 <tr><th scope="row">Județe</th><td>${r.peJudet.map(([j, p]) => `${D.esc(D.numeJudet(j))} ${PCT.format(p / total)}`).join(", ")}</td></tr>
                 <tr><th scope="row">Regiuni istorice (1930)</th><td>${r.peIstoric.map(([i, p]) => `${D.esc(i)} ${PCT.format(p / total)}`).join(", ")}</td></tr>
@@ -223,7 +223,7 @@ window.AdpTematice = function() {
             peJudet.set(j, x);
         }));
         const popJudet = new Map();
-        D.date.uat.forEach(u => popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.p21 || 0)));
+        D.date.uat.forEach(u => popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.pop || 0)));
         const randuri = Array.from(peJudet, ([j, x]) => {
             x.regiuni.sort((a, b) => b.p - a.p);
             const dom = x.regiuni[0];

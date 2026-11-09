@@ -79,24 +79,26 @@
                 <li><b>Districtul</b> — circumscripția judecătoriei: orașul și localitățile care țin deja de el.
                     Îl conduc primarii, fără alte alegeri. În interiorul lui, fiecare oraș e pol al unei
                     microregiuni, cu grupul ei de acțiune locală.</li>
-                <li><b>Comuna sau orașul</b> — comasate până la cel puțin 5.000 de locuitori, cu un oficiu de
-                    2–3 oameni în fiecare fostă comună.</li>
+                <li><b>Comuna sau orașul</b> — comuna, comasată până la cel puțin 3.000 de locuitori; orașul, până
+                    la 10.000; cu un oficiu de 2–3 oameni în fiecare fostă comună.</li>
             </ul>
             <div class="tabel-derulant"><table class="tabel-doc tabel-numeric">
                 <thead><tr><th></th><th>Azi</th><th>Propus</th></tr></thead>
                 <tbody>
-                    <tr><th scope="row">Comune și orașe</th><td>3.181</td><td>1.208</td></tr>
-                    <tr><th scope="row">Unități sub 5.000 de locuitori</th><td>2.501</td><td>71</td></tr>
-                    <tr><th scope="row">Districte / microregiuni</th><td>—</td><td>168 / 283</td></tr>
-                    <tr><th scope="row">Aleși locali și județeni</th><td>43.808</td><td>18.401</td></tr>
-                    <tr><th scope="row">Consilieri județeni → regionali</th><td>1.392</td><td>296</td></tr>
-                    <tr><th scope="row">Aparatul primăriilor, pe an</th><td>13,7 mld. lei</td><td>9,8 mld. lei</td></tr>
-                    <tr><th scope="row">Economie pe an, primării și consilii județene</th><td>—</td><td>5 mld. lei</td></tr>
-                    <tr><th scope="row">Drumul mediu până la primărie</th><td>2,1 min</td><td>5,7 min</td></tr>
+                    <tr><th scope="row">Comune și orașe</th><td>3.181</td><td>1.567</td></tr>
+                    <tr><th scope="row">Unități sub 3.000 de locuitori</th><td>1.565</td><td>25</td></tr>
+                    <tr><th scope="row">Orașe și municipii sub 10.000 de locuitori</th><td>120</td><td>21</td></tr>
+                    <tr><th scope="row">Districte / microregiuni</th><td>—</td><td>169 / 300</td></tr>
+                    <tr><th scope="row">Aleși locali și județeni</th><td>44.410</td><td>22.529</td></tr>
+                    <tr><th scope="row">Consilieri județeni → regionali</th><td>1.412</td><td>296</td></tr>
+                    <tr><th scope="row">Aparatul primăriilor, pe an</th><td>13,7 mld. lei</td><td>10,7 mld. lei</td></tr>
+                    <tr><th scope="row">Economie pe an, primării și consilii județene</th><td>—</td><td>4,2 mld. lei</td></tr>
+                    <tr><th scope="row">Drumul mediu până la primărie</th><td>2,1 min</td><td>4,5 min</td></tr>
                 </tbody>
             </table></div>
-            <p class="nota">Cifrele sunt cele calculate la 19 octombrie 2026. Cu instituțiile statului din județe, unde
-                reducerea de 20% e încă o ipoteză, economia ajunge la 7,6 mld. lei pe an (vezi
+            <p class="nota">Cifrele sunt cele calculate la 9 noiembrie 2026, pe regulile v2 și pe populația după
+                domiciliu la 1 ianuarie 2026 (INS). Cu instituțiile statului din județe, unde
+                reducerea de 20% e încă o ipoteză, economia ajunge la 6,7 mld. lei pe an (vezi
                 <a href="sinteza.html#cifre">sinteza</a>). Cele la zi, cu filtre pe regiune și
                 județ, sunt în <a href="raport.html">raport</a>; harta, în <a href="index.html">pagina de hartă</a>.</p>
         </section>
@@ -122,16 +124,16 @@
                         <td>Circumscripția în care se aleg consilierii regionali; fără aparat propriu</td>
                         <td>Oficiul județean unic; unitatea statistică</td>
                         <td>Fiecare județ, întreg într-o regiune</td></tr>
-                    <tr><th scope="row">Districtul</th><td class="num">168</td>
+                    <tr><th scope="row">Districtul</th><td class="num">169</td>
                         <td>— nu are alegeri și nici impozite; îl conduc primarii</td>
                         <td>Judecătoria, notarii, ghișeul de documente, spitalul, liceul, transportul; asocierea
                             primăriilor</td>
                         <td>Fiecare district, întreg într-un județ</td></tr>
-                    <tr><th scope="row">Microregiunea</th><td class="num">283</td>
+                    <tr><th scope="row">Microregiunea</th><td class="num">300</td>
                         <td>—</td>
                         <td>Grupul de acțiune locală și strategia lui, în jurul unui oraș</td>
                         <td>Fiecare microregiune, întreagă într-un district</td></tr>
-                    <tr><th scope="row">Comuna sau orașul</th><td class="num">1.208</td>
+                    <tr><th scope="row">Comuna sau orașul</th><td class="num">1.567</td>
                         <td>Primar și consiliu local aleși, buget și impozite proprii</td>
                         <td>Serviciile de zi cu zi</td>
                         <td>Fiecare comună, întreagă într-o microregiune</td></tr>
@@ -173,10 +175,11 @@
                     întregi.</li>
                 <li><b>Nu se desenează ce există deja.</b> Regiunile sunt cele de dezvoltare; județele își păstrează
                     limitele; districtele sunt circumscripțiile judecătoriilor. Se desenează doar comunele.</li>
-                <li><b>Comunele se comasează întâi între ele.</b> Orașul nu înghite satele din jur. Un oraș sub
-                    25.000 de locuitori poate prelua doar UAT-urile mici care altfel ar rămâne sub prag.</li>
-                <li><b>Pragul e durabil.</b> O unitate trebuie să aibă 5.000 de locuitori azi <i>și</i> în proiecția
-                    la 2050 (7.000 dacă are oraș). Harta trebuie să țină o sută de ani, nu până la următorul
+                <li><b>Comunele se comasează întâi între ele; orașul ajunge la 10.000.</b> Orașul sub 10.000 de
+                    locuitori preia comunele din jur până la 10.000; cel mai mare preia doar UAT-urile mici care
+                    altfel ar rămâne sub prag. Două orașe nu se unesc.</li>
+                <li><b>Pragul e durabil.</b> O unitate trebuie să aibă 3.000 de locuitori azi <i>și</i> în proiecția
+                    la 2050 (10.000 dacă are oraș). Harta trebuie să țină o sută de ani, nu până la următorul
                     recensământ.</li>
                 <li><b>Nimeni nu e la mai mult de o jumătate de oră de primărie.</b> 30 de minute pe drum real;
                     45, limita peste care comasarea nu se face nici forțat.</li>
@@ -281,8 +284,9 @@
             <ul>
                 <li><b>Administrația nu se poate întreține.</b> 2.801 din 3.126 de primării (89,6%) cheltuiesc pe
                     propriul aparat peste 30% din veniturile proprii.</li>
-                <li><b>Unitățile sunt prea mici ca să facă proiecte.</b> 2.501 din 3.181 au sub 5.000 de locuitori;
-                    jumătate au sub 2.900. Bugetul mediu de investiții e de 10 milioane de lei pe an.</li>
+                <li><b>Unitățile sunt prea mici ca să facă proiecte.</b> 1.565 din 3.181 au sub 3.000 de locuitori
+                    și 2.416 sub 5.000 (populația după domiciliu la 1 ianuarie 2026). Bugetul mediu de investiții e de
+                    10 milioane de lei pe an.</li>
                 <li><b>Infrastructura de bază lipsește exact unde nu are cine să o ceară.</b> 1.479 de UAT-uri nu au
                     nicio rețea de canalizare; acolo trăiește o cincime din populație.</li>
                 <li><b>Hărțile statului nu se suprapun.</b> Un district al judecătoriei e împărțit azi între 3,4
@@ -314,10 +318,10 @@
 
             <h3>Ce aduce și ce costă</h3>
             <ul>
-                <li><b>5 miliarde de lei pe an</b> mai puțin pe administrație: 3,8 din primării, 1,2 din consiliile
-                    județene. Duse în investiții, le ridică de la 32,6 la 37,6 miliarde pe an.</li>
-                <li><b>Capacitate</b>: bugetul mediu de investiții al unei unități crește de peste două ori și
-                    jumătate.</li>
+                <li><b>4,2 miliarde de lei pe an</b> mai puțin pe administrație: 2,9 din primării, 1,2 din consiliile
+                    județene. Duse în investiții, le ridică de la 32,6 la 36,7 miliarde pe an.</li>
+                <li><b>Capacitate</b>: bugetul mediu de investiții al unei unități se dublează, de la 10,2 la 20,8
+                    milioane de lei pe an.</li>
                 <li><b>Prețul</b>: drumul mediu până la primărie crește de la 2 la aproape 6 minute, iar numărul
                     aleșilor scade la mai puțin de jumătate. Compensarea e în model: oficiul din sat, delegatul
                     sătesc cu fond propriu, transportul de district.</li>
@@ -342,8 +346,8 @@
                     <tr><th scope="row">Pragurile și rangurile</th>
                         <td>Legea 351/2001: oraș de la 5.000 de locuitori, municipiu de la 25.000; indicatori
                             minimi pentru o comună nouă.</td>
-                        <td>Pragul de 5.000 pentru orice unitate; regula orașului sub 25.000 care preia UAT-urile
-                            mici.</td>
+                        <td>Pragul de 3.000 pentru comună și de 10.000 pentru oraș; orașul sub 10.000 preia comunele
+                            din jur până la prag.</td>
                         <td>—</td></tr>
                     <tr><th scope="row">Satul: delegat și fond propriu</th>
                         <td>Codul administrativ are delegatul sătesc, fără buget.</td>
@@ -453,7 +457,7 @@
                 până în iunie 2027 și nu mută limitele circumscripțiilor locale: districtul, transferul atribuțiilor,
                 consiliile județene cu scara redusă. Treapta a II-a, comasarea comunelor, se votează până în iunie 2031 și
                 intră în alegerile din 2032. Opt acte; fiecare se votează după cele de care depinde, iar revizuirea
-                Constituției vine la urmă. Cifrele sunt cele calculate la 19 octombrie 2026
+                Constituției vine la urmă. Cifrele sunt cele calculate la 9 noiembrie 2026, pe regulile v2
                 (<a href="raport.html">raportul</a>, <a href="sinteza.html">sinteza</a>).</p>
             <div class="tabel-derulant"><table class="tabel-doc">
                 <thead><tr><th>Nr.</th><th>Treapta</th><th>Actul</th><th>Ce conține</th><th>Depinde de</th></tr></thead>
@@ -473,15 +477,15 @@
                             stimulente.</td>
                         <td>1</td></tr>
                     <tr><td>3</td><td>II, până în iunie 2031</td><th scope="row">Legea hărții</th>
-                        <td>Lege organică: unitățile rezultate (1.208), cu derogările motivate din
-                            <a href="raport.html#judete">fișele de județ</a> (541 azi); modifică Legea 2/1968. Districtele
-                            (168) și microregiunile (283) sunt deja în vigoare din treapta I; aici se așază unitățile din
+                        <td>Lege organică: unitățile rezultate (1.567), cu derogările motivate din
+                            <a href="raport.html#judete">fișele de județ</a> (330 azi); modifică Legea 2/1968. Districtele
+                            (169) și microregiunile (300) sunt deja în vigoare din treapta I; aici se așază unitățile din
                             ele.</td>
                         <td>2</td></tr>
                     <tr><td>4</td><td>I și II</td><th scope="row">Codul administrativ și legea alegerilor locale</th>
                         <td><b>Partea I (iunie 2027):</b> art. 89–91 (districtul devine obligatoriu), art. 173 (atribuțiile
                             consiliului județean trec la district și la regiune), art. 171 (scara consilierilor județeni:
-                            296 de mandate în loc de 1.392), Legea 115/2015 pentru circumscripțiile județene.
+                            296 de mandate în loc de 1.412), Legea 115/2015 pentru circumscripțiile județene.
                             <b>Partea a II-a (iunie 2031):</b> art. 94 (minoritățile, pe localitate), art. 112 (scara
                             consilierilor locali), fondul sătesc, Legea 115/2015 pentru circumscripțiile locale.</td>
                         <td>1 pentru partea I; 3 pentru partea a II-a</td></tr>

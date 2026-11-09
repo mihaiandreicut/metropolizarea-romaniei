@@ -191,14 +191,23 @@ window.AdpScenariu = function() {
         return m;
     }
 
+    /** Pragul și ținta unității cu oraș, după controalele hărții. */
+    function bandaOras() {
+        const pmin = Number($("#sc-pmin").value);
+        const oras = Number($("#sc-oras").value);
+        return $("#sc-legal").checked
+            ? { pMinOras: pmin + 2000, pTintaOras: pmin + 4000 }
+            : { pMinOras: oras, pTintaOras: oras + 2000 };
+    }
+
     function parametri() {
         return {
-            // banda de praguri: comuna crește spre minim + 2.000, unitatea cu oraș
-            // pornește de unde se termină banda rurală și are propria țintă
+            // banda de praguri: comuna crește spre minim + 2.000; unitatea cu oraș are pragul
+            // orașului și ținta lui + 2.000 (cu pragurile legale pe rang, pornește de unde se
+            // termină banda rurală, ca în regulile v1)
             pMin: Number($("#sc-pmin").value),
             pTinta: Number($("#sc-pmin").value) + 2000,
-            pMinOras: Number($("#sc-pmin").value) + 2000,
-            pTintaOras: Number($("#sc-pmin").value) + 4000,
+            ...bandaOras(),
             tMax: Number($("#sc-tmax").value),
             pOrasAutonom: Number($("#sc-oras").value),
             pMaxRural: Number($("#sc-pmax").value),
@@ -316,8 +325,9 @@ window.AdpScenariu = function() {
 
     function actualizeazaEtichete() {
         const pmin = Number($("#sc-pmin").value);
+        const b = bandaOras();
         $("#sc-pmin-val").textContent = `${NF.format(pmin)}–${NF.format(pmin + 2000)} la comune, ` +
-            `${NF.format(pmin + 2000)}–${NF.format(pmin + 4000)} cu oraș`;
+            `${NF.format(b.pMinOras)}–${NF.format(b.pTintaOras)} cu oraș`;
         $("#sc-tmax-val").textContent = $("#sc-tmax").value;
         $("#sc-oras-val").textContent = NF.format(Number($("#sc-oras").value));
         $("#sc-pmax-val").textContent = NF.format(Number($("#sc-pmax").value));
@@ -420,7 +430,7 @@ window.AdpScenariu = function() {
         // regiunile proiectului sunt cele 8 de dezvoltare existente, nu o simulare:
         // București–Ilfov devine Metropola, restul rămân cum sunt
         const popAdr = new Map();
-        D.date.uat.forEach(u => popAdr.set(u.adr, (popAdr.get(u.adr) || 0) + (u.p21 || 0)));
+        D.date.uat.forEach(u => popAdr.set(u.adr, (popAdr.get(u.adr) || 0) + (u.pop || 0)));
         regiuni = D.date.adr.map(a => ({
             cod: a.c,
             nume: a.n === "București-Ilfov" ? "București–Ilfov (Metropola)" : a.n,
@@ -633,7 +643,7 @@ window.AdpScenariu = function() {
             ${infrastructura(g.membri, "Infrastructura esențială a unității")}
             ${restante(g)}
             <p class="nota"><b>UAT-uri:</b> ${g.membri.map(i =>
-                `${D.esc(D.date.uat[i].n)} (${NF.format(D.date.uat[i].p21)})`).join(", ")}.
+                `${D.esc(D.date.uat[i].n)} (${NF.format(D.date.uat[i].pop)})`).join(", ")}.
                 <br><b>Delegați sătești:</b> ${cate(g.nrSate, "sat, cu fond propriu", "sate, fiecare cu fond propriu")}.
                 ${g.birouri.length ? `<br><b>Birouri permanente:</b> ${g.birouri.map(i => D.esc(D.date.uat[i].n)).join(", ")}.` : ""}
                 ${g.transferuri ? `<br>${cate(g.transferuri, "sat ar sta mai bine", "sate ar sta mai bine")} în unitatea vecină (linie punctată pe hartă).` : ""}</p>
@@ -915,7 +925,7 @@ window.AdpScenariu = function() {
         if (!indecsi.length) return "";
         const setIndecsi = new Set(indecsi);
         const grupuri = r.grupuri.filter(g => setIndecsi.has(g.sediu));
-        const populatie = indecsi.reduce((a, i) => a + (D.date.uat[i].p21 || 0), 0);
+        const populatie = indecsi.reduce((a, i) => a + (D.date.uat[i].pop || 0), 0);
         const suprafata = indecsi.reduce((a, i) => a + (D.date.uat[i].a || 0), 0);
         const c = costAparat(grupuri);
         const f = functiiConducere(indecsi, grupuri);
@@ -981,7 +991,7 @@ window.AdpScenariu = function() {
         const b = bani(indecsi);
         const c = grupuri && grupuri.length ? costAparat(grupuri) : null;
         if (!b || !c) return "";
-        const locuitori = indecsi.reduce((a, i) => a + (D.date.uat[i].p21 || 0), 0);
+        const locuitori = indecsi.reduce((a, i) => a + (D.date.uat[i].pop || 0), 0);
         const peCap = v => locuitori ? `${NF.format(Math.round(v / locuitori))} lei` : "—";
         const km = Math.round(c.economie / LEI_PE_KM_DRUM);
         const la25 = c.proiectie[c.proiectie.length - 1];
@@ -1086,7 +1096,7 @@ window.AdpScenariu = function() {
         const nf = v => NF.format(Math.round(v));
         if (nivel === "regiuni") {
             const pop = new Map();
-            D.date.uat.forEach(u => pop.set(u.adr, (pop.get(u.adr) || 0) + (u.p21 || 0)));
+            D.date.uat.forEach(u => pop.set(u.adr, (pop.get(u.adr) || 0) + (u.pop || 0)));
             return `<h3 class="subtitlu-sectiune">Regiuni <small class="nota">— clic pentru județele ei</small></h3>
                 <ol class="lista-grupuri">${D.date.adr.map((a, k) => `
                     <li data-nivel-adr="${a.c}" tabindex="0">
@@ -1101,7 +1111,7 @@ window.AdpScenariu = function() {
             const inZona = j => cheie === TOATA_TARA || !cheie.startsWith(PREFIX_ADR) ||
                 D.date.uat.some(u => u.j === j.c && u.adr === Number(cheie.slice(PREFIX_ADR.length)));
             const pop = new Map();
-            D.date.uat.forEach(u => pop.set(u.j, (pop.get(u.j) || 0) + (u.p21 || 0)));
+            D.date.uat.forEach(u => pop.set(u.j, (pop.get(u.j) || 0) + (u.pop || 0)));
             const lista = D.date.judete.filter(inZona);
             return `<h3 class="subtitlu-sectiune">${cate(lista.length, "județ", "județe")}
                     <small class="nota">— clic pentru districtele lui</small></h3>

@@ -137,7 +137,7 @@ window.AdpExplorator = function() {
             card("Zone metropolitane și districte", NF.format(lista.length),
                 `${NF.format(metropolitane)} zone metropolitane, ${NF.format(lista.length - metropolitane)} districte`) +
             card("Comune și orașe", `${NF.format(suma(lista, "nrUat"))} → ${NF.format(suma(lista, "nrUnitati"))}`,
-                `${NF.format(suma(lista, "subPrag"))} rămân sub pragul lor (5.000 comuna, 7.000 cu oraș)`) +
+                `${NF.format(suma(lista, "subPrag"))} rămân sub pragul lor (${NF.format(D.praguri.comuna)} comuna, ${NF.format(D.praguri.oras)} cu oraș)`) +
             card("Economie pe an", lei(economie),
                 `${lei(economieCuInflatie(economie))} în ${D.aniEconomie} ani, cu inflație de ${Math.round(D.inflatie * 100)}%`, "bun") +
             card("Locuitori fără canalizare", NF.format(faraCanal),

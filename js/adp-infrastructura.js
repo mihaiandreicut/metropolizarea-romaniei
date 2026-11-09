@@ -57,7 +57,7 @@ window.AdpInfrastructura = function() {
         RETELE.forEach(k => { a[k] = { uat: 0, populatie: 0, km: 0 }; });
         indecsi.forEach(i => {
             const u = date.uat[i];
-            const p = u.p21 || 0;
+            const p = u.pop || 0;
             const s = stoc[u.s] || {};
             a.populatie += p;
             RETELE.forEach(k => {

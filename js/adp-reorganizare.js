@@ -38,15 +38,20 @@ window.AdpReorganizare = function() {
     "use strict";
 
     const PARAMETRI_IMPLICITI = {
-        pMin: 5000,            // populația minimă a unei comune noi
-        pTinta: 7000,          // ținta: comasările cresc spre ea, nu se opresc la minim
-        pMinOras: 7000,        // populația minimă a unei unități cu reședința în oraș
-        pTintaOras: 9000,      // ținta pentru unitățile urbane
+        // reguli v2 (9 noiembrie 2026): comunele sub 3.000 se comasează, orașul ajunge la 10.000
+        pMin: 3000,            // populația minimă a unei comune noi
+        pTinta: 5000,          // ținta: comasările cresc spre ea, nu se opresc la minim
+        pMinOras: 10000,       // populația minimă a unei unități cu reședința în oraș
+        pTintaOras: 12000,     // ținta pentru unitățile urbane
         pMaxOras: 100000,      // un oraș care nu e reședință de județ nu crește peste atât
         tMax: 30,              // minute cu mașina, sat → reședință
         pSatMin: 50,           // satele sub acest prag nu blochează o comasare (doar se semnalează)
-        // orașul nu înghite comune: rămâne oraș, iar comunele din jur i se asociază în district
-        absorbtieUrbana: false,
+        // orașul sub pragul de autonomie (pOrasAutonom) preia comunele din jur până la pMinOras;
+        // cu false, orașul nu înghite comune: rămâne oraș, iar comunele i se asociază în district
+        absorbtieUrbana: true,
+        // false: orașul mic fără destule comune în jur rămâne oraș, cu derogare, și nu se unește
+        // cu un oraș vecin nici la comasarea forțată (true: se unește, la forțare)
+        uniriUrbane: false,
         // excepția: orașul mic (sub pOrasMic) preia, ca ultimă soluție, UAT-urile mici din jur,
         // care altfel ar rămâne sub prag — rămâne oraș și centru de district pentru celelalte
         orasMicPreia: true,
@@ -55,7 +60,7 @@ window.AdpReorganizare = function() {
         // el și comunele preluate ar ieși din aria LEADER
         pastreazaLeader: true,
         pOrasAutonom: 10000,   // prag unic de autonomie urbană, când praguriLegale e oprit
-        praguriLegale: true,   // Legea 351/2001: pragul de autonomie e cel al rangului
+        praguriLegale: false,  // true: pragul de autonomie e cel al rangului (Legea 351/2001)
         pragOras: 5000,        // populația minimă a unui oraș (Legea 351/2001, anexa II)
         pragMunicipiu: 25000,  // populația minimă a unui municipiu
         pMaxRural: 15000,      // o unitate rurală nu crește peste atât: altfel ar trebui să fie oraș
@@ -81,7 +86,7 @@ window.AdpReorganizare = function() {
         comasari: null
     };
     const TIP_RESEDINTA = [9, 17, 22];
-    const AN_BAZA = 2021;          // anul recensământului folosit ca bază a proiecției
+    const AN_BAZA = 2026;          // anul populației de referință (u.pop, domiciliul la 1 ianuarie)
     const RITM_MIN = -0.03;        // declinul anual nu se extrapolează sub -3%
     const RITM_MAX = 0.01;         // nici creșterea peste +1%: 30 de ani de creștere mare nu se presupun
     const NF = new Intl.NumberFormat("ro-RO");
@@ -138,23 +143,23 @@ window.AdpReorganizare = function() {
     }
 
     /**
-     * Ritmul anual de schimbare a populației unui UAT: tendința 2011 → 2024 pe
+     * Ritmul anual de schimbare a populației unui UAT: tendința 2011 → 2026 pe
      * populația cu domiciliul, plafonată, la care se adaugă declinul natural
      * acolo unde vârstnicii sunt de peste 1,5 ori mai mulți decât copiii.
      * E un model simplu și declarat, nu proiecția oficială a INS — dar e
      * suficient ca pragul să nu fie trecut azi și ratat peste 25 de ani.
      */
     function ritmAnual(u) {
-        if (!u.p11d || !u.p24) return 0;
-        let r = Math.pow(u.p24 / u.p11d, 1 / 13) - 1;
+        if (!u.p11d || !u.pop) return 0;
+        let r = Math.pow(u.pop / u.p11d, 1 / (AN_BAZA - 2011)) - 1;
         const imbatranire = u.v014 > 0 ? u.v65 / u.v014 : 3;
         r -= 0.002 * Math.max(0, imbatranire - 1.5);
         return Math.max(RITM_MIN, Math.min(RITM_MAX, r));
     }
 
-    /** Populația unui UAT proiectată la un an, pornind de la recensământul 2021. */
+    /** Populația unui UAT proiectată la un an, pornind de la populația de referință (AN_BAZA). */
     function proiecteaza(u, an) {
-        return Math.round((u.p21 || 0) * Math.pow(1 + ritmAnual(u), Math.max(0, an - AN_BAZA)));
+        return Math.round((u.pop || 0) * Math.pow(1 + ritmAnual(u), Math.max(0, an - AN_BAZA)));
     }
 
     /**
@@ -258,7 +263,7 @@ window.AdpReorganizare = function() {
 
         // --- pragul durabil: populația de azi și proiecția la anProiectie
         const proiectat = new Map(uatJud.map(i => [i, proiecteaza(date.uat[i], P.anProiectie)]));
-        const pAzi = lista => lista.reduce((a, i) => a + date.uat[i].p21, 0);
+        const pAzi = lista => lista.reduce((a, i) => a + date.uat[i].pop, 0);
         const pViitor = lista => lista.reduce((a, i) => a + proiectat.get(i), 0);
         /** Populația de referință a unui grup: cea mai mică dintre azi și proiecție. */
         const pRef = lista => P.proiectie ? Math.min(pAzi(lista), pViitor(lista)) : pAzi(lista);
@@ -360,7 +365,7 @@ window.AdpReorganizare = function() {
                 if (!et || !et.min || et.pmin < P.pragMinoritate) return true;
                 const n = lista.reduce((a, j) => {
                     const e = date.uat[j].et;
-                    return a + (e && e.min === et.min ? date.uat[j].p21 * e.pmin / 100 : 0);
+                    return a + (e && e.min === et.min ? date.uat[j].pop * e.pmin / 100 : 0);
                 }, 0);
                 return 100 * n / tot >= P.pragMinoritate;
             });
@@ -377,11 +382,12 @@ window.AdpReorganizare = function() {
             // `ruralMic`: grupul rural care intră e el însuși sub prag (îl știe cine face comasarea);
             // fără el, se cere ca tot ruralul unității să fie sub prag
             const mic = ruralMic === undefined ? !viabil(lista.filter(i => !urban(i))) : ruralMic;
-            if (ultima && P.orasMicPreia && orase.length === 1 && pRef(orase) < P.pOrasMic && mic &&
-                (!P.pastreazaLeader || pAzi(orase) > PRAG_ORAS_LEADER || pAzi(lista) <= PRAG_ORAS_LEADER)) return true;
+            // un oraș de cel mult 20.000 nu trece, prin comasare, peste 20.000 (aria LEADER)
+            const inLeader = !P.pastreazaLeader || pAzi(orase) > PRAG_ORAS_LEADER || pAzi(lista) <= PRAG_ORAS_LEADER;
+            if (ultima && P.orasMicPreia && orase.length === 1 && pRef(orase) < P.pOrasMic && mic && inLeader) return true;
             if (!P.absorbtieUrbana) return false;
-            if (orase.length > 1) return !!ultima;
-            return !!ultima || orasMic(orase[0]);
+            if (orase.length > 1) return !!ultima && P.uniriUrbane;
+            return (!!ultima || orasMic(orase[0])) && inLeader;
         }
 
         /**
@@ -749,7 +755,7 @@ window.AdpReorganizare = function() {
             const etnii = new Map();
             lista.forEach(i => {
                 const et = date.uat[i].et;
-                if (et && et.min) etnii.set(et.min, (etnii.get(et.min) || 0) + date.uat[i].p21 * et.pmin / 100);
+                if (et && et.min) etnii.set(et.min, (etnii.get(et.min) || 0) + date.uat[i].pop * et.pmin / 100);
             });
             const riscMinoritate = [];
             lista.forEach(i => {
@@ -834,7 +840,7 @@ window.AdpReorganizare = function() {
 
             const conditii = [
                 {
-                    nume: "Populație (RPL 2021)", valoare: NF.format(pTot),
+                    nume: "Populație (1 ianuarie 2026)", valoare: NF.format(pTot),
                     prag: `≥ ${NF.format(pragUnitate(lista))}, țintă ${NF.format(tintaUnitate(lista))}`,
                     stare: pTot >= pragUnitate(lista) ? "ok" : "derogare"
                 },
@@ -927,7 +933,7 @@ window.AdpReorganizare = function() {
             };
         }
         const inainte = indicatori(uatJud.map(i =>
-            ({ populatie: date.uat[i].p21, populatieProiectata: proiectat.get(i) })), "tAcum");
+            ({ populatie: date.uat[i].pop, populatieProiectata: proiectat.get(i) })), "tAcum");
         const dupa = indicatori(grupuri, "tNou");
 
         return {
@@ -1376,7 +1382,7 @@ window.AdpReorganizare = function() {
             const tMaxim = Math.max(...m.map(k => timp(k, s)).filter(t => isFinite(t)), 0);
             // districtul poartă numele celui mai mare UAT din el, nu neapărat al reședinței
             const celMaiMare = m.flatMap(k => unitati[k].membri)
-                .reduce((a, i) => !a || date.uat[i].p21 > date.uat[a].p21 ? i : a, null);
+                .reduce((a, i) => !a || date.uat[i].pop > date.uat[a].pop ? i : a, null);
             return {
                 sediu: unitati[s].sediu,
                 nume: celMaiMare === null ? unitati[s].nume : date.uat[celMaiMare].n,
@@ -1496,7 +1502,7 @@ window.AdpReorganizare = function() {
         const alese = new Set(manuale.map(c => c.uat));
         const implicite = [];
         bucati.forEach(lista => {
-            const resedinta = lista.reduce((a, u) => (u.p21 || 0) > (a.p21 || 0) ? u : a);
+            const resedinta = lista.reduce((a, u) => (u.pop || 0) > (a.pop || 0) ? u : a);
             lista.forEach(u => {
                 if (!alese.has(u.s)) implicite.push({ uat: u.s, district: resedinta.s, implicit: true });
             });
@@ -1562,7 +1568,7 @@ window.AdpReorganizare = function() {
             };
         }
         const rest = neacoperite.map(i => ({
-            populatie: date.uat[i].p21 || 0,
+            populatie: date.uat[i].pop || 0,
             populatieProiectata: proiecteaza(date.uat[i], P.anProiectie)
         }));
         return {
@@ -1577,7 +1583,7 @@ window.AdpReorganizare = function() {
             unitateDistrict: cuDistrict ? unitateDistrict : null,
             unitateMicro: cuDistrict ? unitateMicro : null,
             inainte: indicatori(date.uat.filter((u, i) => !zona || zona.has(i)).map(u =>
-                ({ populatie: u.p21 || 0, populatieProiectata: proiecteaza(u, P.anProiectie) })), "tAcum"),
+                ({ populatie: u.pop || 0, populatieProiectata: proiecteaza(u, P.anProiectie) })), "tAcum"),
             dupa: indicatori(grupuri.concat(rest), "tNou"),
             financiar: sumarFinanciar(grupuri),
             judete: rezultate.map(r => ({ judet: r.judet, inainte: r.inainte, dupa: r.dupa, grupuri: r.grupuri.length }))

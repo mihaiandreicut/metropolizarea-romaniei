@@ -67,11 +67,11 @@ function scenariuRegional(date, vecini) {
         const nuts2 = dupaNuts.get((e.nuts || "").slice(0, 4));
         return {
             c: j.c, nume: j.n, auto: j.auto, adr: j.adr, ist: uats[0].ist,
-            populatie: uats.reduce((a, u) => a + (u.p21 || 0), 0),
+            populatie: uats.reduce((a, u) => a + (u.pop || 0), 0),
             suprafata: uats.reduce((a, u) => a + (u.a || 0), 0),
             centru: e.centru, pibTotal: e.pibTotal, pibLoc: e.pibLoc,
             euroPeOra: nuts2 ? nuts2.euroPeOra : null,
-            oras: { n: resedinta.n, e: resedinta.e, p: resedinta.p21, s: resedinta.s }
+            oras: { n: resedinta.n, e: resedinta.e, p: resedinta.pop, s: resedinta.s }
         };
     }).filter(j => j.centru);
     const seturi = new Map(judete.map(j => [j.c, new Set()]));

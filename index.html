@@ -26,7 +26,7 @@
         "@context": "https://schema.org",
         "@type": "Dataset",
         "name": "Harta administrativă a României — UAT-uri, județe, regiuni",
-        "description": "Limitele celor 3.181 de UAT-uri ale României, cu apartenența la județ, regiune de dezvoltare și regiune istorică, populația RPL 2021 și atribute demografice.",
+        "description": "Limitele celor 3.181 de UAT-uri ale României, cu apartenența la județ, regiune de dezvoltare și regiune istorică, populația INS la 1 ianuarie 2026 și atribute demografice.",
         "inLanguage": "ro",
         "spatialCoverage": "România",
         "isBasedOn": [
@@ -95,7 +95,9 @@
                     <select id="sc-exemplu" hidden style="display:none" aria-hidden="true" tabindex="-1"></select>
                     <div id="sc-regiuni" class="regiuni-scurtaturi" hidden></div>
                     <label for="sc-pmin">Banda de populație: <b id="sc-pmin-val"></b></label>
-                    <input id="sc-pmin" type="range" min="1500" max="10000" step="500" value="5000">
+                    <input id="sc-pmin" type="range" min="1500" max="10000" step="500" value="3000">
+                    <label for="sc-oras">Pragul orașului: <b id="sc-oras-val"></b> loc.</label>
+                    <input id="sc-oras" type="range" min="5000" max="50000" step="1000" value="10000">
                     <details id="sc-avansat" class="pliant">
                         <summary>Criterii avansate</summary>
                         <div class="formular-scenariu">
@@ -105,12 +107,10 @@
                     <input id="sc-tfortat" type="range" min="30" max="90" step="5" value="45">
                     <label for="sc-pmax">Maximul unei unități rurale: <b id="sc-pmax-val"></b> loc.</label>
                     <input id="sc-pmax" type="range" min="7500" max="30000" step="500" value="15000">
-                    <label for="sc-oras">Oraș autonom de la: <b id="sc-oras-val"></b> loc.</label>
-                    <input id="sc-oras" type="range" min="5000" max="50000" step="1000" value="10000">
-                    <label class="bifa"><input id="sc-legal" type="checkbox" checked> Praguri legale pe rang: oraș 5.000, municipiu 25.000 (Legea 351/2001)</label>
+                    <label class="bifa"><input id="sc-legal" type="checkbox"> Praguri legale pe rang în locul pragului orașului: oraș 5.000, municipiu 25.000 (Legea 351/2001)</label>
                     <label class="bifa"><input id="sc-proiectie" type="checkbox" checked> Prag durabil: și populația proiectată la 2050</label>
                     <label class="bifa"><input id="sc-fortare" type="checkbox" checked> Nicio unitate sub prag (comasare forțată)</label>
-                    <label class="bifa"><input id="sc-urban" type="checkbox"> Orașele sub pragul rangului pot prelua comune</label>
+                    <label class="bifa"><input id="sc-urban" type="checkbox" checked> Orașele sub prag pot prelua comune</label>
                     <label class="bifa"><input id="sc-istorice" type="checkbox"> Unitățile nu trec peste regiunile istorice</label>
                     <label class="bifa"><input id="sc-district" type="checkbox" checked> Nivel intermediar: zone metropolitane și districte, independente unele de altele</label>
                     <label for="sc-baza">Desenul districtelor</label>
@@ -252,7 +252,7 @@
 
             <section>
                 <h2>Surse</h2>
-                <p class="nota">Limite UAT: Eurostat GISCO, LAU 2024 (© EuroGeographics). Tip UAT, județ, regiune ADR: INS, SIRUTA 2025. Populație, vârste, etnie: INS, RPL 2021. Regiuni istorice: județele interbelice 1930, geo-spatial.org (CC BY-SA 3.0). Regiuni tematice: Wikipedia, liste GAL (MADR), asociații locale — sursa e dată la fiecare regiune. Coordonate localități: Wikidata. Fundal: © OpenStreetMap, OpenTopoMap.</p>
+                <p class="nota">Limite UAT: Eurostat GISCO, LAU 2024 (© EuroGeographics). Tip UAT, județ, regiune ADR: INS, SIRUTA 2025. Populație: INS, după domiciliu la 1 ianuarie 2026 (TEMPO, POP107D). Vârste, etnie: INS, RPL 2021. Regiuni istorice: județele interbelice 1930, geo-spatial.org (CC BY-SA 3.0). Regiuni tematice: Wikipedia, liste GAL (MADR), asociații locale — sursa e dată la fiecare regiune. Coordonate localități: Wikidata. Fundal: © OpenStreetMap, OpenTopoMap.</p>
             </section>
             </details>
         </aside>

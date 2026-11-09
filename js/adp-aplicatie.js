@@ -63,7 +63,7 @@ window.AdpAplicatie = function() {
     }
 
     function densitate(u) {
-        return u.a ? u.p21 / u.a : null;
+        return u.a ? u.pop / u.a : null;
     }
 
     function slot(n) {
@@ -112,11 +112,11 @@ window.AdpAplicatie = function() {
             etichete: () => eticheteGrup(u => u.j, k => numeJudet(k), "e-judet")
         },
         populatie: {
-            titlu: "Populație (RPL 2021)",
-            stil: u => `--secv-${clasa(u.p21, CLASE_POPULATIE)}`,
+            titlu: "Populație (INS, 1 ianuarie 2026)",
+            stil: u => `--secv-${clasa(u.pop, CLASE_POPULATIE)}`,
             limite: { uat: true, judet: true },
-            legenda: () => legendaSecventiala(CLASE_POPULATIE, "locuitori", u => clasa(u.p21, CLASE_POPULATIE)),
-            nota: "Populația rezidentă la 1 decembrie 2021. Pragul de 5.000 de locuitori, folosit des ca minim pentru o comună viabilă, separă treptele 3 și 4.",
+            legenda: () => legendaSecventiala(CLASE_POPULATIE, "locuitori", u => clasa(u.pop, CLASE_POPULATIE)),
+            nota: "Populația după domiciliu la 1 ianuarie 2026 (INS, POP107D). Pragul de 3.000 de locuitori, minimul comunei în propunere, separă treptele 2 și 3; 5.000, folosit des ca minim pentru o comună viabilă, separă treptele 3 și 4.",
             etichete: () => eticheteGrup(u => u.j, k => numeJudet(k), "e-judet")
         },
         densitate: {
@@ -194,7 +194,7 @@ window.AdpAplicatie = function() {
         date.uat.forEach(u => {
             const k = cheie(u);
             nr.set(k, (nr.get(k) || 0) + 1);
-            pop.set(k, (pop.get(k) || 0) + (u.p21 || 0));
+            pop.set(k, (pop.get(k) || 0) + (u.pop || 0));
         });
         return `<ul class="legenda">${elemente.map(e => `
             <li title="${esc(e.detaliu || "")}">
@@ -253,7 +253,7 @@ window.AdpAplicatie = function() {
         const extra = extinderiTooltip.map(fn => fn(idx) || "").join("");
         t.innerHTML = `<strong>${esc(u.n)}</strong>
             <div class="rand"><span>${esc(u.t)}, jud. ${esc(numeJudet(u.j))}</span></div>
-            <div class="rand"><span>Populație 2021</span><b>${NF.format(u.p21)}</b></div>${extra}`;
+            <div class="rand"><span>Populație 2026</span><b>${NF.format(u.pop)}</b></div>${extra}`;
         t.hidden = false;
         const p = ev.containerPoint;
         const zona = $(".zona-harta").getBoundingClientRect();
@@ -277,7 +277,7 @@ window.AdpAplicatie = function() {
         const u = date.uat[idx];
         const adr = date.adr.find(r => r.c === u.adr);
         const d = densitate(u);
-        const evolutie = u.p11d ? (100 * (u.p24 - u.p11d) / u.p11d) : null;
+        const evolutie = u.p11d ? (100 * (u.pop - u.p11d) / u.p11d) : null;
         const et = u.et || {};
         const minoritate = et.min && et.pmin >= 1 ? `${esc(et.min)} ${NF1.format(et.pmin)}%${et.pmin >= 20 ? ` <span class="eticheta-stare atentie" title="Peste 20%: drept la folosirea limbii materne în administrație (Codul administrativ)">≥ 20%</span>` : ""}` : "—";
         const html = `
@@ -287,9 +287,9 @@ window.AdpAplicatie = function() {
                 ${rand("Regiune de dezvoltare", esc(adr ? adr.n : "—"))}
                 ${rand("Regiune istorică", esc(u.ist))}
                 ${rand("Județ interbelic (1930)", esc(u.j30))}
-                ${rand("Populație rezidentă 2021", NF.format(u.p21))}
-                ${rand("Populație după domiciliu 2024", NF.format(u.p24))}
-                ${rand("Evoluție 2011–2024 (domiciliu)", evolutie === null ? "—" : `${evolutie > 0 ? "+" : ""}${NF1.format(evolutie)}%`)}
+                ${rand("Populație după domiciliu, 1 ianuarie 2026", NF.format(u.pop))}
+                ${rand("Populație rezidentă 2021 (recensământ)", NF.format(u.p21))}
+                ${rand("Evoluție 2011–2026 (domiciliu)", evolutie === null ? "—" : `${evolutie > 0 ? "+" : ""}${NF1.format(evolutie)}%`)}
                 ${rand("Suprafață", `${NF1.format(u.a)} km²`)}
                 ${rand("Densitate", d === null ? "—" : `${NF1.format(d)} loc./km²`)}
                 ${rand("Copii 0–14 ani", u.v014 === null ? "—" : `${NF1.format(u.v014)}%`)}
@@ -326,7 +326,7 @@ window.AdpAplicatie = function() {
                     <td style="width:34%"><span style="display:block;height:6px;border-radius:3px;background:var(--accent);width:${Math.max(2, 100 * (s.p || 0) / max)}%"></span></td>
                 </tr>`).join("")}
             </table>
-            <p class="nota" style="margin-top:6px">Populație rezidentă 2021 (RPL 2021, tab. 1.22). Punctele de pe hartă: coordonate Wikidata.</p>`;
+            <p class="nota" style="margin-top:6px">Populația: după domiciliu la 1 ianuarie 2026 (INS, POP107D); rezidentă 2021 din recensământ (RPL 2021, tab. 1.22). Punctele de pe hartă: coordonate Wikidata.</p>`;
         sate.forEach(s => {
             if (!s.e) return;
             Harta.punct(s.e, {
@@ -392,7 +392,7 @@ window.AdpAplicatie = function() {
                 rezultate = [];
             } else {
                 rezultate = index.filter(r => r.cheie.includes(q))
-                    .sort((a, b) => (b.cheie.startsWith(q) - a.cheie.startsWith(q)) || (b.u.p21 - a.u.p21))
+                    .sort((a, b) => (b.cheie.startsWith(q) - a.cheie.startsWith(q)) || (b.u.pop - a.u.pop))
                     .slice(0, 12);
             }
             randeaza();
