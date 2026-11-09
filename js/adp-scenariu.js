@@ -45,6 +45,9 @@ window.AdpScenariu = function() {
     let gal = null;         // din date/gal-uat.json: grupurile de acțiune locală, pe UAT
     let corectii = [];          // alegerile voluntare în lucru: [{ uat, district, nume }]
     let comasari = [];          // comasările alese de mână: [{ uat, cu, nume }]
+    let transferuri = [];       // satele mutate de mână: [{ sat, uat, nume }] — satul trece în unitatea UAT-ului
+    let satAles = null;         // satul (SIRUTA) ales pe hartă, care așteaptă unitatea în care trece
+    let clicPeSat = false;      // clicul tocmai a ales un sat: nu e și un clic pe unitatea de sub el
     let tintaComasare = null;   // UAT-ul (SIRUTA) la care se alipesc următoarele clicuri
     let stratNume = null;       // numele și populația districtelor, pe hartă
     let corectiiSalvate = "[]"; // cum sunt în fișier, ca text, pentru comparație
@@ -216,6 +219,9 @@ window.AdpScenariu = function() {
             proiectie: $("#sc-proiectie").checked,
             forteaza: $("#sc-fortare").checked,
             absorbtieUrbana: $("#sc-urban").checked,
+            uniriUrbane: $("#sc-uniri-orase").checked,
+            pastreazaLeader: $("#sc-leader").checked,
+            resedinta: $("#sc-resedinta").checked ? "populatie" : "centralitate",
             respectaIstorice: $("#sc-istorice").checked,
             regimMinoritati: $("#sc-minoritati").value,
             dotari: dotari && dotari.localitati,
@@ -224,6 +230,7 @@ window.AdpScenariu = function() {
             corectii: $("#sc-baza").value === "judecatorii" ? D.reorganizare.alegeriCuCircumscriptii(judecatorii, corectii)
                 : $("#sc-baza").value === "gal" ? D.reorganizare.alegeriCuGal(D.date, gal, corectii) : corectii,
             comasari: comasari,
+            transferuri: transferuri,
             districte: true
         };
     }
@@ -565,20 +572,42 @@ window.AdpScenariu = function() {
             }).addTo(strat);
         });
 
+        // satele mutate de mână: o linie spre noua reședință
+        r.sate.filter(s => s.mutat).forEach(s => {
+            D.harta.linii([[s.e, satResedinta(s.grup).e]], {
+                pane: "puncte", token: "--text", weight: 1.8, opacity: 0.9
+            }).addTo(strat);
+        });
+
+        const modSat = editare && modEditare() === "sat";
         r.sate.forEach(s => {
-            const esteSediu = esteResedinta(s.k) && r.grup.get(s.uat) === s.uat;
+            const esteSediu = esteResedinta(s.k) && s.grup === s.uat && !s.mutat;
             const esteFostSediu = esteResedinta(s.k) && !esteSediu;
+            const esteAles = satAles === s.s;
             let umplere = "--text";
-            if (s.depasire) umplere = "--stare-atentie";
+            if (s.mutat) umplere = `--serie-${culoareGrup.get(s.grup) + 1}`;
+            else if (s.depasire) umplere = "--stare-atentie";
             else if (s.transfer) umplere = "--stare-serios";
             const m = D.harta.punct(s.e, {
-                radius: esteSediu ? 7 : esteFostSediu ? 4.5 : 3,
-                tokenContur: esteSediu ? "--text" : "--suprafata",
-                weight: esteSediu ? 2.5 : 1.2,
+                radius: esteAles ? 9 : esteSediu ? 7 : s.mutat ? 6 : esteFostSediu ? 4.5 : modSat ? 4.5 : 3,
+                tokenContur: esteAles ? "--evidentiere" : esteSediu || s.mutat ? "--text" : "--suprafata",
+                weight: esteAles ? 3.5 : esteSediu || s.mutat ? 2.5 : 1.2,
                 tokenUmplere: esteSediu ? "--suprafata" : umplere,
                 fillOpacity: 1
             });
-            const g = r.grupuri.find(x => x.sediu === r.grup.get(s.uat));
+            // modul „un sat trece în altă comună”: clicul pe sat îl alege
+            m.on("click", ev => {
+                if (!editare || modEditare() !== "sat") return;
+                if (window.L) window.L.DomEvent.stop(ev);
+                clicPeSat = true;
+                setTimeout(() => { clicPeSat = false; }, 0);
+                satAles = satAles === s.s ? null : s.s;
+                deseneaza();
+                deseneazaEditare(satAles === null ? "Alege un sat." :
+                    `${s.n} (${NF.format(s.p || 0)} loc., din ${D.date.uat[s.uat].n}): dă clic pe unitatea vecină în care trece` +
+                    (s.transfer ? ` — cea mai apropiată e ${D.date.uat[s.transfer.g].n}, la ${NF1.format(s.transfer.t)} min.` : "."));
+            });
+            const g = r.grupuri.find(x => x.sediu === s.grup);
             const linii = [
                 `<strong>${D.esc(s.n)}</strong>${esteSediu ? " — reședință nouă" : esteFostSediu ? " — fostă reședință" : ""}`,
                 `${s.p === null || s.p === undefined ? "—" : NF.format(s.p)} loc. · UAT actual: ${D.esc(D.date.uat[s.uat].n)}`,
@@ -587,6 +616,8 @@ window.AdpScenariu = function() {
             ];
             if (s.depasire) linii.push(`⚠ peste ${r.parametri.tMax} min`);
             if (s.transfer) linii.push(`↪ mai aproape de ${D.esc(D.date.uat[s.transfer.g].n)}: ${NF1.format(s.transfer.t)} min`);
+            if (s.mutat) linii.push(`↪ mutat de mână, din ${D.esc(D.date.uat[s.uat].n)}`);
+            if (modSat) linii.push("<i>clic: alege satul ca să-l muți</i>");
             m.bindTooltip(linii.join("<br>"), { direction: "top" });
             m.addTo(strat);
         });
@@ -672,7 +703,9 @@ window.AdpScenariu = function() {
     const numeSiruta = s => (D.date.uat.find(u => u.s === s) || { n: String(s) }).n;
     const curataComasari = lista => (lista || []).map(c =>
         ({ uat: Number(c.uat), cu: Number(c.cu), nume: c.nume || "" }));
-    const stare = () => JSON.stringify({ corectii: corectii, comasari: comasari });
+    const curataTransferuri = lista => (lista || []).map(c =>
+        ({ sat: Number(c.sat), uat: Number(c.uat), nume: c.nume || "" }));
+    const stare = () => JSON.stringify({ corectii: corectii, comasari: comasari, transferuri: transferuri });
     const modificat = () => stare() !== corectiiSalvate;
     const modEditare = () => (document.querySelector("input[name=sc-mod-editare]:checked") || {}).value || "district";
 
@@ -682,8 +715,8 @@ window.AdpScenariu = function() {
             if (!text) return null;
             const j = JSON.parse(text);
             // forma veche ținea doar lista alegerilor de district
-            return Array.isArray(j) ? { corectii: curata(j), comasari: [] }
-                : { corectii: curata(j.corectii), comasari: curataComasari(j.comasari) };
+            return Array.isArray(j) ? { corectii: curata(j), comasari: [], transferuri: [] }
+                : { corectii: curata(j.corectii), comasari: curataComasari(j.comasari), transferuri: curataTransferuri(j.transferuri) };
         } catch (e) {
             return null;   // stocarea locală poate fi oprită; alegerile rămân doar în pagină
         }
@@ -708,6 +741,8 @@ window.AdpScenariu = function() {
     function deseneazaEditare(mesaj) {
         $("#sc-editare").hidden = !editare;
         $("#sc-editeaza").setAttribute("aria-pressed", String(editare));
+        $("#pp-editeaza").setAttribute("aria-pressed", String(editare));
+        $("#pp-editeaza").textContent = editare ? "Gata cu modificările" : "Modifică de mână: unește comune, mută sate";
         if (!editare) return;
         const cod = activ ? judetulCurent() : null;
         const orase = cod === null ? []
@@ -719,13 +754,18 @@ window.AdpScenariu = function() {
         if (orase.some(u => String(u.s) === pastrat)) tinta.value = pastrat;
         tinta.disabled = !orase.length;
         const comasare = modEditare() === "comasare";
-        tinta.hidden = comasare;
-        $("#sc-tinta-eticheta").hidden = comasare;
+        const modSat = modEditare() === "sat";
+        tinta.hidden = comasare || modSat;
+        $("#sc-tinta-eticheta").hidden = comasare || modSat;
         $("#sc-ajutor-editare").textContent = comasare
             ? "Dă clic pe comuna sau orașul la care se alipesc celelalte, apoi pe fiecare UAT care se comasează cu el. " +
               "Încă un clic pe același UAT anulează; clic pe țintă alege alta."
-            : "Alege orașul-reședință, apoi dă clic pe hartă pe comunele care trec la districtul lui. " +
-              "Încă un clic pe aceeași comună anulează alegerea.";
+            : modSat
+                ? (national ? "Satele se mută pe un județ: alege un județ la pasul 1." :
+                    "Dă clic pe un sat (punctele de pe hartă), apoi pe unitatea vecină în care trece. " +
+                    "Satul mutat apare cu culoarea noii unități; limitele rămân pe UAT-uri.")
+                : "Alege orașul-reședință, apoi dă clic pe hartă pe comunele care trec la districtul lui. " +
+                  "Încă un clic pe aceeași comună anulează alegerea.";
 
         const inJudet = s => {
             const u = D.date.uat.find(x => x.s === s);
@@ -738,7 +778,11 @@ window.AdpScenariu = function() {
             .concat(comasari.filter(c => inJudet(c.uat)).map(c =>
                 `<li><span>${D.esc(numeSiruta(c.uat))} + <b>${D.esc(numeSiruta(c.cu))}</b> <small>(comasare)</small></span>
                 <button class="buton" type="button" data-desface="${c.uat}"
-                    aria-label="Desface comasarea: ${D.esc(numeSiruta(c.uat))}">✕</button></li>`));
+                    aria-label="Desface comasarea: ${D.esc(numeSiruta(c.uat))}">✕</button></li>`))
+            .concat(transferuri.filter(c => inJudet(c.uat)).map(c =>
+                `<li><span>${D.esc(c.nume || String(c.sat))} <small>(sat mutat)</small></span>
+                <button class="buton" type="button" data-intoarce="${c.sat}"
+                    aria-label="Întoarce satul: ${D.esc(c.nume || String(c.sat))}">✕</button></li>`));
         $("#sc-alegeri").innerHTML = randuri.length ? randuri.join("")
             : `<li class="nota">Nicio alegere în acest județ.</li>`;
         document.querySelectorAll("#sc-alegeri button[data-sterge]").forEach(b =>
@@ -753,10 +797,16 @@ window.AdpScenariu = function() {
                 scrieLocal(corectii);
                 ruleaza(false);
             }));
+        document.querySelectorAll("#sc-alegeri button[data-intoarce]").forEach(b =>
+            b.addEventListener("click", () => {
+                transferuri = transferuri.filter(c => c.sat !== Number(b.dataset.intoarce));
+                scrieLocal(corectii);
+                ruleaza(false);
+            }));
         $("#sc-stare-salvare").textContent = mesaj || (cod === null
             ? "Alege un județ și apasă „Arată scenariul”: districtele se reorganizează județ cu județ."
             : modificat() ? "Modificări nesalvate."
-                : `${cate(corectii.length + comasari.length, "alegere salvată", "alegeri salvate")}, în toată țara.`);
+                : `${cate(corectii.length + comasari.length + transferuri.length, "alegere salvată", "alegeri salvate")}, în toată țara.`);
         $("#sc-salveaza").disabled = !modificat();
         $("#sc-renunta").disabled = !modificat();
     }
@@ -764,6 +814,29 @@ window.AdpScenariu = function() {
     /** Clic pe hartă în editare: orașul devine țintă, comuna trece la districtul-țintă. */
     function alegeUat(idx) {
         const u = D.date.uat[idx];
+        if (modEditare() === "sat") {
+            const x = satAles === null ? null : rezultat.sate.find(s => s.s === satAles);
+            if (!x) {
+                deseneazaEditare("Dă clic întâi pe un sat: punctele de pe hartă.");
+                return;
+            }
+            const tinta = rezultat.grup.get(idx);
+            const vecina = idx === x.uat || vecini[x.uat].some(n => rezultat.grup.get(n) === tinta);
+            if (tinta === undefined || !vecina) {
+                deseneazaEditare(`${x.n} poate trece doar într-o unitate vecină cu UAT-ul lui (${D.date.uat[x.uat].n}).`);
+                return;
+            }
+            transferuri = transferuri.filter(c => c.sat !== x.s);
+            // înapoi în unitatea în care e UAT-ul lui: mutarea se anulează
+            if (tinta !== rezultat.grup.get(x.uat)) {
+                const numeUnitate = (rezultat.grupuri.find(g => g.sediu === tinta) || {}).nume || u.n;
+                transferuri.push({ sat: x.s, uat: u.s, nume: `${x.n} (din ${D.date.uat[x.uat].n}) → ${numeUnitate}` });
+            }
+            satAles = null;
+            scrieLocal(corectii);
+            ruleaza(false);
+            return;
+        }
         if (modEditare() === "comasare") {
             if (tintaComasare === null) {
                 tintaComasare = u.s;
@@ -815,9 +888,11 @@ window.AdpScenariu = function() {
     async function salveaza() {
         const corp = JSON.stringify({
             versiune: 1,
-            descriere: "Alegerile voluntare: UAT-ul (cod SIRUTA) intră în districtul cu reședința în UAT-ul `district`.",
+            descriere: "Alegerile voluntare: UAT-ul (cod SIRUTA) intră în districtul cu reședința în UAT-ul `district`; " +
+                "comasările: UAT-ul `uat` se comasează cu `cu`; transferurile: satul `sat` trece în unitatea UAT-ului `uat`.",
             corectii: corectii,
-            comasari: comasari
+            comasari: comasari,
+            transferuri: transferuri
         }, null, 1);
         let scris = false;
         try {
@@ -831,7 +906,7 @@ window.AdpScenariu = function() {
         if (scris) {
             corectiiSalvate = stare();
             scrieLocal(null);
-            deseneazaEditare(`Salvat în ${CALE_CORECTII}: ${cate(corectii.length + comasari.length, "alegere", "alegeri")}.`);
+            deseneazaEditare(`Salvat în ${CALE_CORECTII}: ${cate(corectii.length + comasari.length + transferuri.length, "alegere", "alegeri")}.`);
         } else {
             scrieLocal(corectii);
             deseneazaEditare("Serverul nu acceptă scriere: alegerile rămân în acest browser. " +
@@ -840,7 +915,7 @@ window.AdpScenariu = function() {
     }
 
     function descarca() {
-        const corp = JSON.stringify({ versiune: 1, corectii: corectii, comasari: comasari }, null, 1);
+        const corp = JSON.stringify({ versiune: 1, corectii: corectii, comasari: comasari, transferuri: transferuri }, null, 1);
         const legatura = document.createElement("a");
         legatura.href = URL.createObjectURL(new Blob([corp], { type: "application/json" }));
         legatura.download = "corectii-districte.json";
@@ -852,7 +927,9 @@ window.AdpScenariu = function() {
         const salvat = JSON.parse(corectiiSalvate);
         corectii = salvat.corectii || [];
         comasari = salvat.comasari || [];
+        transferuri = salvat.transferuri || [];
         tintaComasare = null;
+        satAles = null;
         scrieLocal(null);
         if (activ) ruleaza(false);
         else deseneazaEditare();
@@ -1204,6 +1281,7 @@ window.AdpScenariu = function() {
 
     /** Clic pe hartă, cât timp scenariul e activ: deschide dosarul unității atinse. */
     function clicPeHarta(idx) {
+        if (clicPeSat) return true;
         // pasul 1: clicul alege județul (în afara straturilor care au clicul lor);
         // în județul deja ales, clicul arată fișa UAT-ului, ca de obicei
         const mod = document.querySelector("input[name=mod]:checked");
@@ -1665,12 +1743,18 @@ window.AdpScenariu = function() {
                 ${tipPas(cheie) === "judet" ? "" : "Calculul pe mai multe județe durează câteva secunde."}</p>`;
     }
 
-    /** Pasul 2 → 3: calculul pe teritoriul ales, cu regulile din formular. */
-    async function genereazaPas() {
-        if (pasCheie === null) return;
+    /** Arată, în pasul 2, că indicatorii se recalculează. */
+    function marcheazaCalcul(da) {
+        $("#pp-viu").classList.toggle("se-calculeaza", da);
         const buton = $("#pp-genereaza");
-        buton.disabled = true;
-        buton.textContent = "Se calculează…";
+        buton.disabled = da;
+        buton.textContent = da ? "Se calculează…" : "Vezi raportul înainte și după";
+    }
+
+    /** Calculul pe teritoriul ales, cu regulile din formular; harta arată propunerea. */
+    async function calculeazaPas() {
+        if (pasCheie === null) return;
+        marcheazaCalcul(true);
         final = false;
         regiuni = null;
         districtAles = null;
@@ -1681,13 +1765,36 @@ window.AdpScenariu = function() {
             await dateGata;
             await ruleaza(true);
         } finally {
-            buton.disabled = false;
-            buton.textContent = "Generează reorganizarea";
+            marcheazaCalcul(false);
         }
+    }
+
+    /** Pasul 2 → 3. */
+    async function genereazaPas() {
+        if (pasCheie === null) return;
+        if (!rezultatPas()) await calculeazaPas();
         if (rezultatPas()) {
             arataPas(3);
             $("#pp").scrollIntoView({ block: "start", behavior: "smooth" });
         }
+    }
+
+    /** Navigarea între pași: la pasul 2, harta și indicatorii arată deja propunerea. */
+    function mergiLa(n) {
+        arataPas(n);
+        if (pas === 2 && !rezultatPas()) calculeazaPas();
+    }
+
+    // o schimbare de criteriu reface calculul, o singură dată la o serie de mișcări de cursor
+    let temporizator = null;
+    function recalculeazaCurand() {
+        actualizeazaEtichete();
+        if (!activ) return;
+        clearTimeout(temporizator);
+        if (pas === 2) $("#pp-viu").classList.add("se-calculeaza");
+        temporizator = setTimeout(() => {
+            if (activ) ruleaza(false);
+        }, national ? 400 : 150);
     }
 
     /** Pasul 3: harta de azi (UAT-urile) sau cea propusă (unitățile noi). */
@@ -1754,18 +1861,39 @@ window.AdpScenariu = function() {
         return `${d > 0 ? "+" : "−"}${(fmt || (v => NF.format(Math.round(v))))(Math.abs(d))}${procent}`;
     }
 
-    /** Rândurile comparației azi / propus, pentru județul calculat (folosite și la descărcare). */
+    /**
+     * Indicatorii economici ai teritoriului calculat, azi și propus: costul aparatului (total și pe
+     * locuitor), primăriile peste pragul de 30% și investițiile, dacă economia se duce în investiții.
+     * Null fără execuția bugetară.
+     */
+    function indicatoriEconomici(r) {
+        const executie = finante && finante.executieUat;
+        const c = costAparat(r.grupuri);
+        const b = bani(r.uat);
+        if (!executie || !c || !b) return null;
+        const prag = D.reorganizare.REGULA_FINANCIARA.prag;
+        const cuDate = r.uat.filter(i => executie[D.date.uat[i].s]);
+        const locuitori = cuDate.reduce((s, i) => s + (D.date.uat[i].pop || 0), 0);
+        const cuDateDupa = r.grupuri.filter(g => g.financiar && g.financiar.pondere !== null);
+        return {
+            aparatAzi: c.acum, aparatDupa: c.dupa, economie: c.economie,
+            peLocAzi: locuitori ? c.acum / locuitori : null, peLocDupa: locuitori ? c.dupa / locuitori : null,
+            investAzi: b.investitii, investDupa: b.investitii + c.economie,
+            prag: prag,
+            pesteAzi: cuDate.filter(i => executie[D.date.uat[i].s].pondere > prag).length, cuDateAzi: cuDate.length,
+            pesteDupa: cuDateDupa.filter(g => g.financiar.pondere > prag).length, cuDateDupa: cuDateDupa.length
+        };
+    }
+
+    /** Rândurile comparației azi / propus, pentru teritoriul calculat (folosite și la descărcare). */
     function randuriComparatie(r) {
         const P = r.parametri, a = r.inainte, d = r.dupa;
         const R = D.reorganizare;
         const pop = i => D.date.uat[i].pop || 0;
         const c = costAparat(r.grupuri);
-        const executie = finante && finante.executieUat;
-        const prag = R.REGULA_FINANCIARA.prag;
-        const cuDateAzi = executie ? r.uat.filter(i => executie[D.date.uat[i].s]) : [];
-        const pesteAzi = cuDateAzi.filter(i => executie[D.date.uat[i].s].pondere > prag).length;
-        const cuDateDupa = r.grupuri.filter(g => g.financiar && g.financiar.pondere !== null);
-        const pesteDupa = cuDateDupa.filter(g => g.financiar.pondere > prag).length;
+        const e = indicatoriEconomici(r);
+        const mare = c && c.acum >= 1e9;
+        const bani = v => NF1.format(v / (mare ? 1e9 : 1e6));
         const min = v => NF1.format(v) + " min";
         return [
             { nume: "Comune și orașe", azi: a.unitati, dupa: d.unitati },
@@ -1778,11 +1906,12 @@ window.AdpScenariu = function() {
             { nume: "Primari", azi: a.unitati, dupa: d.unitati },
             { nume: "Consilieri locali", azi: r.uat.reduce((s, i) => s + R.consilieriLocali(pop(i)), 0),
                 dupa: r.grupuri.reduce((s, g) => s + R.consilieriLocali(g.populatie, R.FACTOR_CONSILIERI), 0) },
-            c && { nume: `Aparatul primăriilor, ${c.acum >= 1e9 ? "mld." : "mil."} lei pe an`, azi: c.acum, dupa: c.dupa,
-                fmt: v => NF1.format(v / (c.acum >= 1e9 ? 1e9 : 1e6)) },
-            executie && { nume: `Aparatul peste ${prag}% din veniturile proprii`, azi: pesteAzi, dupa: pesteDupa,
-                textAzi: `${NF.format(pesteAzi)} din ${NF.format(cuDateAzi.length)}`,
-                textDupa: `${NF.format(pesteDupa)} din ${NF.format(cuDateDupa.length)}` },
+            e && { nume: `Aparatul primăriilor, ${mare ? "mld." : "mil."} lei pe an`, azi: e.aparatAzi, dupa: e.aparatDupa, fmt: bani },
+            e && { nume: "Aparatul pe locuitor, lei pe an", azi: e.peLocAzi, dupa: e.peLocDupa },
+            e && { nume: `Investiții, ${mare ? "mld." : "mil."} lei pe an, cu economia`, azi: e.investAzi, dupa: e.investDupa, fmt: bani },
+            e && { nume: `Aparatul peste ${e.prag}% din veniturile proprii`, azi: e.pesteAzi, dupa: e.pesteDupa,
+                textAzi: `${NF.format(e.pesteAzi)} din ${NF.format(e.cuDateAzi)}`,
+                textDupa: `${NF.format(e.pesteDupa)} din ${NF.format(e.cuDateDupa)}` },
             { nume: "Drumul mediu sat → primărie", azi: a.timpMediu, dupa: d.timpMediu, fmt: min },
             { nume: `Sate (de cel puțin ${P.pSatMin} loc.) la peste ${P.tMax} min`, azi: a.pesteTMax, dupa: d.pesteTMax },
             r.districte && { nume: "Zone metropolitane și districte", azi: null, dupa: r.districte.length },
@@ -1936,7 +2065,39 @@ window.AdpScenariu = function() {
         setTimeout(() => URL.revokeObjectURL(legatura.href), 1000);
     }
 
-    /** După orice calcul: dacă e pe teritoriul ales, raportul pasului 3 se reface. */
+    /**
+     * Pasul 2: indicatorii care se schimbă pe loc, cu fiecare criteriu bifat — întâi banii,
+     * apoi forma hărții. Fiecare card: valoarea propusă, cea de azi și diferența.
+     */
+    function randeazaViu() {
+        const r = rezultatPas();
+        const cont = $("#pp-viu");
+        cont.classList.remove("se-calculeaza");
+        if (!r) { cont.innerHTML = ""; return; }
+        const e = indicatoriEconomici(r);
+        const a = r.inainte, d = r.dupa;
+        const mare = e && e.aparatAzi >= 1e9;
+        const unitate = mare ? "mld. lei" : "mil. lei";
+        const bani = v => NF1.format(v / (mare ? 1e9 : 1e6));
+        const procent = (x, din) => `${NF.format(Math.round(100 * x / din))}%`;
+        const card = (eticheta, propus, azi, dif, bun) => `<div class="pp-card${bun === true ? " bun" : bun === false ? " rau" : ""}">
+                <span class="eticheta">${eticheta}</span><b>${propus}</b><small>azi ${azi}${dif ? ` · ${dif}` : ""}</small></div>`;
+        cont.innerHTML = `<h4>${D.esc(numePas(pasCheie))}, cu regulile alese</h4>
+            <div class="pp-carduri">
+                ${e ? card(`Economie, ${unitate}/an`, bani(e.economie), `aparat ${bani(e.aparatAzi)}`, `−${procent(e.economie, e.aparatAzi)}`, e.economie > 0) : ""}
+                ${e ? card("Aparat pe locuitor, lei", NF.format(Math.round(e.peLocDupa)), NF.format(Math.round(e.peLocAzi)),
+                    diferenta(e.peLocAzi, e.peLocDupa), e.peLocDupa < e.peLocAzi) : ""}
+                ${e ? card(`Investiții, ${unitate}/an`, bani(e.investDupa), bani(e.investAzi), diferenta(e.investAzi, e.investDupa, bani), true) : ""}
+                ${e ? card(`Aparat peste ${e.prag}% din venituri`, procent(e.pesteDupa, e.cuDateDupa), procent(e.pesteAzi, e.cuDateAzi),
+                    `${NF.format(e.pesteDupa)} din ${NF.format(e.cuDateDupa)} unități`, e.pesteDupa / e.cuDateDupa < e.pesteAzi / e.cuDateAzi) : ""}
+                ${card("Comune și orașe", NF.format(d.unitati), NF.format(a.unitati), diferenta(a.unitati, d.unitati))}
+                ${card("Drum mediu la primărie, min", NF1.format(d.timpMediu), NF1.format(a.timpMediu),
+                    `${NF.format(d.pesteTMax)} sate peste ${r.parametri.tMax} min`, d.timpMediu <= a.timpMediu)}
+            </div>
+            ${e ? "" : `<p class="nota">Banii apar după ce se încarcă execuția bugetară.</p>`}`;
+    }
+
+    /** După orice calcul: dacă e pe teritoriul ales, indicatorii și raportul pasului 3 se refac. */
     function actualizeazaPas() {
         if (rezultatPas()) {
             vedereInainte = false;
@@ -1944,6 +2105,7 @@ window.AdpScenariu = function() {
             if (radio) radio.checked = true;
             randeazaPas();
         }
+        randeazaViu();
         arataPas(pas);
     }
 
@@ -1957,14 +2119,18 @@ window.AdpScenariu = function() {
         sel.addEventListener("change", () => {
             if (sel.value) alegeTeritoriuPas(sel.value);
         });
-        $("#pp-spre-reguli").addEventListener("click", () => arataPas(2));
+        $("#pp-spre-reguli").addEventListener("click", () => mergiLa(2));
         $("#pp-genereaza").addEventListener("click", genereazaPas);
         $("#pp-descarca").addEventListener("click", descarcaPas);
+        $("#pp-editeaza").addEventListener("click", () => {
+            if (vedereInainte) vedere(false);
+            $("#sc-editeaza").click();
+        });
         document.querySelectorAll("#pp [data-mergi]").forEach(b => b.addEventListener("click", () => {
             const tinta = Number(b.dataset.mergi);
             // „Alt teritoriu”: harta revine la UAT-urile de azi
             if (tinta === 1 && activ) inchide();
-            arataPas(tinta);
+            mergiLa(tinta);
         }));
         document.querySelectorAll("input[name=pp-harta]").forEach(radio =>
             radio.addEventListener("change", () => vedere(radio.value === "inainte")));
@@ -1989,15 +2155,11 @@ window.AdpScenariu = function() {
         stratNume = D.harta.stratNou("puncte");
         D.adaugaTooltip(tooltipScenariu);
         D.adaugaClic(clicPeHarta);
-        ["#sc-pmin", "#sc-tmax", "#sc-oras", "#sc-pmax", "#sc-tfortat"].forEach(id => $(id).addEventListener("input", () => {
-            actualizeazaEtichete();
-            if (activ) ruleaza(false);
-        }));
-        ["#sc-urban", "#sc-minoritati", "#sc-proiectie", "#sc-fortare", "#sc-legal", "#sc-istorice", "#sc-district", "#sc-baza"]
-            .forEach(id => $(id).addEventListener("change", () => {
-                actualizeazaEtichete();
-                if (activ) ruleaza(false);
-            }));
+        ["#sc-pmin", "#sc-tmax", "#sc-oras", "#sc-pmax", "#sc-tfortat"].forEach(id =>
+            $(id).addEventListener("input", recalculeazaCurand));
+        ["#sc-urban", "#sc-minoritati", "#sc-proiectie", "#sc-fortare", "#sc-legal", "#sc-istorice", "#sc-district", "#sc-baza",
+            "#sc-uniri-orase", "#sc-leader", "#sc-resedinta"]
+            .forEach(id => $(id).addEventListener("change", recalculeazaCurand));
         $("#sc-exemplu").addEventListener("change", () => {
             const cheie = $("#sc-exemplu").value;
             marcheazaRegiunea(cheie.startsWith(PREFIX_ADR) ? cheie.slice(PREFIX_ADR.length) : null);
@@ -2046,6 +2208,7 @@ window.AdpScenariu = function() {
         $("#sc-tinta").addEventListener("change", () => { if (activ) deseneaza(); });
         document.querySelectorAll("input[name=sc-mod-editare]").forEach(radio => radio.addEventListener("change", () => {
             tintaComasare = null;
+            satAles = null;
             if (activ) deseneaza();
             deseneazaEditare();
         }));
@@ -2077,11 +2240,13 @@ window.AdpScenariu = function() {
         asteptate.push(fetch(CALE_CORECTII, { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => {
             corectii = curata(j && j.corectii);
             comasari = curataComasari(j && j.comasari);
+            transferuri = curataTransferuri(j && j.transferuri);
             corectiiSalvate = stare();
             const local = citesteLocal();
             if (local) {
                 corectii = local.corectii;
                 comasari = local.comasari;
+                transferuri = local.transferuri;
             }
         }).catch(() => {
             console.warn(`[ro-adp] "${CALE_CORECTII}" nu a putut fi încărcat; se pornește fără alegeri voluntare.`);
@@ -2089,6 +2254,7 @@ window.AdpScenariu = function() {
             if (local) {
                 corectii = local.corectii;
                 comasari = local.comasari;
+                transferuri = local.transferuri;
             }
         }));
         dateGata = Promise.all(asteptate);

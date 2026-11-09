@@ -33,7 +33,8 @@ function scenariuNational(date, vecini) {
     const judecatorii = fs.existsSync(cale("date/judecatorii-uat.json")) ? json("date/judecatorii-uat.json") : null;
     const r = AdpReorganizare.calculeazaNational(date, vecini, exemple, {
         districte: true, corectii: AdpReorganizare.alegeriCuCircumscriptii(judecatorii, alegeri),
-        comasari: fisierAlegeri.comasari || []
+        comasari: fisierAlegeri.comasari || [],
+        transferuri: fisierAlegeri.transferuri || []
     });
     const birouri = r.grupuri.reduce((a, g) => a + g.birouri.length, 0);
     return {

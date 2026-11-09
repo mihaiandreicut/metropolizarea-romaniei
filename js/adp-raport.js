@@ -1743,7 +1743,8 @@ window.AdpRaport = function() {
                 // districtele pornesc de la circumscripțiile judecătoriilor; alegerile voluntare
                 // făcute pe hartă trec înaintea lor și intră și în cifrele raportului
                 corectii: dependente.reorganizare.alegeriCuCircumscriptii(judecatorii, (alegeri && alegeri.corectii) || []),
-                comasari: (alegeri && alegeri.comasari) || []
+                comasari: (alegeri && alegeri.comasari) || [],
+                transferuri: (alegeri && alegeri.transferuri) || []
             });
             const c = costuri(date, r, executie, finante);
             const regional = institutii ? regionalizeaza(date, vecini, institutii, dependente) : null;

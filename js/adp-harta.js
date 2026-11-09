@@ -119,7 +119,20 @@ window.AdpHarta = function() {
             if (evidentiere) evidentiere.setLatLngs([]);
             if (apeluri.iesire) apeluri.iesire();
         });
-        stratUat.on("click", e => apeluri.clic && apeluri.clic(e.layer.idx));
+        stratUat.on("click", e => {
+            if (e.originalEvent) e.originalEvent.roUatTratat = true;
+            if (apeluri.clic) apeluri.clic(e.layer.idx);
+        });
+        // satele (stratul „puncte”, tot pe canvas) stau deasupra UAT-urilor și le acoperă: un clic
+        // care nu nimerește niciun sat ajunge doar la hartă, așa că se caută UAT-ul de sub el
+        harta.on("click", e => {
+            if (!apeluri.clic || !e.layerPoint || (e.originalEvent && e.originalEvent.roUatTratat)) return;
+            let gasit = null;
+            stratUat.eachLayer(l => {
+                if (gasit === null && l._containsPoint && l._containsPoint(e.layerPoint)) gasit = l;
+            });
+            if (gasit) apeluri.clic(gasit.idx);
+        });
 
         const limRandator = L.canvas({ pane: "limite", padding: 0.3 });
         const optLimita = { renderer: limRandator, interactive: false, pane: "limite", fill: false };

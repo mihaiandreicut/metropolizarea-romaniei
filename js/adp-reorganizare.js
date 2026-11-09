@@ -66,6 +66,9 @@ window.AdpReorganizare = function() {
         pMaxRural: 15000,      // o unitate rurală nu crește peste atât: altfel ar trebui să fie oraș
         respectaIstorice: false, // unitățile noi nu trec peste granițele regiunilor istorice
         tBirou: 15,            // fosta reședință peste acest timp de noua reședință păstrează un birou local
+        // reședința unității noi: "populatie" — localitatea cea mai mare (regulile v2); "centralitate" —
+        // cel mai mic drum mediu, cu dotări (regulile v1). În ambele, orașul și limita de drum au întâietate.
+        resedinta: "populatie",
         tAccesibil: 15,        // raza (minute) pentru populația accesibilă din scorul de centralitate
         pragMinoritate: 20,    // % — Codul administrativ: folosirea limbii materne în administrație
         // ce se întâmplă când o comasare ar coborî o minoritate de peste 20% sub prag:
@@ -83,7 +86,10 @@ window.AdpReorganizare = function() {
         corectii: null,
         // comasările alese de mână: [{ uat, cu }], coduri SIRUTA — cele două UAT-uri ajung în
         // aceeași unitate, oricum ar fi ieșit din calcul; criteriile se verifică la fel
-        comasari: null
+        comasari: null,
+        // satele mutate de mână: [{ sat, uat }], coduri SIRUTA — satul trece în unitatea în care e
+        // UAT-ul `uat` (din același județ); limitele rămân pe UAT-uri, nu există limite oficiale de sat
+        transferuri: null
     };
     const TIP_RESEDINTA = [9, 17, 22];
     const AN_BAZA = 2026;          // anul populației de referință (u.pop, domiciliul la 1 ianuarie)
@@ -407,10 +413,17 @@ window.AdpReorganizare = function() {
             return pAzi(lista) <= P.pMaxRural;
         }
 
+        /** Populația localității-reședință a unui UAT (satul sau orașul propriu-zis, RPL 2021). */
+        const popLocalitate = i => (ex.sate[satResedinta.get(i)] || {}).p || 0;
+
         /**
          * Evaluează fiecare candidat la reședința unui grup. Ordinea criteriilor:
          *   1. dacă grupul are un oraș, reședința e obligatoriu orașul;
          *   2. niciun UAT nu capătă sate peste tMax pe care nu le avea deja („respectă”);
+         * apoi, cu resedinta = "populatie" (implicit):
+         *   3. localitatea cea mai mare;
+         *   4. cel mai mic timp mediu de deplasare, ponderat cu populația;
+         * sau, cu resedinta = "centralitate":
          *   3. cât mai puține sate peste tMax, în total;
          *   4. reședință bine dotată (scor de centralitate ≥ 60% din maximul grupului);
          *   5. cel mai mic timp mediu de deplasare, ponderat cu populația.
@@ -431,12 +444,15 @@ window.AdpReorganizare = function() {
                 });
                 return {
                     sediu: s, mediu: suma / g, max: max, depasiri: dep, respecta: respecta,
-                    scor: scor.get(s).total,
+                    scor: scor.get(s).total, locuitori: popLocalitate(s),
                     eligibil: areUrban ? urban(s) : true,
                     preferat: areUrban ? urban(s) : scor.get(s).total >= 0.6 * maxScor
                 };
             });
-            const cheie = x => [x.eligibil ? 0 : 1, x.respecta ? 0 : 1, x.depasiri, x.preferat ? 0 : 1, x.mediu];
+            const cheie = P.resedinta === "centralitate"
+                ? x => [x.eligibil ? 0 : 1, x.respecta ? 0 : 1, x.depasiri, x.preferat ? 0 : 1, x.mediu]
+                // când niciun candidat nu respectă limita de drum, cel cu cele mai puține sate peste ea
+                : x => [x.eligibil ? 0 : 1, x.respecta ? 0 : 1, x.respecta ? 0 : x.depasiri, -x.locuitori, x.mediu];
             candidati.sort((a, b) => {
                 const ka = cheie(a), kb = cheie(b);
                 for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return ka[i] - kb[i];
@@ -710,6 +726,29 @@ window.AdpReorganizare = function() {
             };
         });
 
+        // satele mutate de mână: trec în unitatea aleasă, cu drumul până la reședința ei și cu
+        // populația lor (din recensământ, adusă la anul populației de referință a UAT-ului)
+        const mutari = new Map();   // reședința unității -> câți locuitori primește (sau pierde)
+        (() => {
+            const dupaSiruta = new Map(sate.map(x => [x.s, x]));
+            const popSat = x => (x.p || 0) * ((date.uat[x.uat].pop || 0) / (date.uat[x.uat].p21 || date.uat[x.uat].pop || 1));
+            (P.transferuri || []).forEach(m => {
+                const x = dupaSiruta.get(m.sat);
+                const i = idxDupaSiruta.get(m.uat);
+                if (!x || i === undefined || !inJud.has(i)) return;
+                const g = grup.get(i);
+                if (g === undefined || g === x.grup) return;
+                const d = popSat(x);
+                mutari.set(x.grup, (mutari.get(x.grup) || 0) - d);
+                mutari.set(g, (mutari.get(g) || 0) + d);
+                x.grup = g;
+                x.mutat = true;
+                x.tNou = timp(x.k, col.get(g));
+                x.depasire = x.tNou > P.tMax && (x.p || 0) >= P.pSatMin;
+                x.transfer = null;
+            });
+        })();
+
         /** De ce rămâne un grup sub prag: ce anume blochează comasarea cu fiecare vecin. */
         function motiveSubPrag(id, lista) {
             const partenere = vecineleGrupului(lista, id);
@@ -735,6 +774,10 @@ window.AdpReorganizare = function() {
         function motivRespingere(c, ales, maxScor) {
             if (!c.eligibil) return "grupul are oraș, reședința trebuie să fie orașul";
             if (!c.respecta) return `ar fi lăsat sate peste ${P.tMax} min care acum nu sunt`;
+            if (P.resedinta !== "centralitate") {
+                if (c.locuitori < ales.locuitori) return `localitate mai mică: ${NF.format(c.locuitori)} loc., față de ${NF.format(ales.locuitori)}`;
+                return `timp mediu mai mare: ${NF1.format(c.mediu)} vs ${NF1.format(ales.mediu)} min`;
+            }
             if (c.depasiri > ales.depasiri) return `${cate(c.depasiri, "sat", "sate")} peste ${P.tMax} min, față de ${ales.depasiri}`;
             if (!c.preferat) return `scor de centralitate ${NF1.format(c.scor)}, sub 60% din ${NF1.format(maxScor)}`;
             return `timp mediu mai mare: ${NF1.format(c.mediu)} vs ${NF1.format(ales.mediu)} min`;
@@ -743,9 +786,12 @@ window.AdpReorganizare = function() {
         const grupuri = idGrupuri().map(id => {
             const s = sediu.get(id);
             const lista = membri(id);
-            const sateGrup = sate.filter(x => grup.get(x.uat) === s);
-            const pTot = pAzi(lista);
-            const pProiectat = pViitor(lista);
+            const sateGrup = sate.filter(x => x.grup === s);
+            // satele mutate de mână schimbă populația unității; proiecția urmează în aceeași proporție
+            const mutat = mutari.get(s) || 0;
+            const pTot = Math.round(pAzi(lista) + mutat);
+            const pProiectat = Math.round(pViitor(lista) + mutat * (pAzi(lista) ? pViitor(lista) / pAzi(lista) : 1));
+            const pReferinta = P.proiectie ? Math.min(pTot, pProiectat) : pTot;
             const mediu = sateGrup.reduce((a, x) => a + x.tNou * pop(x.k), 0) / sateGrup.reduce((a, x) => a + pop(x.k), 0);
             const birouri = lista.filter(i => i !== s && timp(satResedinta.get(i), col.get(s)) > P.tBirou);
             const depasiri = sateGrup.filter(x => x.depasire);
@@ -765,7 +811,7 @@ window.AdpReorganizare = function() {
                     if (pondere < P.pragMinoritate) riscMinoritate.push({ uat: i, etnie: et.min, inainte: et.pmin, dupa: pondere });
                 }
             });
-            const subPrag = pRef(lista) < pragUnitate(lista);
+            const subPrag = pReferinta < pragUnitate(lista);
             const motive = subPrag ? motiveSubPrag(id, lista) : [];
             const fin = P.executie ? testFinanciar(lista, s, pTot, P.executie) : null;
 
@@ -777,7 +823,10 @@ window.AdpReorganizare = function() {
             }));
             dosar.push({
                 regula: "Reședință",
-                text: `${nume(s)}: ${NF1.format(ev.ales.mediu)} min în medie pentru locuitorii unității, ` +
+                text: `${nume(s)}: ` + (P.resedinta === "centralitate" ? "" :
+                    (ev.candidati.every(c => c.locuitori <= ev.ales.locuitori) ? "localitatea cea mai mare" : "cea mai mare localitate care respectă limita de drum") +
+                    ` (${NF.format(ev.ales.locuitori)} loc.), `) +
+                    `${NF1.format(ev.ales.mediu)} min în medie pentru locuitorii unității, ` +
                     `scor de centralitate ${NF1.format(scor.get(s).total)} (maximul grupului: ${NF1.format(ev.maxScor)})` +
                     (ev.areUrban ? ", singurul oraș al grupului" : "") + "." +
                     (respinse.length ? " Respinse: " + respinse.map(r => `${r.nume} (${r.motiv})`).join("; ") + "." : "")
@@ -793,6 +842,14 @@ window.AdpReorganizare = function() {
                             : "unitatea intră în el.")
                 });
             });
+            // satele mutate de mână, în dosarul unității care le primește și al celei care le dă
+            sate.filter(x => x.mutat && (x.grup === s || grup.get(x.uat) === s)).forEach(x => dosar.push({
+                regula: "Sat mutat",
+                text: x.grup === s
+                    ? `${x.n} (din ${nume(x.uat)}) trece în această unitate, ales de mână: ${NF1.format(x.tNou)} min până la reședință, ` +
+                      `față de ${NF1.format(timp(x.k, col.get(grup.get(x.uat))))} min în unitatea din care pleacă.`
+                    : `${x.n} trece în unitatea ${nume(x.grup)}, ales de mână.`
+            }));
             const derogari = [];
             const tipuriDerogari = [];  // câte un cod pe fiecare derogare, în aceeași ordine
             const deroga = (tip, text) => { derogari.push(text); tipuriDerogari.push(tip); };
@@ -895,7 +952,8 @@ window.AdpReorganizare = function() {
                 membri: lista,
                 populatie: pTot,
                 populatieProiectata: pProiectat,
-                populatieReferinta: pRef(lista),
+                populatieReferinta: pReferinta,
+                sateMutate: sateGrup.filter(x => x.mutat).length,
                 suprafata: lista.reduce((a, i) => a + date.uat[i].a, 0),
                 nrSate: sateGrup.length,
                 timpMediu: mediu,

@@ -66,7 +66,8 @@ function ruleaza(extra) {
     return AdpReorganizare.calculeazaNational(date, vecini, exemple, Object.assign({
         districte: true, executie: executie,
         corectii: AdpReorganizare.alegeriCuCircumscriptii(judecatorii, alegeri.corectii || []),
-        comasari: alegeri.comasari || []
+        comasari: alegeri.comasari || [],
+        transferuri: alegeri.transferuri || []
     }, baza, extra || {}));
 }
 

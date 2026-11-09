@@ -260,8 +260,8 @@ a {
 
 /* ------------------------------------------------------------------ aplicație */
 .aplicatie {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
+    /* harta și panoul, cu despărțitorul dintre ele (js/adp-despartitor.js, Split.js) */
+    display: flex;
     height: calc(100vh - 57px);
     height: calc(100dvh - 57px);
 }
@@ -271,6 +271,44 @@ a {
     background: var(--suprafata);
     overflow: hidden;
     min-height: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.aplicatie > .panou {
+    flex: 0 0 380px;   /* fără scriptul despărțitorului */
+    min-width: 0;
+}
+
+.aplicatie > .gutter {
+    flex: 0 0 8px;
+    position: relative;
+    background: var(--linie);
+    cursor: col-resize;
+    touch-action: none;
+}
+
+.aplicatie > .gutter::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    width: 4px;
+    height: 36px;
+    margin-top: -18px;
+    border-radius: 2px;
+    background: var(--margine);
+}
+
+.aplicatie > .gutter:hover,
+.aplicatie > .gutter:focus-visible {
+    background: var(--accent-fundal);
+    outline: none;
+}
+
+.aplicatie > .gutter:hover::after,
+.aplicatie > .gutter:focus-visible::after {
+    background: var(--accent);
 }
 
 .harta {
@@ -814,6 +852,140 @@ a {
 
 .tabel-pas td {
     vertical-align: top;
+}
+
+.pp-criterii {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+    margin: 14px 0 6px;
+    padding: 10px 12px 12px;
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    font-size: 13.5px;
+}
+
+.pp-criterii legend {
+    padding: 0 4px;
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-2);
+}
+
+.pp-criterii .bifa {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.35;
+}
+
+.pp-criterii .bifa input {
+    margin-top: 2px;
+    flex: none;
+}
+
+.pp-criterii select {
+    width: 100%;
+    min-width: 0;
+}
+
+.pp-moduri {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    margin: 4px 0 8px;
+    font-size: 13.5px;
+}
+
+.pp-moduri .bifa {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.35;
+}
+
+.pp-moduri .bifa input {
+    margin-top: 2px;
+    flex: none;
+}
+
+.pp-pas > .butoane.pp-sus {
+    margin: 0 0 10px;
+}
+
+.pp-pas > .editare-districte {
+    margin-bottom: 12px;
+}
+
+.pp-viu {
+    /* rămâne la vedere cât se derulează criteriile */
+    position: sticky;
+    top: -4px;   /* acoperă și marginea de sus a panoului */
+    z-index: 2;
+    margin: 8px 0 10px;
+    padding: 12px 0 10px;
+    background: var(--panou);
+    border-bottom: 1px solid var(--linie);
+    transition: opacity 0.15s;
+}
+
+.pp-viu:empty {
+    display: none;
+}
+
+.pp-viu.se-calculeaza {
+    opacity: 0.45;
+}
+
+.pp-viu h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+}
+
+.pp-carduri {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.pp-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 7px;
+    border: 1px solid var(--margine);
+    border-left-width: 3px;
+    border-radius: 8px;
+    min-width: 0;
+}
+
+.pp-card .eticheta {
+    font-size: 11px;
+    color: var(--text-2);
+    line-height: 1.25;
+}
+
+.pp-card b {
+    font-size: 16px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.pp-card small {
+    font-size: 10.5px;
+    line-height: 1.3;
+    color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.pp-card.bun {
+    border-left-color: var(--serie-3);
+}
+
+.pp-card.rau {
+    border-left-color: var(--stare-serios);
 }
 
 .pp-dif {
@@ -2033,6 +2205,7 @@ label.inactiv {
 /* ------------------------------------------------------------------ mobil */
 @media (max-width: 860px) {
     .aplicatie {
+        display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: 62vh auto;
         height: auto;

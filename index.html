@@ -95,46 +95,52 @@
 
                     <div class="pp-pas" data-pas="2" hidden>
                         <h3>Alege regulile</h3>
-                        <p class="nota">Pornești de la regulile propuse (v2): comuna are cel puțin 3.000 de locuitori,
-                            orașul ajunge la 10.000, niciun sat nu ajunge la mai mult de 30 de minute de primărie.
-                            Schimbă-le dacă vrei să vezi alt scenariu.</p>
+                        <p class="nota">Pornești de la regulile propuse (v2). Orice schimbare se vede pe loc: pe hartă
+                            și în indicatorii de aici.</p>
+                        <div id="pp-viu" class="pp-viu" aria-live="polite"></div>
                         <div class="formular-scenariu">
-                    <label for="sc-pmin">Banda de populație: <b id="sc-pmin-val"></b></label>
-                    <input id="sc-pmin" type="range" min="1500" max="10000" step="500" value="3000">
-                    <label for="sc-oras">Pragul orașului: <b id="sc-oras-val"></b> loc.</label>
-                    <input id="sc-oras" type="range" min="5000" max="50000" step="1000" value="10000">
-                    <details id="sc-avansat" class="pliant">
-                        <summary>Criterii avansate</summary>
-                        <div class="formular-scenariu">
-                    <label for="sc-tmax">Timp maxim sat → reședință: <b id="sc-tmax-val"></b> min</label>
-                    <input id="sc-tmax" type="range" min="15" max="60" step="5" value="30">
-                    <label for="sc-tfortat">Limita absolută la comasarea forțată: <b id="sc-tfortat-val"></b> min</label>
-                    <input id="sc-tfortat" type="range" min="30" max="90" step="5" value="45">
-                    <label for="sc-pmax">Maximul unei unități rurale: <b id="sc-pmax-val"></b> loc.</label>
-                    <input id="sc-pmax" type="range" min="7500" max="30000" step="500" value="15000">
-                    <label class="bifa"><input id="sc-legal" type="checkbox"> Praguri legale pe rang în locul pragului orașului: oraș 5.000, municipiu 25.000 (Legea 351/2001)</label>
-                    <label class="bifa"><input id="sc-proiectie" type="checkbox" checked> Prag durabil: și populația proiectată la 2050</label>
-                    <label class="bifa"><input id="sc-fortare" type="checkbox" checked> Nicio unitate sub prag (comasare forțată)</label>
-                    <label class="bifa"><input id="sc-urban" type="checkbox" checked> Orașele sub prag pot prelua comune</label>
-                    <label class="bifa"><input id="sc-istorice" type="checkbox"> Unitățile nu trec peste regiunile istorice</label>
-                    <label class="bifa"><input id="sc-district" type="checkbox" checked> Nivel intermediar: zone metropolitane și districte, independente unele de altele</label>
-                    <label for="sc-baza">Desenul districtelor</label>
-                    <select id="sc-baza" class="buton">
-                        <option value="judecatorii" selected>circumscripțiile judecătoriilor (ca la notari)</option>
-                        <option value="gal">teritoriile grupurilor de acțiune locală — mai fărâmițat</option>
-                        <option value="calcul">calculat: fiecare oraș, districtul lui</option>
-                    </select>
-                    <label for="sc-minoritati">Pragul de 20% al minorităților (Codul administrativ, art. 94)</label>
-                    <select id="sc-minoritati" class="buton">
-                        <option value="localitate" selected>se păstrează la nivelul localității componente</option>
-                        <option value="blocheaza">blochează comasarea (litera legii de azi)</option>
-                        <option value="ignora">nu se ia în seamă</option>
-                    </select>
+                            <label for="sc-pmin">Banda de populație: <b id="sc-pmin-val"></b></label>
+                            <input id="sc-pmin" type="range" min="1500" max="10000" step="500" value="3000">
+                            <label for="sc-oras">Pragul orașului: <b id="sc-oras-val"></b> loc.</label>
+                            <input id="sc-oras" type="range" min="5000" max="50000" step="1000" value="10000">
                         </div>
-                    </details>
-                        </div>
+                        <fieldset class="pp-criterii">
+                            <legend>Criteriile de asociere</legend>
+                            <label class="bifa"><input id="sc-proiectie" type="checkbox" checked> <span><b>Prag durabil</b>: pragul se verifică și pe populația proiectată la 2050</span></label>
+                            <label class="bifa"><input id="sc-fortare" type="checkbox" checked> <span><b>Nicio unitate sub prag</b>: ce rămâne mic se comasează forțat, până la limita absolută de drum</span></label>
+                            <label class="bifa"><input id="sc-urban" type="checkbox" checked> <span><b>Orașul preia comune</b>: orașul sub prag preia comunele din jur până ajunge la el</span></label>
+                            <label class="bifa"><input id="sc-uniri-orase" type="checkbox"> <span><b>Orașele mici se pot uni</b> cu orașul vecin, la comasarea forțată</span></label>
+                            <label class="bifa"><input id="sc-leader" type="checkbox" checked> <span><b>Plafonul LEADER</b>: orașul de cel mult 20.000 nu trece de 20.000 prin comasare</span></label>
+                            <label class="bifa"><input id="sc-resedinta" type="checkbox" checked> <span><b>Reședința e localitatea cea mai mare</b> (altfel: cea cu drumul mediu cel mai scurt)</span></label>
+                            <label class="bifa"><input id="sc-istorice" type="checkbox"> <span><b>Regiunile istorice</b>: unitățile nu trec peste ele</span></label>
+                            <label class="bifa"><input id="sc-legal" type="checkbox"> <span><b>Praguri legale pe rang</b> în locul pragului orașului: oraș 5.000, municipiu 25.000 (Legea 351/2001)</span></label>
+                            <label for="sc-minoritati">Pragul de 20% al minorităților (Codul administrativ, art. 94)</label>
+                            <select id="sc-minoritati" class="buton">
+                                <option value="localitate" selected>se păstrează la nivelul localității componente</option>
+                                <option value="blocheaza">blochează comasarea (litera legii de azi)</option>
+                                <option value="ignora">nu se ia în seamă</option>
+                            </select>
+                        </fieldset>
+                        <details id="sc-avansat" class="pliant">
+                            <summary>Limitele de drum și de mărime, districtele</summary>
+                            <div class="formular-scenariu">
+                                <label for="sc-tmax">Timp maxim sat → reședință: <b id="sc-tmax-val"></b> min</label>
+                                <input id="sc-tmax" type="range" min="15" max="60" step="5" value="30">
+                                <label for="sc-tfortat">Limita absolută la comasarea forțată: <b id="sc-tfortat-val"></b> min</label>
+                                <input id="sc-tfortat" type="range" min="30" max="90" step="5" value="45">
+                                <label for="sc-pmax">Maximul unei unități rurale: <b id="sc-pmax-val"></b> loc.</label>
+                                <input id="sc-pmax" type="range" min="7500" max="30000" step="500" value="15000">
+                                <label class="bifa"><input id="sc-district" type="checkbox" checked> Nivel intermediar: zone metropolitane și districte, independente unele de altele</label>
+                                <label for="sc-baza">Desenul districtelor</label>
+                                <select id="sc-baza" class="buton">
+                                    <option value="judecatorii" selected>circumscripțiile judecătoriilor (ca la notari)</option>
+                                    <option value="gal">teritoriile grupurilor de acțiune locală — mai fărâmițat</option>
+                                    <option value="calcul">calculat: fiecare oraș, districtul lui</option>
+                                </select>
+                            </div>
+                        </details>
                         <div class="butoane">
-                            <button id="pp-genereaza" class="buton principal" type="button">Generează reorganizarea</button>
+                            <button id="pp-genereaza" class="buton principal" type="button">Vezi raportul înainte și după</button>
                             <button class="buton" type="button" data-mergi="1">Înapoi</button>
                         </div>
                     </div>
@@ -144,6 +150,27 @@
                         <div class="straturi" role="radiogroup" aria-label="Ce arată harta">
                             <label><input type="radio" name="pp-harta" value="inainte"><span>Harta de azi</span></label>
                             <label><input type="radio" name="pp-harta" value="dupa" checked><span>Harta propusă</span></label>
+                        </div>
+                        <div class="butoane pp-sus">
+                            <button id="pp-editeaza" class="buton" type="button" aria-pressed="false">Modifică de mână: unește comune, mută sate</button>
+                        </div>
+                        <div id="sc-editare" class="detalii editare-districte" hidden>
+                            <h4>Modifică de mână</h4>
+                            <div class="pp-moduri" role="radiogroup" aria-label="Ce se schimbă">
+                                <label class="bifa"><input type="radio" name="sc-mod-editare" value="comasare" checked> <span><b>Unește două comune</b>: clic pe una, apoi pe cealaltă</span></label>
+                                <label class="bifa"><input type="radio" name="sc-mod-editare" value="sat"> <span><b>Un sat trece în altă comună</b>: clic pe sat, apoi pe unitatea vecină</span></label>
+                                <label class="bifa"><input type="radio" name="sc-mod-editare" value="district"> <span><b>Comuna trece în alt district</b></span></label>
+                            </div>
+                            <p id="sc-ajutor-editare" class="nota"></p>
+                            <label for="sc-tinta" id="sc-tinta-eticheta">Districtul-țintă</label>
+                            <select id="sc-tinta" class="buton"></select>
+                            <ul id="sc-alegeri" class="lista-alegeri"></ul>
+                            <p id="sc-stare-salvare" class="nota" role="status"></p>
+                            <div class="butoane">
+                                <button id="sc-salveaza" class="buton principal" type="button">Salvează</button>
+                                <button id="sc-renunta" class="buton" type="button">Renunță</button>
+                                <button id="sc-descarca" class="buton" type="button">Descarcă fișierul</button>
+                            </div>
                         </div>
                         <div id="pp-raport" aria-live="polite"></div>
                         <div class="butoane">
@@ -185,23 +212,6 @@
                         <button id="sc-final" class="buton" type="button">Harta finală</button>
                         <button id="sc-editeaza" class="buton" type="button" aria-pressed="false">Reorganizează</button>
                         <button id="sc-inchide" class="buton" type="button" hidden>Închide scenariul</button>
-                    </div>
-                </div>
-                <div id="sc-editare" class="detalii editare-districte" hidden>
-                    <h3>Reorganizează districtele și comunele</h3>
-                    <div class="straturi" role="radiogroup" aria-label="Ce se schimbă">
-                        <label><input type="radio" name="sc-mod-editare" value="district" checked><span>Comuna trece în alt district</span></label>
-                        <label><input type="radio" name="sc-mod-editare" value="comasare"><span>Comuna se comasează cu alta</span></label>
-                    </div>
-                    <p id="sc-ajutor-editare" class="nota"></p>
-                    <label for="sc-tinta" id="sc-tinta-eticheta">Districtul-țintă</label>
-                    <select id="sc-tinta" class="buton"></select>
-                    <ul id="sc-alegeri" class="lista-alegeri"></ul>
-                    <p id="sc-stare-salvare" class="nota" role="status"></p>
-                    <div class="butoane">
-                        <button id="sc-salveaza" class="buton principal" type="button">Salvează</button>
-                        <button id="sc-renunta" class="buton" type="button">Renunță</button>
-                        <button id="sc-descarca" class="buton" type="button">Descarcă fișierul</button>
                     </div>
                 </div>
                 <div id="sc-rezultat" aria-live="polite"></div>
@@ -312,6 +322,8 @@
     </main>
 
     <script src="vendor/leaflet/leaflet.js"></script>
+    <script src="vendor/split/split.min.js"></script>
+    <script src="js/adp-despartitor.js"></script>
     <script src="js/adp-topologie.js"></script>
     <script src="js/adp-harta.js"></script>
     <script src="js/adp-reorganizare.js"></script>
