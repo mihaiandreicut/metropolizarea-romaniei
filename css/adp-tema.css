@@ -315,7 +315,7 @@ a {
 /* selector de strat: butoane segmentate */
 .straturi {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
 }
 
@@ -532,6 +532,11 @@ a {
     cursor: pointer;
 }
 
+/* display: inline-flex ar anula atributul hidden */
+.buton[hidden] {
+    display: none;
+}
+
 .buton.principal {
     background: var(--accent);
     border-color: var(--accent);
@@ -654,8 +659,15 @@ a {
 /* ------------------------------------------------------------------ scenariu de reorganizare */
 .formular-scenariu {
     display: grid;
+    /* coloana nu se lărgește după cea mai lungă opțiune a unei liste: rămâne cât panoul */
+    grid-template-columns: minmax(0, 1fr);
     gap: 6px;
     font-size: 14px;
+}
+
+.formular-scenariu select {
+    width: 100%;
+    min-width: 0;
 }
 
 .formular-scenariu input[type="range"] {
@@ -671,6 +683,7 @@ a {
 
 .formular-scenariu .butoane {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 6px;
 }
@@ -855,11 +868,13 @@ label.inactiv {
 
 .cascada {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 6px;
 }
 
 .cascada select {
     width: 100%;
+    min-width: 0;
 }
 
 .cascada select:disabled {
