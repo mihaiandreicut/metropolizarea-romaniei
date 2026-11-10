@@ -344,7 +344,7 @@ window.AdpScenariu = function() {
         $("#sc-tmax-val").textContent = $("#sc-tmax").value;
         $("#sc-oras-val").textContent = NF.format(Number($("#sc-oras").value));
         const birou = Number($("#sc-birou").value);
-        $("#sc-birou-val").textContent = `${birou}%` + (birou === 25 ? " (un sfert, calculul de bază)" : birou === 0 ? " (nimic: plafonul teoretic)" : "");
+        $("#sc-birou-val").textContent = `${birou}%` + (birou === 25 ? " (calculul de bază)" : birou === 0 ? " (plafonul teoretic)" : "");
         $("#sc-pmax-val").textContent = NF.format(Number($("#sc-pmax").value));
         $("#sc-tfortat-val").textContent = $("#sc-tfortat").value;
         // pragul unic de autonomie e înlocuit de pragurile de rang, când sunt active
@@ -1920,10 +1920,11 @@ window.AdpScenariu = function() {
     /** Rândurile comparației azi / propus, pentru teritoriul calculat (folosite și la descărcare). */
     function randuriComparatie(r) {
         const P = r.parametri, a = r.inainte, d = r.dupa;
-        const R = D.reorganizare;
         const pop = i => D.date.uat[i].pop || 0;
         const c = costAparat(r.grupuri);
         const e = indicatoriEconomici(r);
+        // aleșii, după Codul administrativ: consilierii pe populația după domiciliu, fără București
+        const al = window.AdpInstitutii ? window.AdpInstitutii.alesiLocali(D.date, r.uat, r.grupuri) : null;
         const mare = c && c.acum >= 1e9;
         const bani = v => NF1.format(v / (mare ? 1e9 : 1e6));
         const min = v => NF1.format(v) + " min";
@@ -1935,17 +1936,11 @@ window.AdpScenariu = function() {
                 azi: r.uat.filter(i => esteOras(i) && pop(i) < P.pMinOras).length,
                 dupa: r.grupuri.filter(g => g.urban && g.populatie < P.pMinOras).length },
             { nume: `Unități sub prag în ${P.anProiectie}`, azi: a.subPrag2050, dupa: d.subPrag2050 },
-            { nume: "Primari", azi: a.unitati, dupa: d.unitati },
-            window.AdpInstitutii && { nume: "Viceprimari", ...(() => {
-                const V = window.AdpInstitutii.viceprimari;
-                return {
-                    azi: Array.from(new Set(r.uat.concat(r.neacoperite || []))).reduce((s, i) => s + V(D.date.uat[i]), 0),
-                    dupa: r.grupuri.reduce((s, g) => s + (g.membri.some(i => V(D.date.uat[i]) === 2) ? 2 : 1), 0) +
-                        (r.neacoperite || []).reduce((s, i) => s + V(D.date.uat[i]), 0)
-                };
-            })() },
-            { nume: "Consilieri locali", azi: r.uat.reduce((s, i) => s + R.consilieriLocali(pop(i)), 0),
-                dupa: r.grupuri.reduce((s, g) => s + R.consilieriLocali(g.populatie, R.FACTOR_CONSILIERI), 0) },
+            ...(al ? [
+                { nume: "Primari", azi: al.primari[0], dupa: al.primari[1] },
+                { nume: "Viceprimari", azi: al.viceprimari[0], dupa: al.viceprimari[1] },
+                { nume: "Consilieri locali", azi: al.consilieriLocali[0], dupa: al.consilieriLocali[1] }
+            ] : []),
             e && { nume: `Aparatul primăriilor, ${mare ? "mld." : "mil."} lei pe an`, azi: e.aparatAzi, dupa: e.aparatDupa, fmt: bani },
             e && { nume: "Aparatul pe locuitor, lei pe an", azi: e.peLocAzi, dupa: e.peLocDupa },
             e && e.aparatCJ && { nume: `Aparatul ${tipPas(pasCheie) === "judet" ? "consiliului județean" : "consiliilor județene"}, ${mare ? "mld." : "mil."} lei pe an`,
@@ -2057,8 +2052,9 @@ window.AdpScenariu = function() {
                 ${NF.format(P.pMinOras)}–${NF.format(P.pTintaOras)}, cel mult ${P.tMax} de minute până la reședință.
                 Populația: rezidentă, estimată la 1 ianuarie 2026 din recensământ și datele INS. Costul: execuția bugetară 2025; unitatea nouă
                 păstrează aparatul primăriei-reședință și ${Math.round(cotaBirouri() * 100)}% din al fiecărei primării desființate${
-                    Math.round(cotaBirouri() * 100) === Math.round(COTA_BIROURI_IMPLICITA * 100) ? "" : ` (în calculul de bază, ${Math.round(COTA_BIROURI_IMPLICITA * 100)}%)`}. Consilierii:
-                Codul administrativ, art. 112, cu un consilier la dublul populației în propunere.
+                    Math.round(cotaBirouri() * 100) === Math.round(COTA_BIROURI_IMPLICITA * 100) ? "" : ` (în calculul de bază, ${Math.round(COTA_BIROURI_IMPLICITA * 100)}%)`}. Aleșii:
+                Codul administrativ, art. 148 și 112 — consilierii pe populația după domiciliu, ca în lege, cu un consilier
+                la dublul populației în propunere; Bucureștiul nu se numără.
                 <a href="#sc-rezultat" id="pp-detalii">Toate detaliile: banii, districtele, satele</a> ·
                 <a href="raport.html#judete">fișele de județ din raport</a>.</p>`;
         document.querySelectorAll("#pp-raport tr[data-cheie]").forEach(tr => {
@@ -2092,7 +2088,7 @@ window.AdpScenariu = function() {
                 const tinta = $("#pp-institutii");
                 if (!tinta || rezultatPas() !== r) return;
                 tinta.innerHTML = window.AdpInstitutii.fisaJudet(D.date, r, cod, Object.assign({ judecatorii: judecatorii }, s),
-                    { clasa: "tabel-atribute tabel-pas", titlu: "h4" });
+                    { clasa: "tabel-atribute tabel-pas", titlu: "h4", ingust: true });
             }).catch(e => console.warn(`[ro-adp] Fișa de instituții nu a putut fi calculată (${e.message}).`));
         }
     }

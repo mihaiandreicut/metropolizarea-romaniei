@@ -3,9 +3,12 @@
 
    O singură fișă, folosită de pasul 3 de pe hartă (index.html) și de fișele de
    județ din raport.html, ca amândouă să arate aceleași cifre:
-     * aleșii și funcțiile, după Codul administrativ (OUG 57/2019): primari,
-       viceprimari, consilieri locali, delegați sătești, consilieri județeni,
-       președintele și vicepreședinții consiliului județean;
+     * aleșii și funcțiile, după Codul administrativ (OUG 57/2019): primari și
+       viceprimari (art. 148), consilieri locali (art. 112), delegați sătești
+       (art. 142), consilieri județeni (art. 171), președintele și vicepreședinții
+       consiliului județean (art. 188). Consilierii se numără, ca în lege, pe
+       populația după domiciliu din anul alegerilor; Bucureștiul, care rămâne
+       cum e, nu intră în numărătoare;
      * consiliul județean și unde se mută fiecare atribuție a lui, cu banii;
      * judecătoriile de azi și districtele propuse, cu piesele fiecăruia;
      * grupurile de acțiune locală (GAL) de azi și microregiunile propuse;
@@ -19,14 +22,22 @@ window.AdpInstitutii = function() {
     const NF = new Intl.NumberFormat("ro-RO");
     const NF1 = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 1 });
 
-    // Codul administrativ, art. 152 alin. (1): un viceprimar în fiecare comună, oraș și municipiu,
+    // Codul administrativ, art. 148 alin. (1): un viceprimar în fiecare comună, oraș și municipiu,
     // doi în municipiile reședință de județ. Propunerea guvernului din 2025 de a desființa funcția
     // în unitățile sub 1.500 de locuitori a fost scoasă din pachetul de măsuri: nu e lege.
     const viceprimari = u => u.t === "municipiu" && u.r ? 2 : 1;
-    // consiliul județean își alege, dintre consilieri, doi vicepreședinți; președintele e ales direct
+    // art. 188: consiliul județean își alege, dintre consilieri, doi vicepreședinți; președintele e ales direct
     const VICEPRESEDINTI_CJ = 2;
-    // Codul administrativ, art. 171: consilieri județeni (plus președintele), după populația județului
+    // art. 171: consilieri județeni (plus președintele), după populația județului
     const CONSILIERI_JUDETENI = [[350000, 30], [500000, 32], [650000, 34], [Infinity, 36]];
+    // art. 112 și 171: numărul consilierilor se stabilește pe populația după domiciliu de la 1 ianuarie
+    // a anului alegerilor — pentru consiliile de azi, 2024 (câmpul p24). E altă cifră decât populația
+    // rezidentă pe care se judecă pragurile de comasare.
+    const AN_ALEGERI = 2024;
+    const popAlegeri = u => u.p24 || u.pd || u.pop || 0;
+    // Bucureștiul are regulile lui (primar general, sectoare, Consiliul General cu 55 de membri, art. 112
+    // și 164) și rămâne cum e: nu intră în numărătoarea aleșilor, nici azi, nici în propunere
+    const esteBucuresti = u => u.t === "municipiu" && u.n === "București";
     // costul unui salariat pentru angajator: câștigul brut plus contribuția asiguratorie pentru muncă
     const COST_ANGAJATOR = 1.0225;
     // din aparatul consiliului județean, jumătate trece la personalul tehnic al districtelor și al
@@ -56,19 +67,22 @@ window.AdpInstitutii = function() {
      * mai mare rest. Fiecare județ e o circumscripție.
      */
     function consiliiRegionale(date, factor) {
-        const popJudet = new Map(), adrJudet = new Map(), popAdr = new Map();
+        const popJudet = new Map(), adrJudet = new Map(), popAdr = new Map(), legalJudet = new Map();
         date.uat.forEach(u => {
             popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.pop || 0));
+            legalJudet.set(u.j, (legalJudet.get(u.j) || 0) + popAlegeri(u));
             popAdr.set(u.adr, (popAdr.get(u.adr) || 0) + (u.pop || 0));
             adrJudet.set(u.j, u.adr);
         });
         const scara = scaraLargita(CONSILIERI_JUDETENI, factor || 1);
         return date.adr.map(a => {
             const populatie = popAdr.get(a.c) || 0;
+            // locurile se socotesc, ca în art. 171, pe populația după domiciliu; cea afișată e rezidentă
             const judete = date.judete.filter(j => adrJudet.get(j.c) === a.c)
-                .map(j => ({ c: j.c, nume: j.n, populatie: popJudet.get(j.c) || 0 }));
-            const locuri = dupaScara(scara, populatie);
-            const cote = judete.map(j => locuri * j.populatie / (populatie || 1));
+                .map(j => ({ c: j.c, nume: j.n, populatie: popJudet.get(j.c) || 0, legal: legalJudet.get(j.c) || 0 }));
+            const legal = judete.reduce((s, j) => s + j.legal, 0);
+            const locuri = dupaScara(scara, legal);
+            const cote = judete.map(j => locuri * j.legal / (legal || 1));
             const impartite = cote.map(Math.floor);
             cote.map((c, k) => ({ k: k, rest: c - Math.floor(c) })).sort((x, y) => y.rest - x.rest)
                 .slice(0, locuri - impartite.reduce((s, v) => s + v, 0)).forEach(x => { impartite[x.k]++; });
@@ -80,6 +94,33 @@ window.AdpInstitutii = function() {
                 judete: judete.map((j, k) => Object.assign(j, { locuri: impartite[k] })).sort((x, y) => y.locuri - x.locuri)
             };
         });
+    }
+
+    /**
+     * Aleșii locali ai unui teritoriu, azi și în propunere, după Codul administrativ: primari și
+     * viceprimari (art. 148), consilieri locali (art. 112, pe populația după domiciliu din anul
+     * alegerilor; în propunere, aceeași scară la `FACTOR_CONSILIERI` ori populația). `uat` = indecșii
+     * UAT-urilor de azi, `grupuri` = unitățile noi. Bucureștiul nu se numără.
+     */
+    function alesiLocali(date, uat, grupuri) {
+        const R = window.AdpReorganizare;
+        const ale = uat.filter(i => !esteBucuresti(date.uat[i]));
+        const noi = grupuri.filter(g => !g.membri.some(i => esteBucuresti(date.uat[i])));
+        const popUnitate = g => g.membri.reduce((a, i) => a + popAlegeri(date.uat[i]), 0);
+        const viceDupa = g => g.membri.some(i => viceprimari(date.uat[i]) === 2) ? 2 : 1;
+        return {
+            primari: [ale.length, noi.length],
+            viceprimari: [ale.reduce((a, i) => a + viceprimari(date.uat[i]), 0), noi.reduce((a, g) => a + viceDupa(g), 0)],
+            consilieriLocali: [ale.reduce((a, i) => a + R.consilieriLocali(popAlegeri(date.uat[i])), 0),
+                noi.reduce((a, g) => a + R.consilieriLocali(popUnitate(g), R.FACTOR_CONSILIERI), 0)]
+        };
+    }
+
+    /** Consilierii fiecărui consiliu județean de azi (art. 171, fără președinte): Map cod județ → număr. */
+    function consilieriJudeteni(date) {
+        const legal = new Map();
+        date.uat.forEach(u => { if (!esteBucuresti(u)) legal.set(u.j, (legal.get(u.j) || 0) + popAlegeri(u)); });
+        return new Map(Array.from(legal.entries()).map(([cod, p]) => [cod, dupaScara(CONSILIERI_JUDETENI, p)]));
     }
 
     /**
@@ -262,21 +303,18 @@ window.AdpInstitutii = function() {
         const consiliuRegional = consiliiRegionale(date, R.FACTOR_CONSILIERI)
             .find(x => x.judete.some(j => j.c === cod)) || null;
         const locuriRegionale = consiliuRegional ? (consiliuRegional.judete.find(j => j.c === cod) || {}).locuri || 0 : 0;
-        const viceDupa = g => g.membri.some(i => viceprimari(date.uat[i]) === 2) ? 2 : 1;
         const sate = (r.sate || []).filter(x => date.uat[x.uat].j === cod);
-        const alesi = {
-            primari: [toate.length, grupuri.length],
-            viceprimari: [toate.reduce((a, i) => a + viceprimari(date.uat[i]), 0), grupuri.reduce((a, g) => a + viceDupa(g), 0)],
-            consilieriLocali: [toate.reduce((a, i) => a + R.consilieriLocali(pop(i)), 0),
-                grupuri.reduce((a, g) => a + R.consilieriLocali(g.populatie, R.FACTOR_CONSILIERI), 0)],
-            delegati: [0, sate.length],
+        const alesi = Object.assign(alesiLocali(date, toate, grupuri), {
+            // în model, fiecare sat își alege delegatul și are un fond al lui; azi delegatul există doar
+            // în satele fără consilier (art. 142), fără buget — câți sunt nu se știe din date
+            delegati: [null, sate.length],
             secretari: [toate.length, grupuri.length],
-            consilieriJudeteni: [dupaScara(CONSILIERI_JUDETENI, popJudet), locuriRegionale],
+            consilieriJudeteni: [consilieriJudeteni(date).get(cod) || 0, locuriRegionale],
             conducereCJ: [1 + VICEPRESEDINTI_CJ, 0],
             sub1500: [toate.filter(i => pop(i) < 1500).length, grupuri.filter(g => g.populatie < 1500).length],
             consiliuRegional: consiliuRegional,
             districte: districte.length
-        };
+        });
 
         // judecătoriile de azi și districtele propuse
         let judecatorii = null;
@@ -398,109 +436,123 @@ window.AdpInstitutii = function() {
 
     /**
      * Fișa ca HTML. `optiuni.clasa`: clasa tabelelor (raportul: „tabel-doc”, panoul hărții:
-     * „tabel-atribute tabel-pas”); `optiuni.titlu`: nivelul titlurilor („h3” sau „h4”).
+     * „tabel-atribute tabel-pas”); `optiuni.titlu`: nivelul titlurilor („h3” sau „h4”);
+     * `optiuni.ingust`: varianta pentru panoul îngust al hărții — cel mult trei coloane, cu
+     * explicațiile sub numele rândului, nu într-o coloană a lor.
      */
     function fisaJudet(date, r, cod, s, optiuni) {
-        const o = Object.assign({ clasa: "tabel-doc", titlu: "h4" }, optiuni || {});
+        const o = Object.assign({ clasa: "tabel-doc", titlu: "h4", ingust: false }, optiuni || {});
+        const ingust = o.ingust;
         const x = sumarJudet(date, r, cod, s);
         const a = x.alesi;
         const H = (text, mic) => `<${o.titlu}>${text}${mic ? ` <small class="nota">${mic}</small>` : ""}</${o.titlu}>`;
         const tabel = (cap, randuri) => `<div class="tabel-derulant"><table class="${o.clasa} tabel-institutii">
-            <thead><tr>${cap.map(c => `<th scope="col">${c}</th>`).join("")}</tr></thead>
+            <thead><tr>${cap.map(c => c.charAt(0) === "#" ? `<th scope="col" class="num">${c.slice(1)}</th>` : `<th scope="col">${c}</th>`).join("")}</tr></thead>
             <tbody>${randuri.join("")}</tbody></table></div>`;
-        const dif = (azi, dupa) => azi === dupa ? "" : `<small class="pp-dif">${dupa > azi ? "+" : "−"}${NF.format(Math.abs(dupa - azi))}</small>`;
-        const randAles = (functia, regula, azi, dupa, nota) => `<tr>
-            <th scope="row">${functia}<br><small>${regula}</small></th>
-            <td>${NF.format(azi)}</td><td><b>${NF.format(dupa)}</b> ${dif(azi, dupa)}</td>
-            <td><small>${nota}</small></td></tr>`;
+        // un rând: capul lui (cu explicații mărunte dedesubt) și celulele; în varianta îngustă,
+        // coloanele `inCap` coboară sub nume
+        const mic = lista => { const ce = lista.filter(Boolean); return ce.length ? `<br><small>${ce.join(" · ")}</small>` : ""; };
+        const rand = (nume, sub, celule, inCap, clasa) => `<tr${clasa ? ` class="${clasa}"` : ""}>
+            <th scope="row">${nume}${mic(sub || [])}${ingust ? (inCap || []).filter(Boolean).map(c => `<small class="fisa-schimbare">${c}</small>`).join("") : ""}</th>
+            ${celule.join("")}${ingust ? "" : (inCap || []).map(c => `<td><small>${c}</small></td>`).join("")}</tr>`;
+        const num = v => `<td class="num">${v}</td>`;
+        const dif = (azi, dupa) => azi === null || azi === dupa ? "" : ` <small class="pp-dif">${dupa > azi ? "+" : "−"}${NF.format(Math.abs(dupa - azi))}</small>`;
+        const randAles = (functia, regula, [azi, dupa], nota, clasa) => rand(functia, [regula],
+            [num(azi === null ? "—" : NF.format(azi)), num(`<b>${NF.format(dupa)}</b>${dif(azi, dupa)}`)],
+            [nota && ingust ? `→ ${nota}` : nota], clasa);
+
         const totalAzi = a.primari[0] + a.consilieriLocali[0] + a.consilieriJudeteni[0] + 1;
         const totalDupa = a.primari[1] + a.consilieriLocali[1] + a.consilieriJudeteni[1];
-        const remAzi = a.primari[0] + a.viceprimari[0] + a.conducereCJ[0];
-        const remDupa = a.primari[1] + a.viceprimari[1];
+        const demnAzi = a.primari[0] + a.viceprimari[0] + a.conducereCJ[0];
+        const demnDupa = a.primari[1] + a.viceprimari[1];
         const regiune = a.consiliuRegional;
 
         const sectiuneAlesi = `
-            ${H("Aleși și funcții, după Codul administrativ", "— azi, după legea în vigoare; propus, după aceleași reguli aplicate unităților noi")}
-            ${tabel(["Funcția", "Azi", "Propus", "Cum se schimbă"], [
-                randAles("Primari", "unul în fiecare comună, oraș, municipiu", a.primari[0], a.primari[1],
-                    "unul în fiecare unitate nouă; satele comasate își aleg delegatul"),
-                randAles("Viceprimari", "art. 152: unul; doi în municipiul reședință de județ", a.viceprimari[0], a.viceprimari[1],
-                    "aceeași regulă, pe unitățile noi; aleși dintre consilieri, deci nu se adaugă la aleși"),
-                randAles("Consilieri locali", "art. 112: de la 9 (sub 1.500 loc.) la 31", a.consilieriLocali[0], a.consilieriLocali[1],
+            ${H("Aleși și funcții, după Codul administrativ")}
+            ${tabel(["Funcția", "#Azi", "#Propus"].concat(ingust ? [] : ["Cum se schimbă"]), [
+                randAles("Primari", "art. 148: unul în fiecare comună, oraș și municipiu", a.primari,
+                    "unul în fiecare unitate nouă"),
+                randAles("Viceprimari", "art. 148: unul; doi în municipiul reședință de județ", a.viceprimari,
+                    "aceeași regulă, pe unitățile noi; sunt aleși dintre consilieri"),
+                randAles("Consilieri locali", `art. 112: de la 9 la 31, după populația cu domiciliul în localitate`, a.consilieriLocali,
                     "aceeași scară, la dublul populației: un consilier la de două ori mai mulți locuitori"),
-                randAles("Delegați sătești, cu fond propriu", "art. 142: doar în satele fără consilier", a.delegati[0], a.delegati[1],
-                    "fiecare sat comasat își alege delegatul, care participă la consiliul local"),
-                randAles("Secretari generali ai unității", "unul în fiecare UAT", a.secretari[0], a.secretari[1],
+                randAles("Delegați sătești cu fond propriu", "art. 142: azi, doar în satele fără consilier, fără buget", a.delegati,
+                    "fiecare sat își alege delegatul, care are un fond al satului și vine la consiliul local"),
+                randAles("Secretari generali ai unității", "funcționar public de conducere, unul în fiecare UAT", a.secretari,
                     "unul în fiecare unitate; în fostele primării rămân birouri, nu secretariate"),
-                randAles("Consilieri județeni → regionali", "art. 171: 30–36 pe județ, după populație",
-                    a.consilieriJudeteni[0], a.consilieriJudeteni[1],
-                    regiune ? `locurile județului în consiliul regional ${esc(regiune.nume)} (${NF.format(regiune.locuri)} în total), după populație` : ""),
-                randAles("Președinte și vicepreședinți ai consiliului județean", "președinte ales direct, 2 vicepreședinți",
-                    a.conducereCJ[0], a.conducereCJ[1],
-                    "consiliul județean dispare; regiunea are un singur președinte și vicepreședinții ei"),
-                `<tr class="rand-total"><th scope="row">Aleși, în total<br><small>primari, consilieri locali, consilieri județeni, președintele CJ</small></th>
-                    <td>${NF.format(totalAzi)}</td><td><b>${NF.format(totalDupa)}</b> ${dif(totalAzi, totalDupa)}</td>
-                    <td><small>viceprimarii și vicepreședinții sunt aleși dintre consilieri</small></td></tr>`,
-                `<tr class="rand-total"><th scope="row">Funcții de demnitate publică, plătite<br><small>primari, viceprimari, conducerea CJ</small></th>
-                    <td>${NF.format(remAzi)}</td><td><b>${NF.format(remDupa)}</b> ${dif(remAzi, remDupa)}</td>
-                    <td><small>în ${cate(a.districte, "district", "districte")}, consiliul e format din primari, fără indemnizație în plus</small></td></tr>`
+                randAles("Consilieri județeni → regionali", "art. 171: 30–36 pe județ, după populație", a.consilieriJudeteni,
+                    regiune ? `locurile județului în consiliul regional ${esc(regiune.nume)}, care are ${NF.format(regiune.locuri)} în total` : ""),
+                randAles("Președinte și vicepreședinți ai consiliului județean", "președinte ales direct; art. 188: doi vicepreședinți", a.conducereCJ,
+                    "consiliul județean dispare; regiunea are un singur președinte, cu vicepreședinții lui"),
+                randAles("Aleși, în total", "primari, consilieri locali, consilieri județeni, președintele consiliului județean",
+                    [totalAzi, totalDupa], "viceprimarii și vicepreședinții nu se adună: sunt aleși dintre consilieri", "rand-total"),
+                randAles("Funcții de demnitate publică", "primari, viceprimari, președintele și vicepreședinții consiliului județean",
+                    [demnAzi, demnDupa], `în ${cate(a.districte, "district", "districte")}, consiliul e format din primari, fără indemnizație în plus`, "rand-total")
             ])}
-            <p class="nota">Cifrele de azi urmează Codul administrativ în vigoare. Desființarea viceprimarului în unitățile
-                sub 1.500 de locuitori, propusă de guvern în 2025, a fost scoasă din pachetul de măsuri; în județ ar fi
-                atins ${cate(a.sub1500[0], "UAT", "UAT-uri")} azi și ${a.sub1500[1] ? cate(a.sub1500[1], "unitate", "unități") : "nicio unitate"} după comasare.</p>`;
+            <p class="nota">„Azi” urmează Codul administrativ în vigoare. Consilierii se numără, cum cere legea, pe populația
+                după domiciliu de la 1 ianuarie ${AN_ALEGERI}, anul alegerilor — nu pe cea rezidentă, pe care se judecă pragurile
+                de comasare. Desființarea viceprimarului în unitățile sub 1.500 de locuitori, propusă de guvern în 2025, nu a
+                devenit lege; în județ ar fi atins ${cate(a.sub1500[0], "UAT", "UAT-uri")} azi și
+                ${a.sub1500[1] ? cate(a.sub1500[1], "unitate", "unități") : "nicio unitate"} după comasare.</p>`;
 
-        // instituțiile, pe scurt
+        // instituțiile, pe scurt: tabel în raport, listă în panoul îngust
         const j = x.judecatorii, g = x.gal, cj = x.cj, st = x.stat;
         const cuJudecatorie = j ? x.districte.filter(d => (j.peDistrict.get(d.sediu) || {}).sediuInDistrict).length : 0;
         const cuSpital = x.districte.filter(d => (x.piese.get(d.sediu) || {}).spitale).length;
         const microInPrag = x.microregiuni.filter(m => m.inBanda).length;
-        const rand = (inst, azi, propus) => `<tr><th scope="row">${inst}</th><td>${azi}</td><td>${propus}</td></tr>`;
+        const pesteJudet = g ? g.lista.filter(y => y.pesteJudet).length : 0;
+        const institutii = [
+            ["Primăriile", `${NF.format(x.uat)} primării și consilii locale`,
+                `<b>${NF.format(x.unitati)}</b>; în fostele primării, birou cu program și delegat sătesc`],
+            ["Consiliul județean", cj ? `un consiliu, ${lei(cj.total)} pe an (${x.anCJ})` : "un consiliu",
+                cj ? `<b>dispare</b>: ${lei(cj.regiune.lei)} trec la regiune, ${lei(cj.district.lei)} la districte; aparatul, ${lei(cj.aparat.lei)} → ${lei(cj.aparat.lei * COTA_CJ_PASTRATA)}`
+                    : "<b>dispare</b>; atribuțiile trec la regiune și la districte"],
+            ["Districte (nivelul dintre comună și regiune)", "—",
+                `<b>${NF.format(x.districte.length)}</b>: ${x.districte.map(d => esc(d.nume)).join(", ") || "—"}`],
+            j && ["Judecătorii, parchete, notari", `${cate(j.lista.length, "judecătorie", "judecătorii")}: ${j.lista.map(y => esc(y.numeSediu)).join(", ")}`,
+                `câte una în fiecare district: <b>${NF.format(cuJudecatorie)}</b> din ${NF.format(x.districte.length)} au deja sediul în district` +
+                (x.districte.length - cuJudecatorie ? `; ${cate(x.districte.length - cuJudecatorie, "district primește", "districte primesc")} un punct de lucru sau se unesc cu vecinul` : "")],
+            g && ["Grupuri de acțiune locală (LEADER)", cate(g.lista.length, "grup", "grupuri") +
+                (pesteJudet ? `, ${NF.format(pesteJudet)} peste granița județului` : "") +
+                (g.inAfara ? `; ${cate(g.inAfara, "UAT", "UAT-uri")} în afara oricărui grup` : ""),
+                `<b>${cate(x.microregiuni.length, "microregiune", "microregiuni")}</b>, fiecare cu un oraș-pol și întreagă într-un district; ${NF.format(microInPrag)} în pragurile LEADER`],
+            ["Spitale publice", NF.format(x.spitaleAzi),
+                `spitalele județene trec la regiune; spital public în <b>${NF.format(cuSpital)}</b> din ${NF.format(x.districte.length)} districte`],
+            st && ["Prefectura și serviciile statului", `${NF.format(st.total)} instituții cu structură în județ` +
+                (x.salariati && x.salariati.O ? `; ${NF.format(x.salariati.O)} de salariați în administrația publică (INS, ${x.anPersonal})` : ""),
+                `${NF.format(st.nrRegiune)} devin regionale (regiunea ${esc(st.regiune)}), ${NF.format(st.district)} au ghișeu în fiecare district; ` +
+                `în ${esc(st.resedinta || "fosta reședință")} rămâne oficiul județean unic` +
+                (st.grupuri.some(y => y.inJudet) ? ` și sediul regional pentru: ${st.grupuri.filter(y => y.inJudet).map(y => esc(y.g.nume.toLowerCase())).join("; ")}` : "")]
+        ].filter(Boolean);
         const sectiuneSumar = `
             ${H("Instituțiile județului, azi și propus")}
-            ${tabel(["Instituția", "Azi", "Propus"], [
-                rand("Primăriile", `${NF.format(x.uat)} primării și consilii locale`,
-                    `<b>${NF.format(x.unitati)}</b>; în fostele primării, birou cu program și delegat sătesc`),
-                rand("Consiliul județean", cj ? `un consiliu, ${lei(cj.total)} pe an (${x.anCJ})` : "un consiliu",
-                    cj ? `<b>dispare</b>: ${lei(cj.regiune.lei)} trec la regiune, ${lei(cj.district.lei)} la districte; aparatul, ${lei(cj.aparat.lei)} → ${lei(cj.aparat.lei * COTA_CJ_PASTRATA)}`
-                        : "<b>dispare</b>; atribuțiile trec la regiune și la districte"),
-                rand("Districte (nivelul dintre comună și regiune)", "—",
-                    `<b>${NF.format(x.districte.length)}</b>: ${x.districte.map(d => esc(d.nume)).join(", ") || "—"}`),
-                j ? rand("Judecătorii, parchete, notari", `${cate(j.lista.length, "judecătorie", "judecătorii")}: ${j.lista.map(y => esc(y.numeSediu)).join(", ")}`,
-                    `câte una în fiecare district: <b>${NF.format(cuJudecatorie)}</b> din ${NF.format(x.districte.length)} au deja sediul în district` +
-                    (x.districte.length - cuJudecatorie ? `; ${cate(x.districte.length - cuJudecatorie, "district primește", "districte primesc")} un punct de lucru sau se unesc cu vecinul` : "")) : "",
-                g ? rand("Grupuri de acțiune locală (LEADER)", `${cate(g.lista.length, "grup", "grupuri")}` +
-                    (g.lista.filter(y => y.pesteJudet).length ? `, ${NF.format(g.lista.filter(y => y.pesteJudet).length)} peste granița județului` : "") +
-                    (g.inAfara ? `; ${cate(g.inAfara, "UAT", "UAT-uri")} în afara oricărui grup` : ""),
-                    `<b>${cate(x.microregiuni.length, "microregiune", "microregiuni")}</b>, fiecare cu un oraș-pol și întreagă într-un district; ${NF.format(microInPrag)} în pragurile LEADER`) : "",
-                rand("Spitale publice", `${NF.format(x.spitaleAzi)}`,
-                    `spitalele județene trec la regiune; spital public în <b>${NF.format(cuSpital)}</b> din ${NF.format(x.districte.length)} districte`),
-                st ? rand("Prefectura și serviciile statului", `${NF.format(st.total)} instituții cu structură în județ` +
-                    (x.salariati && x.salariati.O ? `; ${NF.format(x.salariati.O)} de salariați în administrația publică (INS, ${x.anPersonal})` : ""),
-                    `${NF.format(st.nrRegiune)} devin regionale (regiunea ${esc(st.regiune)}), ${NF.format(st.district)} au ghișeu în fiecare district; ` +
-                    `în ${esc(st.resedinta || "fosta reședință")} rămâne oficiul județean unic` +
-                    (st.grupuri.some(y => y.inJudet) ? ` și sediul regional pentru: ${st.grupuri.filter(y => y.inJudet).map(y => esc(y.g.nume.toLowerCase())).join("; ")}` : "")) : ""
-            ].filter(Boolean))}`;
+            ${ingust ? `<dl class="fisa-lista">${institutii.map(([nume, azi, propus]) => `<div>
+                    <dt>${nume}</dt>
+                    <dd><span class="fisa-cand">azi</span> ${azi}</dd>
+                    <dd><span class="fisa-cand propus">propus</span> ${propus}</dd></div>`).join("")}</dl>`
+                : tabel(["Instituția", "Azi", "Propus"], institutii.map(([nume, azi, propus]) =>
+                    `<tr><th scope="row">${nume}</th><td>${azi}</td><td>${propus}</td></tr>`))}`;
 
         // districtele, cu piesele lor
+        const stare = (bun, text) => `<span class="eticheta-stare ${bun ? "bun" : "atentie"}">${text}</span>`;
         const sectiuneDistricte = !x.districte.length ? "" : `
             <details class="fisa-detalii"><summary>Districtele propuse și instanțele lor</summary>
-            ${tabel(["Districtul", "Judecătoria", "Spital public, licee", "Microregiuni LEADER"], x.districte.map(d => {
+            ${tabel(["Districtul", "Judecătoria", "Spital public, licee"].concat(ingust ? [] : ["Microregiuni LEADER"]), x.districte.map(d => {
                 const jd = j ? j.peDistrict.get(d.sediu) || {} : {};
                 const p = x.piese.get(d.sediu) || {};
                 const m = d.microregiuni || [];
-                return `<tr><th scope="row">${esc(d.nume)}
-                        <br><small>${d.tip === "metropolitan" ? "zonă metropolitană" : "district"} · ${NF.format(d.populatie)} loc. ·
-                        ${cate(d.unitati.length, "unitate", "unități")}${d.numeResedinta !== d.nume ? ` · reședința: ${esc(d.numeResedinta)}` : ""}</small></th>
-                    <td>${jd.sediuInDistrict ? `<span class="eticheta-stare bun">${esc(jd.sediuInDistrict)}</span>`
-                        : `<span class="eticheta-stare atentie">fără sediu</span>${jd.majoritara ? `<br><small>azi ține de ${esc(jd.majoritara)}</small>` : ""}`}</td>
-                    <td>${p.spitale ? `<span class="eticheta-stare bun">${cate(p.spitale, "spital", "spitale")}</span>` : `<span class="eticheta-stare atentie">fără spital</span>`}
-                        <br><small>${p.licee ? cate(p.licee, "liceu", "licee") : "fără liceu"}</small></td>
-                    <td>${NF.format(m.length)}<br><small>${NF.format(m.filter(y => y.inBanda).length)} în prag</small></td></tr>`;
+                const micro = `${cate(m.length, "microregiune", "microregiuni")}, ${NF.format(m.filter(y => y.inBanda).length)} în pragul LEADER`;
+                return rand(esc(d.nume), [d.tip === "metropolitan" ? "zonă metropolitană" : "district", `${NF.format(d.populatie)} loc.`,
+                    cate(d.unitati.length, "unitate", "unități"), d.numeResedinta !== d.nume ? `reședința: ${esc(d.numeResedinta)}` : ""],
+                    [`<td>${jd.sediuInDistrict ? stare(true, esc(jd.sediuInDistrict))
+                        : stare(false, "fără sediu") + (jd.majoritara ? `<br><small>azi ține de ${esc(jd.majoritara)}</small>` : "")}</td>`,
+                    `<td>${p.spitale ? stare(true, cate(p.spitale, "spital", "spitale")) : stare(false, "fără spital")}
+                        <br><small>${p.licee ? cate(p.licee, "liceu", "licee") : "fără liceu"}</small></td>`], [micro]);
             }))}
             ${j ? H("Judecătoriile de azi", "— circumscripțiile, pe UAT-uri, și districtele în care ajung") +
-                tabel(["Judecătoria", "UAT-uri", "Locuitori", "Ajunge în"], j.lista.map(y => `<tr>
-                    <th scope="row">${esc(y.numeSediu)}</th><td class="num">${NF.format(y.uat)}</td>
-                    <td class="num">${NF.format(y.populatie)}</td><td>${y.districte.map(esc).join(", ") || "—"}</td></tr>`)) : ""}
+                tabel(["Judecătoria", "#UAT‑uri", "#Locuitori"].concat(ingust ? [] : ["Ajunge în"]), j.lista.map(y =>
+                    rand(esc(y.numeSediu), [], [num(NF.format(y.uat)), num(NF.format(y.populatie))],
+                        [(ingust ? "ajunge în: " : "") + (y.districte.map(esc).join(", ") || "—")]))) : ""}
             <p class="nota">Districtul pornește de la circumscripția judecătoriei: e singura împărțire sub județ pe care o
                 folosesc deja mai multe instituții (instanța, parchetul, notarii). Unde lipsește o piesă, districtul o
                 primește sau se unește cu vecinul — asta se hotărăște în etapa voluntară.</p>
@@ -510,31 +562,35 @@ window.AdpInstitutii = function() {
         const sectiuneGal = !g ? "" : `
             <details class="fisa-detalii"><summary>Grupurile de acțiune locală și microregiunile propuse</summary>
             ${H("Grupurile de azi")}
-            ${tabel(["Grupul", "UAT-uri în județ", "Locuitori", "Districte atinse"], g.lista.map(y => `<tr>
-                <th scope="row">${esc(y.nume)}${y.pesteJudet ? `<br><small>trece granița județului (${NF.format(y.total)} UAT-uri în total)</small>` : ""}</th>
-                <td class="num">${NF.format(y.uat)}</td><td class="num">${NF.format(y.populatie)}</td>
-                <td>${y.nrDistricte > 1 ? `<span class="eticheta-stare atentie">${NF.format(y.nrDistricte)}</span>` : NF.format(y.nrDistricte)}</td></tr>`).concat(
-                g.inAfara ? [`<tr><th scope="row"><i>în afara oricărui grup</i></th><td class="num">${NF.format(g.inAfara)}</td>
-                    <td class="num">${NF.format(g.popInAfara)}</td><td><small>${cate(g.comuneInAfara, "comună", "comune")}</small></td></tr>`] : []))}
+            ${tabel(["Grupul", ingust ? "#UAT‑uri" : "#UAT‑uri în județ", "#Locuitori"].concat(ingust ? [] : ["Districte atinse"]), g.lista.map(y =>
+                rand(esc(y.nume), [y.pesteJudet ? `trece granița județului (${NF.format(y.total)} UAT-uri în total)` : ""],
+                    [num(NF.format(y.uat)), num(NF.format(y.populatie))],
+                    [ingust ? (y.nrDistricte > 1 ? `împărțit între ${NF.format(y.nrDistricte)} districte` : "într-un singur district")
+                        : y.nrDistricte > 1 ? stare(false, NF.format(y.nrDistricte)) : NF.format(y.nrDistricte)])).concat(
+                g.inAfara ? [rand("<i>în afara oricărui grup</i>", [], [num(NF.format(g.inAfara)), num(NF.format(g.popInAfara))],
+                    [[g.comuneInAfara ? cate(g.comuneInAfara, "comună", "comune") : "",
+                        g.inAfara - g.comuneInAfara ? cate(g.inAfara - g.comuneInAfara, "oraș", "orașe") + ", cu strategia lor urbană" : ""]
+                        .filter(Boolean).join("; ")])] : []))}
             ${H("Microregiunile propuse", `— LEADER cere ${NF.format(PRAG_GAL.min)}–${NF.format(PRAG_GAL.max)} de locuitori eligibili`)}
-            ${tabel(["Microregiunea (orașul-pol)", "Districtul", "Unități", "Locuitori", "Eligibili LEADER"], x.microregiuni.map(m => `<tr>
-                <th scope="row">${esc(m.nume)}</th><td>${esc(m.district)}</td><td class="num">${NF.format(m.unitati.length)}</td>
-                <td class="num">${NF.format(m.populatie)}</td>
-                <td>${NF.format(m.popLeader)} ${m.inBanda ? `<span class="eticheta-stare bun">în prag</span>` : `<span class="eticheta-stare atentie">în afara pragului</span>`}</td></tr>`))}
+            ${tabel(["Microregiunea (orașul-pol)"].concat(ingust ? [] : ["Districtul", "#Unități"]).concat(["#Locuitori", "Eligibili LEADER"]), x.microregiuni.map(m => `<tr>
+                <th scope="row">${esc(m.nume)}${ingust ? mic([`districtul ${esc(m.district)}`, cate(m.unitati.length, "unitate", "unități")]) : ""}</th>
+                ${ingust ? "" : `<td>${esc(m.district)}</td>${num(NF.format(m.unitati.length))}`}
+                ${num(NF.format(m.populatie))}
+                <td>${NF.format(m.popLeader)} ${stare(m.inBanda, m.inBanda ? "în prag" : "în afara pragului")}</td></tr>`))}
             <p class="nota">Grupurile de azi s-au format voluntar și se întind adesea peste mai multe districte. În model,
                 microregiunea e grupul de acțiune locală: comunele din jurul unui oraș-pol, întregi într-un district.
                 Orașele de peste 20.000 de locuitori ies din LEADER și au strategia lor urbană.</p>
             </details>`;
 
         // consiliul județean, atribuție cu atribuție
+        const mergeLa = y => y.a.merge === "aparat" ? "jumătate rămâne, jumătate dispare" : esc(y.a.merge);
         const sectiuneCJ = !cj ? "" : `
             <details class="fisa-detalii"><summary>Consiliul județean: unde merge fiecare atribuție</summary>
-            ${tabel(["Atribuția", "Merge la", "Bani pe an", "Oameni (estimat)"], Array.from(cj.grupuri.values()).filter(y => y.lei > 0)
-                .map(y => `<tr><th scope="row">${esc(y.a.nume)}</th>
-                    <td>${y.a.merge === "aparat" ? "jumătate rămâne, jumătate dispare" : esc(y.a.merge)}</td>
-                    <td class="num">${lei(y.lei)}</td><td class="num">${NF.format(Math.round(y.oameni))}</td></tr>`)
-                .concat([`<tr class="rand-total"><th scope="row">Total</th><td></td><td class="num">${lei(cj.total)}</td>
-                    <td class="num">${NF.format(Math.round(Array.from(cj.grupuri.values()).reduce((t, y) => t + y.oameni, 0)))}</td></tr>`]))}
+            ${tabel(["Atribuția"].concat(ingust ? [] : ["Merge la"]).concat(["#Bani pe an", ingust ? "#Oameni" : "#Oameni (estimat)"]), Array.from(cj.grupuri.values()).filter(y => y.lei > 0)
+                .map(y => `<tr><th scope="row">${esc(y.a.nume)}${ingust ? mic([`merge la: ${mergeLa(y)}`]) : ""}</th>
+                    ${ingust ? "" : `<td>${mergeLa(y)}</td>`}${num(lei(y.lei))}${num(NF.format(Math.round(y.oameni)))}</tr>`)
+                .concat([`<tr class="rand-total"><th scope="row">Total</th>${ingust ? "" : "<td></td>"}${num(lei(cj.total))}
+                    ${num(NF.format(Math.round(Array.from(cj.grupuri.values()).reduce((t, y) => t + y.oameni, 0))))}</tr>`]))}
             <p class="nota">Execuția bugetară ${esc(String(x.anCJ || ""))} a consiliului județean, pe destinații. Banii se mută
                 odată cu atribuția; economia vine doar din aparat. Oamenii sunt deduși din cheltuiala de personal, la
                 câștigul mediu al județului în sectorul fiecărei atribuții.</p>
@@ -543,17 +599,17 @@ window.AdpInstitutii = function() {
         // serviciile statului
         const sectiuneStat = !st ? "" : `
             <details class="fisa-detalii"><summary>Prefectura și serviciile statului: unde ar sta sediile</summary>
-            ${tabel(["Grupul de instituții", "Sediul regional", "Instituții"], st.grupuri.map(y => `<tr>
-                <th scope="row">${esc(y.g.nume)}<br><small>${esc(y.g.explicatie)}</small></th>
-                <td>${y.oras ? (y.inJudet ? `<span class="eticheta-stare bun">${esc(y.oras)}</span>` : esc(y.oras)) : "—"}</td>
-                <td><small>${y.institutii.map(i => esc(i.nume)).join("; ")}</small></td></tr>`))}
+            ${tabel(["Grupul de instituții", "Sediul regional"].concat(ingust ? [] : ["Instituții"]), st.grupuri.map(y =>
+                rand(esc(y.g.nume), [esc(y.g.explicatie)],
+                    [`<td>${y.oras ? (y.inJudet ? stare(true, esc(y.oras)) : esc(y.oras)) : "—"}</td>`],
+                    [y.institutii.map(i => esc(i.nume)).join("; ")]))) }
             <p class="nota">${NF.format(st.total)} instituții au azi câte o structură în fiecare județ. În model,
                 ${NF.format(st.nrRegiune)} trec la regiune, ${NF.format(st.district)} au un ghișeu în fiecare district
                 (tot ce are de-a face direct cu omul), iar în fosta reședință rămâne un oficiu județean unic. Așezarea pe
                 orașe e o propunere de pornire, de negociat în regiune: nicio regiune cu un singur oraș care adună tot.</p>
             </details>`;
 
-        return `<div class="fisa-institutii">${sectiuneAlesi}${sectiuneSumar}${sectiuneDistricte}${sectiuneGal}${sectiuneCJ}${sectiuneStat}</div>`;
+        return `<div class="fisa-institutii${ingust ? " ingusta" : ""}">${sectiuneAlesi}${sectiuneSumar}${sectiuneDistricte}${sectiuneGal}${sectiuneCJ}${sectiuneStat}</div>`;
     }
 
     return {
@@ -565,6 +621,11 @@ window.AdpInstitutii = function() {
         economiiJudete: economiiJudete,
         ATRIBUTII_CJ: ATRIBUTII_CJ,
         ATRIBUTIE_NEPLASATA: ATRIBUTIE_NEPLASATA,
+        AN_ALEGERI: AN_ALEGERI,
+        popAlegeri: popAlegeri,
+        esteBucuresti: esteBucuresti,
+        alesiLocali: alesiLocali,
+        consilieriJudeteni: consilieriJudeteni,
         viceprimari: viceprimari,
         consiliiRegionale: consiliiRegionale,
         sediiRegionale: sediiRegionale,

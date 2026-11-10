@@ -39,10 +39,6 @@ window.AdpRaport = function() {
     const FUNCTII_PE_INSTITUTIE = 2;
     const NF = new Intl.NumberFormat("ro-RO");
     const NF1 = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 1 });
-    // Codul administrativ, art. 112: consilieri locali, după populație (scara e în adp-reorganizare.js)
-    const CONSILIERI_LOCALI = window.AdpReorganizare.CONSILIERI_LOCALI;
-    // Codul administrativ, art. 171: consilieri județeni (plus președintele)
-    const CONSILIERI_JUDETENI = INST.CONSILIERI_JUDETENI;
     // ipoteza de cost: unitatea nouă păstrează aparatul reședinței, plus un sfert din
     // aparatul fiecărei primării desființate, pentru punctele de lucru din sate
     // reglabilă din cursorul din capul paginii (#f-birou): cifrele care depind de ea se refac pe loc
@@ -84,9 +80,6 @@ window.AdpRaport = function() {
         return r.json();
     }
 
-    const dupaScara = (scara, p) => (scara.find(([prag]) => p <= prag) || scara[scara.length - 1])[1];
-    /** Aceeași scară, dar cu pragurile de populație înmulțite: mai puțini aleși. */
-    const scaraLargita = (scara, factor) => scara.map(([prag, nr]) => [prag * factor, nr]);
     const lei = v => v === null || v === undefined ? "—"
         : Math.abs(v) >= 1e9 ? `${NF1.format(v / 1e9)} mld. lei`
             : Math.abs(v) >= 1e6 ? `${NF1.format(v / 1e6)} mil. lei` : `${NF.format(Math.round(v))} lei`;
@@ -182,38 +175,34 @@ window.AdpRaport = function() {
 
     function structura(date, r, regional) {
         const uatAcum = date.uat;
-        const consilieriAcum = uatAcum.reduce((a, u) => a + dupaScara(CONSILIERI_LOCALI, u.pop || 0), 0);
         const popJudet = new Map();
         uatAcum.forEach(u => popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.pop || 0)));
+        // Aleșii se numără după Codul administrativ (js/adp-institutii.js): consilierii pe populația după
+        // domiciliu din anul alegerilor (art. 112 și 171), fără București, care are regulile lui și
+        // rămâne cum e. La consiliul județean, consilierii și președintele.
+        const al = INST.alesiLocali(date, uatAcum.map((u, i) => i), r.grupuri);
+        const consilieriAcum = al.consilieriLocali[0], consilieriDupa = al.consilieriLocali[1];
         let judeteni = 0;
-        popJudet.forEach(p => { judeteni += dupaScara(CONSILIERI_JUDETENI, p) + 1; });
-
-        const scaraNoua = scaraLargita(CONSILIERI_LOCALI, FACTOR_CONSILIERI);
-        const scaraRegionala = scaraLargita(CONSILIERI_JUDETENI, FACTOR_CONSILIERI);
-        const consilieriDupa = r.grupuri.reduce((a, g) => a + dupaScara(scaraNoua, g.populatie), 0);
+        INST.consilieriJudeteni(date).forEach(n => { judeteni += n + 1; });
         const regiuni = regiuniDezvoltare(date);
         // Consiliul județean devine consiliu regional: consilieri aleși, pe scara județeană socotită
         // la dublul populației, cu locurile împărțite pe județe după populație. Districtul rămâne
         // condus de primarii deja aleși, fără mandate în plus.
         const consiliiRegionale = INST.consiliiRegionale(date, FACTOR_CONSILIERI);
-        // viceprimarii (Codul administrativ, art. 152), azi și pe unitățile noi, după aceeași regulă
-        const viceAzi = uatAcum.reduce((a, u) => a + INST.viceprimari(u), 0);
-        const viceDupa = r.grupuri.reduce((a, g) => a + (g.membri.some(i => INST.viceprimari(date.uat[i]) === 2) ? 2 : 1), 0) +
-            r.neacoperite.reduce((a, i) => a + INST.viceprimari(date.uat[i]), 0);
         // ca la județ: consilierii, plus președintele
         const regionali = consiliiRegionale.reduce((a, x) => a + x.locuri + 1, 0);
 
         return {
             unitati: { inainte: uatAcum.length, dupa: r.grupuri.length + r.neacoperite.length },
-            primari: { inainte: uatAcum.length, dupa: r.grupuri.length + r.neacoperite.length },
+            primari: { inainte: al.primari[0], dupa: al.primari[1] },
             consilieriLocali: { inainte: consilieriAcum, dupa: consilieriDupa },
-            viceprimari: { inainte: viceAzi, dupa: viceDupa },
+            viceprimari: { inainte: al.viceprimari[0], dupa: al.viceprimari[1] },
             // președintele și cei doi vicepreședinți ai fiecărui consiliu județean / regional
             conducereSuperioara: { inainte: date.judete.filter(j => j.n !== "București").length * (1 + INST.VICEPRESEDINTI_CJ), dupa: regiuni.length * (1 + INST.VICEPRESEDINTI_CJ) },
             consilieriSuperiori: { inainte: judeteni, dupa: regionali },
             alesi: {
-                inainte: uatAcum.length + consilieriAcum + judeteni,
-                dupa: r.grupuri.length + r.neacoperite.length + consilieriDupa + regionali
+                inainte: al.primari[0] + consilieriAcum + judeteni,
+                dupa: al.primari[1] + consilieriDupa + regionali
             },
             oficii: {
                 // azi: o primărie în fiecare UAT, un consiliu județean și o prefectură în fiecare județ
@@ -248,7 +237,7 @@ window.AdpRaport = function() {
                     ${randPereche("Populația mediană a unei unități", NF.format(r.inainte.mediana), NF.format(r.dupa.mediana), scadere(r.inainte.mediana, r.dupa.mediana))}
                     ${randPereche(`Unități sub pragul de ${NF.format(r.parametri.pMin)} loc.`, NF.format(r.inainte.subPrag), NF.format(r.dupa.subPrag), scadere(r.inainte.subPrag, r.dupa.subPrag))}
                     ${randPereche("Costul aparatului administrativ (an)", lei(c.aparat.inainte), lei(c.aparat.dupa), scadere(c.aparat.inainte, c.aparat.dupa))}
-                    ${randPereche("Aleși (primari + consilieri)", NF.format(s.alesi.inainte), NF.format(s.alesi.dupa), scadere(s.alesi.inainte, s.alesi.dupa))}
+                    ${randPereche("Aleși (primari + consilieri), fără București", NF.format(s.alesi.inainte), NF.format(s.alesi.dupa), scadere(s.alesi.inainte, s.alesi.dupa))}
                     ${randPereche("Sedii administrative", NF.format(s.oficii.inainte), NF.format(s.oficii.dupa), scadere(s.oficii.inainte, s.oficii.dupa))}
                     ${randPereche("Drum mediu sat → reședință", NF1.format(r.inainte.timpMediu) + " min", NF1.format(r.dupa.timpMediu) + " min", scadere(r.inainte.timpMediu, r.dupa.timpMediu))}
                 </tbody>
@@ -335,11 +324,11 @@ window.AdpRaport = function() {
                 <thead><tr><th></th><th>azi</th><th>în model</th></tr></thead>
                 <tbody>
                     <tr><th scope="row">Scrutine locale</th><td>3 (primar, consiliu local, consiliu județean + președinte)</td><td>2 (primar și consiliu local; consiliu regional)</td></tr>
-                    <tr><th scope="row">Primari</th><td>${NF.format(s.primari.inainte)}</td><td>${NF.format(s.primari.dupa)}</td></tr>
-                    <tr><th scope="row">Viceprimari <small>(art. 152: unul; doi în municipiul reședință de județ)</small></th><td>${NF.format(s.viceprimari.inainte)}</td><td>${NF.format(s.viceprimari.dupa)}</td></tr>
-                    <tr><th scope="row">Consilieri locali</th><td>${NF.format(s.consilieriLocali.inainte)}</td><td>${NF.format(s.consilieriLocali.dupa)}</td></tr>
-                    <tr><th scope="row">Președinți și vicepreședinți de consiliu județean → regional</th><td>${NF.format(s.conducereSuperioara.inainte)}</td><td>${NF.format(s.conducereSuperioara.dupa)}</td></tr>
-                    <tr><th scope="row">Consilieri județeni → regionali</th><td>${NF.format(s.mandateJudetene)}</td><td>${NF.format(s.mandateRegionale)}</td></tr>
+                    <tr><th scope="row">Primari <small>(art. 148)</small></th><td>${NF.format(s.primari.inainte)}</td><td>${NF.format(s.primari.dupa)}</td></tr>
+                    <tr><th scope="row">Viceprimari <small>(art. 148: unul; doi în municipiul reședință de județ)</small></th><td>${NF.format(s.viceprimari.inainte)}</td><td>${NF.format(s.viceprimari.dupa)}</td></tr>
+                    <tr><th scope="row">Consilieri locali <small>(art. 112)</small></th><td>${NF.format(s.consilieriLocali.inainte)}</td><td>${NF.format(s.consilieriLocali.dupa)}</td></tr>
+                    <tr><th scope="row">Consilieri și președinți de consiliu județean → regional <small>(art. 171)</small></th><td>${NF.format(s.mandateJudetene)}</td><td>${NF.format(s.mandateRegionale)}</td></tr>
+                    <tr><th scope="row">din care președinți și vicepreședinți <small>(art. 188)</small></th><td>${NF.format(s.conducereSuperioara.inainte)}</td><td>${NF.format(s.conducereSuperioara.dupa)}</td></tr>
                     <tr><th scope="row">Locuri în consiliile de district</th><td>—</td><td>${NF.format(s.primari.dupa)} (toți primarii, neremunerat)</td></tr>
                     <tr><th scope="row">Aparatul consiliilor județene</th><td>${lei(c.aparatCJ)} pe an</td><td>${lei(c.aparatCJ * COTA_CJ_PASTRATA)} pe an</td></tr>
                     <tr><th scope="row"><b>Economie totală pe an</b></th><td>—</td><td><b>${lei(c.economie)}</b>
@@ -357,7 +346,10 @@ window.AdpRaport = function() {
                     <td>${x.judete.map(j => `${esc(j.nume)} <b>${j.locuri}</b>`).join(" · ")}</td>
                 </tr>`).join("")}</tbody>
             </table></div>
-            <p class="nota">Numărul de consilieri vine din scara consiliilor județene de azi (Codul administrativ,
+            <p class="nota">Aleșii sunt numărați fără București, care are regulile lui (primar general, sectoare,
+                Consiliul General) și rămâne cum e. Consilierii se numără, cum cere legea, pe populația după domiciliu
+                de la 1 ianuarie ${INST.AN_ALEGERI}, anul alegerilor; în model, pe aceeași scară, la dublul populației.
+                Numărul de consilieri regionali vine din scara consiliilor județene de azi (Codul administrativ,
                 art. 171), aplicată la dublul populației. Fiecare județ e o circumscripție; locurile se împart
                 proporțional cu populația, cu regula celui mai mare rest. La total se adaugă câte un președinte.</p>`;
     }
@@ -372,8 +364,8 @@ window.AdpRaport = function() {
                     ${randPereche("Populația mediană", NF.format(r.inainte.mediana), NF.format(r.dupa.mediana), "INS, rezidenți estimați la 1 ianuarie 2026")}
                     ${randPereche("Unități sub 3.000 loc.", NF.format(r.inainte.sub3000), NF.format(r.dupa.sub3000), "INS, rezidenți estimați la 1 ianuarie 2026")}
                     ${randPereche(`Unități sub prag în ${r.parametri.anProiectie}`, NF.format(r.inainte.subPrag2050), NF.format(r.dupa.subPrag2050), "proiecție pe trendul 2011–2026 (domiciliu)")}
-                    ${randPereche("Primari", NF.format(s.primari.inainte), NF.format(s.primari.dupa), "unul pe unitate")}
-                    ${randPereche("Consilieri locali", NF.format(s.consilieriLocali.inainte), NF.format(s.consilieriLocali.dupa), "Codul administrativ, art. 112")}
+                    ${randPereche("Primari", NF.format(s.primari.inainte), NF.format(s.primari.dupa), "unul pe unitate; fără București")}
+                    ${randPereche("Consilieri locali", NF.format(s.consilieriLocali.inainte), NF.format(s.consilieriLocali.dupa), "Codul administrativ, art. 112, pe populația după domiciliu; fără București")}
                     ${randPereche("Consilieri județeni → regionali", NF.format(s.consilieriSuperiori.inainte), NF.format(s.consilieriSuperiori.dupa), "consilieri și președinți (art. 171); consiliul regional ia locul consiliilor județene, cu locuri pe județe după populație")}
                     ${randPereche("Consilii de administrare neremunerate", "—", NF.format(s.districte), `${NF.format(s.districte)} de districte, conduse de primarii în funcție`)}
                     ${randPereche("Aparatul consiliilor județene (an)", lei(c.aparatCJ), lei(c.aparatCJ * COTA_CJ_PASTRATA), `ipoteză: ${Math.round(COTA_CJ_PASTRATA * 100)}% trece la personalul tehnic al districtelor și regiunii`)}

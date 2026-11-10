@@ -2261,23 +2261,27 @@ label.inactiv {
 
 .tabel-institutii small {
     color: var(--text-2);
+    font-weight: 400;
 }
 
 .tabel-institutii th,
 .tabel-institutii td {
-    padding: 5px 8px 5px 0;
+    padding: 6px 10px 6px 0;
+    vertical-align: top;
 }
 
-.tabel-pas.tabel-institutii th[scope="row"] {
-    width: 40%;
+.tabel-institutii th.num,
+.tabel-institutii td.num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.tabel-institutii .pp-dif {
+    display: block;
 }
 
 .tabel-institutii .eticheta-stare {
-    white-space: nowrap;
-}
-
-.tabel-institutii td.num {
-    text-align: right;
     white-space: nowrap;
 }
 
@@ -2287,18 +2291,87 @@ label.inactiv {
     font-weight: 600;
 }
 
+/* în panoul îngust al hărții: numele rândului ia lățimea rămasă, cifrele stau strâns la dreapta */
+.fisa-institutii.ingusta .tabel-institutii {
+    width: 100%;
+    table-layout: auto;
+}
+
+.fisa-institutii.ingusta .tabel-institutii th[scope="row"] {
+    width: 100%;
+    padding-right: 12px;
+    color: var(--text);
+}
+
+.fisa-institutii.ingusta .tabel-institutii thead th {
+    white-space: normal;
+}
+
+.tabel-institutii .fisa-schimbare {
+    display: block;
+    margin-top: 2px;
+}
+
+.fisa-institutii.ingusta .tabel-institutii td:last-child,
+.fisa-institutii.ingusta .tabel-institutii th:last-child {
+    padding-right: 0;
+}
+
+.fisa-lista {
+    margin: 0;
+}
+
+.fisa-lista > div {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--linie);
+}
+
+.fisa-lista dt {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.fisa-lista dd {
+    margin: 2px 0 0;
+    padding-left: 58px;
+    text-indent: -58px;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.fisa-cand {
+    display: inline-block;
+    width: 52px;
+    margin-right: 6px;
+    text-indent: 0;
+    font-size: 11px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-2);
+}
+
+.fisa-cand.propus {
+    color: var(--accent-text);
+}
+
 /* raport: cursorul ipotezei de cost (cât păstrează biroul local) */
 .ipoteza-cost {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 12px;
-    margin: 10px 0 4px;
+    gap: 6px 14px;
+    margin: 12px 0;
+    padding: 10px 14px;
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 14px;
     font-size: 14px;
 }
 
 .ipoteza-cost input[type="range"] {
-    width: min(260px, 100%);
+    flex: 1 1 200px;
+    max-width: 320px;
 }
 
 body.se-recalculeaza .document,
@@ -2306,4 +2379,11 @@ body.se-recalculeaza #carduri,
 body.se-recalculeaza #tabel-teritorii {
     opacity: 0.55;
     transition: opacity 0.15s;
+}
+
+/* harta, pasul 2: cursorul ipotezei de cost */
+.eticheta-ipoteza small {
+    display: block;
+    font-weight: 400;
+    color: var(--text-2);
 }
