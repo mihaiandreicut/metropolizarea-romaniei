@@ -1,36 +1,31 @@
 {
- "generat": "2026-10-02T18:32:50.958Z",
- "secunde": 1.2,
- "status": {
-  "stare": "activ",
-  "progres": 65,
-  "urmeaza": "Calibrare cu specialisti locali (praguri pe relief, liste tematice); dotari oficiale CNAS/ANMDMR/Posta/IGPR; finante locale MF; navetism INS; evaluarea impactului bugetar",
-  "ultima": "2026-10-02 — districtul rural asimilat zonei metropolitane (statut, fonduri mari), treptele functionale se pot schimba in timp: raport, principii.html, harta"
- },
+ "generat": "2026-11-10T07:03:02.990Z",
+ "secunde": 1.4,
+ "status": null,
  "date": {
   "harta UAT": {
-   "octeti": 1552834,
-   "actualizat": "2026-09-22"
+   "octeti": 1620206,
+   "actualizat": "2026-11-10"
   },
   "localități": {
    "octeti": 1242051,
-   "actualizat": "2026-09-21"
+   "actualizat": "2026-11-09"
   },
   "regiuni tematice": {
-   "octeti": 41175,
-   "actualizat": "2026-10-02"
+   "octeti": 38391,
+   "actualizat": "2026-11-09"
   },
   "instituții regionale": {
    "octeti": 15370,
-   "actualizat": "2026-10-02"
+   "actualizat": "2026-11-09"
   },
   "finanțe (MF)": {
-   "octeti": 1652617,
-   "actualizat": "2026-10-02"
+   "octeti": 1991207,
+   "actualizat": "2026-11-09"
   },
   "infrastructură (INS)": {
    "octeti": 278951,
-   "actualizat": "2026-10-02"
+   "actualizat": "2026-11-09"
   },
   "județe cu timpi OSRM": {
    "numar": 41
@@ -39,42 +34,42 @@
  "national": {
   "judete": 41,
   "parametri": {
-   "pMin": 5000,
-   "pTinta": 7000,
-   "pMinOras": 7000,
+   "pMin": 3000,
+   "pTinta": 5000,
+   "pMinOras": 10000,
    "tMax": 30
   },
   "unitati": {
    "inainte": 3181,
-   "dupa": 1208
+   "dupa": 1455
   },
   "subPrag": {
-   "inainte": 2501,
-   "dupa": 71
+   "inainte": 1697,
+   "dupa": 26
   },
   "mediana": {
-   "inainte": 2894,
-   "dupa": 9857
+   "inainte": 2858,
+   "dupa": 7463
   },
   "timpMediu": {
    "inainte": 2.141092502027619,
-   "dupa": 5.67089258417063
+   "dupa": 4.910726152280655
   },
   "pesteTMax": {
    "inainte": 85,
-   "dupa": 384
+   "dupa": 290
   },
   "sate": 13747,
-  "birouri": 933,
+  "birouri": 769,
   "plasi": 168,
-  "plasiSubRegula": 10
+  "plasiSubRegula": 11
  },
  "regional": {
   "regiuni": 8,
-  "populatieMedie": 2381727,
-  "raportPopulatie": 1.963549782178654,
-  "raportPibLoc": 4.183321767291233,
-  "minuteMediu": 84.34950240152413,
+  "populatieMedie": 2380164,
+  "raportPopulatie": 1.980100189991556,
+  "raportPibLoc": 3.938715843922186,
+  "minuteMediu": 83.86881107808657,
   "capitaleCuCurteDeApel": 8,
   "oficiiJudetene": 41
  }
