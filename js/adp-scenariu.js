@@ -23,6 +23,10 @@ window.AdpScenariu = function() {
     const CALE_CORECTII = "date/corectii-districte.json";
     const CALE_JUDECATORII = "date/judecatorii-uat.json";
     const CALE_GAL = "date/gal-uat.json";
+    // fișa de instituții a județului, la pasul 3 (js/adp-institutii.js)
+    const CALE_INSTITUTII_JUDETENE = "date/institutii-judetene.json";
+    const CALE_CJ = "date/cj-destinatii.json";
+    const CALE_PERSONAL = "date/personal-judete.json";
     const CHEIE_CORECTII = "ro-adp.corectii";   // copia de lucru din browser, până la salvare
     const TOATA_TARA = "*";
     const PREFIX_ADR = "adr:";
@@ -1035,14 +1039,11 @@ window.AdpScenariu = function() {
         const al = i => finante.executieUat[D.date.uat[i].s];
         let acum = 0, dupa = 0, cu = 0;
         grupuri.forEach(g => {
-            const ale = g.membri.map(al).filter(Boolean);
-            if (!ale.length) return;
-            cu += ale.length;
-            acum += ale.reduce((a, e) => a + (e.cheltuieliAparat || 0), 0);
-            const sediu = al(g.sediu);
-            const altele = ale.filter(e => e !== sediu);
-            dupa += (sediu ? sediu.cheltuieliAparat || 0 : Math.max(...ale.map(e => e.cheltuieliAparat || 0))) +
-                COTA_BIROURI * altele.reduce((a, e) => a + (e.cheltuieliAparat || 0), 0);
+            const c = D.reorganizare.aparatUnitate(g.membri, g.sediu, al, COTA_BIROURI);
+            if (!c) return;
+            cu += c.membri;
+            acum += c.acum;
+            dupa += c.dupa;
         });
         if (!cu) return null;
         const economie = acum - dupa;
@@ -1667,6 +1668,21 @@ window.AdpScenariu = function() {
     let rezultatCheie = null;    // teritoriul pe care s-a calculat rezultatul curent
     let vedereInainte = false;   // pasul 3: harta de azi în locul celei propuse
     let dateGata = Promise.resolve();   // finanțele, dotările, judecătoriile, alegerile: încărcate
+    let surseFisa = null;        // datele fișei de instituții, încărcate la primul județ ajuns la pasul 3
+    let personal = null;         // din date/personal-judete.json: salariații administrației publice, pe județe
+
+    /** Instituțiile județene, consiliile județene, personalul: o singură dată, la nevoie. */
+    function incarcaSurseFisa() {
+        if (!surseFisa) {
+            const ia = cale => fetch(cale).then(r => r.ok ? r.json() : null).catch(() => null);
+            surseFisa = Promise.all([ia(CALE_INSTITUTII_JUDETENE), ia(CALE_CJ), personal || ia(CALE_PERSONAL),
+                institutii || ia(CALE_INSTITUTII), gal || ia(CALE_GAL), infra || ia(CALE_INFRA)])
+                .then(([lista, cj, personal, regionale, g, inf]) => ({
+                    lista: lista, cj: cj, personal: personal, institutii: regionale, gal: g, infra: inf
+                }));
+        }
+        return surseFisa;
+    }
 
     const rezultatPas = () => rezultat && pasCheie !== null && rezultatCheie === pasCheie ? rezultat : null;
     const esteOras = i => D.date.uat[i].t !== "comună";
@@ -1875,8 +1891,15 @@ window.AdpScenariu = function() {
         const cuDate = r.uat.filter(i => executie[D.date.uat[i].s]);
         const locuitori = cuDate.reduce((s, i) => s + (D.date.uat[i].pop || 0), 0);
         const cuDateDupa = r.grupuri.filter(g => g.financiar && g.financiar.pondere !== null);
+        // deasupra primăriilor: jumătate din aparatul consiliilor județene și 20% din personalul
+        // serviciilor statului (js/adp-institutii.js); nu depind de regulile de comasare
+        const sus = window.AdpInstitutii
+            ? window.AdpInstitutii.economiiJudete(D.date, Array.from(new Set(r.uat.map(i => D.date.uat[i].j))), finante, personal)
+            : { aparatCJ: 0, economieCJ: 0, personalStat: 0, economieStat: 0 };
         return {
             aparatAzi: c.acum, aparatDupa: c.dupa, economie: c.economie,
+            aparatCJ: sus.aparatCJ, economieCJ: sus.economieCJ, personalStat: sus.personalStat, economieStat: sus.economieStat,
+            economieTotala: c.economie + sus.economieCJ + sus.economieStat,
             peLocAzi: locuitori ? c.acum / locuitori : null, peLocDupa: locuitori ? c.dupa / locuitori : null,
             investAzi: b.investitii, investDupa: b.investitii + c.economie,
             prag: prag,
@@ -1904,10 +1927,23 @@ window.AdpScenariu = function() {
                 dupa: r.grupuri.filter(g => g.urban && g.populatie < P.pMinOras).length },
             { nume: `Unități sub prag în ${P.anProiectie}`, azi: a.subPrag2050, dupa: d.subPrag2050 },
             { nume: "Primari", azi: a.unitati, dupa: d.unitati },
+            window.AdpInstitutii && { nume: "Viceprimari", ...(() => {
+                const V = window.AdpInstitutii.viceprimari;
+                return {
+                    azi: Array.from(new Set(r.uat.concat(r.neacoperite || []))).reduce((s, i) => s + V(D.date.uat[i]), 0),
+                    dupa: r.grupuri.reduce((s, g) => s + (g.membri.some(i => V(D.date.uat[i]) === 2) ? 2 : 1), 0) +
+                        (r.neacoperite || []).reduce((s, i) => s + V(D.date.uat[i]), 0)
+                };
+            })() },
             { nume: "Consilieri locali", azi: r.uat.reduce((s, i) => s + R.consilieriLocali(pop(i)), 0),
                 dupa: r.grupuri.reduce((s, g) => s + R.consilieriLocali(g.populatie, R.FACTOR_CONSILIERI), 0) },
             e && { nume: `Aparatul primăriilor, ${mare ? "mld." : "mil."} lei pe an`, azi: e.aparatAzi, dupa: e.aparatDupa, fmt: bani },
             e && { nume: "Aparatul pe locuitor, lei pe an", azi: e.peLocAzi, dupa: e.peLocDupa },
+            e && e.aparatCJ && { nume: `Aparatul ${tipPas(pasCheie) === "judet" ? "consiliului județean" : "consiliilor județene"}, ${mare ? "mld." : "mil."} lei pe an`,
+                azi: e.aparatCJ, dupa: e.aparatCJ - e.economieCJ, fmt: bani, nota: "jumătate trece la districte și regiune" },
+            e && e.personalStat && { nume: `Personalul serviciilor statului din ${tipPas(pasCheie) === "judet" ? "județ" : "județe"} (estimat), ${mare ? "mld." : "mil."} lei pe an`,
+                azi: e.personalStat, dupa: e.personalStat - e.economieStat, fmt: bani },
+            e && { nume: `Economie pe an, în total, ${mare ? "mld." : "mil."} lei`, azi: null, dupa: e.economieTotala, fmt: bani, faraDif: true },
             e && { nume: `Investiții, ${mare ? "mld." : "mil."} lei pe an, cu economia`, azi: e.investAzi, dupa: e.investDupa, fmt: bani },
             e && { nume: `Aparatul peste ${e.prag}% din veniturile proprii`, azi: e.pesteAzi, dupa: e.pesteDupa,
                 textAzi: `${NF.format(e.pesteAzi)} din ${NF.format(e.cuDateAzi)}`,
@@ -1957,6 +1993,7 @@ window.AdpScenariu = function() {
         const randuri = randuriComparatie(r);
         const valoare = (x, v, text) => text || (v === null ? "—" : x.fmt ? x.fmt(v) : NF.format(Math.round(v)));
         const c = costAparat(r.grupuri);
+        const e = indicatoriEconomici(r);
         const cuDerogare = r.grupuri.filter(g => g.derogari && g.derogari.length).length;
         const comasate = r.grupuri.filter(g => g.membri.length > 1);
         const neschimbate = r.grupuri.filter(g => g.membri.length === 1);
@@ -1991,7 +2028,9 @@ window.AdpScenariu = function() {
         $("#pp-raport").innerHTML = `
             <p class="pp-pe-scurt"><b>${NF.format(r.inainte.unitati)} de UAT-uri devin ${NF.format(r.dupa.unitati)}
                 ${r.dupa.unitati === 1 ? "unitate" : "de unități"}.</b>
-                ${c ? `Aparatul primăriilor costă cu <b>${milioane(c.economie)}</b> mai puțin pe an. ` : ""}
+                ${c ? `Aparatul primăriilor costă cu <b>${milioane(c.economie)}</b> mai puțin pe an` +
+                    (e && e.economieTotala > c.economie ? `; cu jumătate din aparatul consiliului județean și o cincime din
+                    personalul serviciilor statului, economia ajunge la <b>${milioane(e.economieTotala)}</b> pe an. ` : ". ") : ""}
                 Drumul mediu până la primărie trece de la ${NF1.format(r.inainte.timpMediu)} la
                 ${NF1.format(r.dupa.timpMediu)} minute.
                 ${cuDerogare ? `${cate(cuDerogare, "unitate are", "unități au")} o derogare scrisă în dosar.` : ""}</p>
@@ -2000,10 +2039,11 @@ window.AdpScenariu = function() {
                 <tbody>${randuri.map(x => `<tr><th scope="row">${x.nume}</th>
                     <td>${valoare(x, x.azi, x.textAzi)}</td>
                     <td><b>${valoare(x, x.dupa, x.textDupa)}</b>
-                        <small class="pp-dif">${x.azi === null ? "nou" : diferenta(x.azi, x.dupa, x.fmt)}</small></td></tr>`).join("")}</tbody>
+                        <small class="pp-dif">${x.azi === null ? (x.faraDif ? "" : "nou") : diferenta(x.azi, x.dupa, x.fmt)}</small></td></tr>`).join("")}</tbody>
             </table></div>
             ${defalcare}
             ${lista}
+            ${tip === "judet" && window.AdpInstitutii ? `<div id="pp-institutii"><p class="nota">Se încarcă aleșii și instituțiile județului…</p></div>` : ""}
             <p class="nota">Regulile: comuna ${NF.format(P.pMin)}–${NF.format(P.pTinta)} de locuitori, unitatea cu oraș
                 ${NF.format(P.pMinOras)}–${NF.format(P.pTintaOras)}, cel mult ${P.tMax} de minute până la reședință.
                 Populația: rezidentă, estimată la 1 ianuarie 2026 din recensământ și datele INS. Costul: execuția bugetară 2025; unitatea nouă
@@ -2035,6 +2075,16 @@ window.AdpScenariu = function() {
             $("#explorare").open = true;
             $("#sc-rezultat").scrollIntoView({ block: "start", behavior: "smooth" });
         });
+        // aleșii după Codul administrativ și instituțiile județului: aceeași fișă ca în raport
+        if (tip === "judet" && window.AdpInstitutii) {
+            const cod = Number(pasCheie);
+            incarcaSurseFisa().then(s => {
+                const tinta = $("#pp-institutii");
+                if (!tinta || rezultatPas() !== r) return;
+                tinta.innerHTML = window.AdpInstitutii.fisaJudet(D.date, r, cod, Object.assign({ judecatorii: judecatorii }, s),
+                    { clasa: "tabel-atribute tabel-pas", titlu: "h4" });
+            }).catch(e => console.warn(`[ro-adp] Fișa de instituții nu a putut fi calculată (${e.message}).`));
+        }
     }
 
     /** Tabelul comparativ și lista unităților, ca fișier CSV (separator „;”, pentru Excel). */
@@ -2081,10 +2131,12 @@ window.AdpScenariu = function() {
         const bani = v => NF1.format(v / (mare ? 1e9 : 1e6));
         const procent = (x, din) => `${NF.format(Math.round(100 * x / din))}%`;
         const card = (eticheta, propus, azi, dif, bun) => `<div class="pp-card${bun === true ? " bun" : bun === false ? " rau" : ""}">
-                <span class="eticheta">${eticheta}</span><b>${propus}</b><small>azi ${azi}${dif ? ` · ${dif}` : ""}</small></div>`;
+                <span class="eticheta">${eticheta}</span><b>${propus}</b><small>${azi === null ? "" : `azi ${azi}`}${dif ? `${azi === null ? "" : " · "}${dif}` : ""}</small></div>`;
         cont.innerHTML = `<h4>${D.esc(numePas(pasCheie))}, cu regulile alese</h4>
             <div class="pp-carduri">
-                ${e ? card(`Economie, ${unitate}/an`, bani(e.economie), `aparat ${bani(e.aparatAzi)}`, `−${procent(e.economie, e.aparatAzi)}`, e.economie > 0) : ""}
+                ${e ? card(`Economie, ${unitate}/an`, bani(e.economieTotala), null,
+                    `primării ${bani(e.economie)} (−${procent(e.economie, e.aparatAzi)})` +
+                    (e.economieCJ || e.economieStat ? ` · consiliu județean ${bani(e.economieCJ)} · stat ${bani(e.economieStat)}` : ""), e.economieTotala > 0) : ""}
                 ${e ? card("Aparat pe locuitor, lei", NF.format(Math.round(e.peLocDupa)), NF.format(Math.round(e.peLocAzi)),
                     diferenta(e.peLocAzi, e.peLocDupa), e.peLocDupa < e.peLocAzi) : ""}
                 ${e ? card(`Investiții, ${unitate}/an`, bani(e.investDupa), bani(e.investAzi), diferenta(e.investAzi, e.investDupa, bani), true) : ""}
@@ -2223,6 +2275,10 @@ window.AdpScenariu = function() {
         const asteptate = [];
         asteptate.push(fetch(CALE_DOTARI).then(r => r.ok ? r.json() : null).then(j => { dotari = j; }).catch(() => {
             console.warn(`[ro-adp] "${CALE_DOTARI}" nu a putut fi încărcat. Rulează unelte/dotari.py.`);
+        }));
+        // salariații administrației publice pe județe: economia la serviciile statului, în indicatori
+        asteptate.push(fetch(CALE_PERSONAL).then(r => r.ok ? r.json() : null).then(j => { personal = j; }).catch(() => {
+            console.warn(`[ro-adp] "${CALE_PERSONAL}" nu a putut fi încărcat. Rulează unelte/personal.py.`);
         }));
         asteptate.push(fetch(CALE_FINANTE).then(r => r.ok ? r.json() : null).then(j => { finante = j; }).catch(() => {
             console.warn(`[ro-adp] "${CALE_FINANTE}" nu a putut fi încărcat. Rulează unelte/finante.py.`);

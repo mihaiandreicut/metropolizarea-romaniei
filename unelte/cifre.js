@@ -78,11 +78,8 @@ const satePeste = (r, min) => r.sate.filter(s => s.tNou > min && (s.p || 0) >= 5
 function aparatDupa(r, cota) {
     let total = 0;
     r.grupuri.forEach(g => {
-        const ale = g.membri.map(i => executie.get(i)).filter(Boolean);
-        if (!ale.length) return;
-        const sediu = executie.get(g.sediu);
-        total += (sediu ? sediu.cheltuieliAparat : Math.max(...ale.map(e => e.cheltuieliAparat))) +
-            cota * ale.filter(e => e !== sediu).reduce((a, e) => a + (e.cheltuieliAparat || 0), 0);
+        const c = AdpReorganizare.aparatUnitate(g.membri, g.sediu, i => executie.get(i), cota);
+        if (c) total += c.dupa;
     });
     return total;
 }

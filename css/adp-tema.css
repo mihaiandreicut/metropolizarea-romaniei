@@ -2241,3 +2241,48 @@ label.inactiv {
         grid-template-columns: 1fr;
     }
 }
+
+/* fișa de instituții a județului (js/adp-institutii.js): pasul 3 și fișele de județ din raport */
+.fisa-institutii h4 {
+    margin: 18px 0 6px;
+}
+
+.fisa-detalii {
+    margin: 10px 0;
+    border-top: 1px solid var(--linie);
+    padding-top: 6px;
+}
+
+.fisa-detalii > summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 4px 0;
+}
+
+.tabel-institutii small {
+    color: var(--text-2);
+}
+
+.tabel-institutii th,
+.tabel-institutii td {
+    padding: 5px 8px 5px 0;
+}
+
+.tabel-pas.tabel-institutii th[scope="row"] {
+    width: 40%;
+}
+
+.tabel-institutii .eticheta-stare {
+    white-space: nowrap;
+}
+
+.tabel-institutii td.num {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tabel-institutii .rand-total th,
+.tabel-institutii .rand-total td {
+    border-top: 1px solid var(--axa);
+    font-weight: 600;
+}

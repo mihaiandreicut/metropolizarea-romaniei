@@ -178,13 +178,27 @@ window.AdpReorganizare = function() {
      * @param populatie  populația unității
      * @param executie   Map UAT (index) -> înregistrare din execuția bugetară; fără date, întoarce null
      */
+    /**
+     * Costul aparatului unei unități noi, din execuția bugetară a membrilor: azi, suma lor; după,
+     * aparatul primăriei-reședință plus `cota` din al fiecărei primării desființate (biroul local).
+     * Când reședința nu are date, îi ține locul membrul cu aparatul cel mai mare. Membrii fără date
+     * nu intră nici azi, nici după. `ia(i)` = execuția UAT-ului i, sau nimic. Singura implementare a
+     * ipotezei de cost: o folosesc testul financiar, harta, raportul și unelte/cifre.js.
+     */
+    function aparatUnitate(lista, sediu, ia, cota) {
+        const c = cota === undefined ? REGULA_FINANCIARA.cotaBirouri : cota;
+        const cu = lista.filter(i => ia(i));
+        if (!cu.length) return null;
+        const aparatul = i => ia(i).cheltuieliAparat || 0;
+        const resedinta = ia(sediu) ? sediu : cu.reduce((a, i) => aparatul(i) > aparatul(a) ? i : a);
+        const acum = cu.reduce((s, i) => s + aparatul(i), 0);
+        return { acum: acum, dupa: aparatul(resedinta) + c * (acum - aparatul(resedinta)), membri: cu.length };
+    }
+
     function testFinanciar(lista, sediu, populatie, executie) {
         const ale = lista.map(i => executie.get(i)).filter(Boolean);
         if (!ale.length) return null;
-        const alSediului = executie.get(sediu);
-        const aparatul = e => e.cheltuieliAparat || 0;
-        const aparat = (alSediului ? aparatul(alSediului) : Math.max(...ale.map(aparatul))) +
-            REGULA_FINANCIARA.cotaBirouri * ale.filter(e => e !== alSediului).reduce((a, e) => a + aparatul(e), 0);
+        const aparat = aparatUnitate(lista, sediu, i => executie.get(i)).dupa;
         const venituri = ale.reduce((a, e) => a + (e.venituriProprii || 0), 0);
         return {
             aparat: aparat,
@@ -1663,6 +1677,7 @@ window.AdpReorganizare = function() {
 
     return {
         PARAMETRI_IMPLICITI: PARAMETRI_IMPLICITI,
+        aparatUnitate: aparatUnitate,
         CONSILIERI_LOCALI: CONSILIERI_LOCALI,
         FACTOR_CONSILIERI: FACTOR_CONSILIERI,
         consilieriLocali: consilieriLocali,

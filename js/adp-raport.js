@@ -26,12 +26,15 @@ window.AdpRaport = function() {
     const CALE_INSTITUTII_JUDETENE = "date/institutii-judetene.json";
     const CALE_PERSONAL = "date/personal-judete.json";
     const CALE_CJ = "date/cj-destinatii.json";
+    // calculele comune cu fișa de instituții a județului (js/adp-institutii.js)
+    const INST = window.AdpInstitutii;
+    const { ATRIBUTII_CJ, ATRIBUTIE_NEPLASATA, mutariCJ, sediiRegionale } = INST;
     // costul unui salariat pentru angajator: câștigul brut plus contribuția asiguratorie pentru muncă
-    const COST_ANGAJATOR = 1.0225;
+    const COST_ANGAJATOR = INST.COST_ANGAJATOR;
     // ipoteză pentru instituțiile statului din județ: conducerea și funcțiile de suport (economic,
     // resurse umane, juridic, achiziții, administrativ), circa 30% din personal, se strâng la
     // regiune într-o treime din mărimea lor — adică o reducere de 20% a personalului
-    const REDUCERE_STAT = 0.2;
+    const REDUCERE_STAT = INST.REDUCERE_STAT;
     // ipoteză pentru numărul funcțiilor de conducere: un director și un adjunct la fiecare instituție
     const FUNCTII_PE_INSTITUTIE = 2;
     const NF = new Intl.NumberFormat("ro-RO");
@@ -39,7 +42,7 @@ window.AdpRaport = function() {
     // Codul administrativ, art. 112: consilieri locali, după populație (scara e în adp-reorganizare.js)
     const CONSILIERI_LOCALI = window.AdpReorganizare.CONSILIERI_LOCALI;
     // Codul administrativ, art. 171: consilieri județeni (plus președintele)
-    const CONSILIERI_JUDETENI = [[350000, 30], [500000, 32], [650000, 34], [Infinity, 36]];
+    const CONSILIERI_JUDETENI = INST.CONSILIERI_JUDETENI;
     // ipoteza de cost: unitatea nouă păstrează aparatul reședinței, plus un sfert din
     // aparatul fiecărei primării desființate, pentru punctele de lucru din sate
     const COTA_BIROURI = 0.25;
@@ -51,7 +54,7 @@ window.AdpRaport = function() {
     const ANI_PROIECTIE = [1, 3, 5, 9, 15, 25];
     // din aparatul consiliilor județene, jumătate se consideră preluat de personalul tehnic
     // al districtelor și al regiunii; cealaltă jumătate dispare odată cu structura
-    const COTA_CJ_PASTRATA = 0.5;
+    const COTA_CJ_PASTRATA = INST.COTA_CJ_PASTRATA;
     // economia cumulată din tabelele pe teritorii: aceleași ipoteze ca fișele de pe hartă
     const INFLATIE = 0.03;
     const ANI_ECONOMIE = 10;
@@ -122,10 +125,7 @@ window.AdpRaport = function() {
             const ale = g.membri.map(i => executie.get(i)).filter(Boolean);
             if (!ale.length) return;
             cuDateDupa++;
-            const sediu = executie.get(g.sediu);
-            const altele = ale.filter(e => e !== sediu);
-            const cost = (sediu ? sediu.cheltuieliAparat : Math.max(...ale.map(e => e.cheltuieliAparat))) +
-                COTA_BIROURI * altele.reduce((a, e) => a + (e.cheltuieliAparat || 0), 0);
+            const cost = window.AdpReorganizare.aparatUnitate(g.membri, g.sediu, i => executie.get(i), COTA_BIROURI).dupa;
             const venituri = ale.reduce((a, e) => a + (e.venituriProprii || 0), 0);
             aparatDupa += cost;
             if (venituri > 0 && 100 * cost / venituri > PRAG_ADMINISTRATIE) pesteDupa++;
@@ -202,23 +202,11 @@ window.AdpRaport = function() {
         // Consiliul județean devine consiliu regional: consilieri aleși, pe scara județeană socotită
         // la dublul populației, cu locurile împărțite pe județe după populație. Districtul rămâne
         // condus de primarii deja aleși, fără mandate în plus.
-        const adrJudet = new Map();
-        uatAcum.forEach(u => adrJudet.set(u.j, u.adr));
-        const consiliiRegionale = regiuni.map(reg => {
-            const judete = date.judete.filter(j => adrJudet.get(j.c) === reg.cod)
-                .map(j => ({ nume: j.n, populatie: popJudet.get(j.c) || 0 }));
-            const locuri = dupaScara(scaraRegionala, reg.populatie);
-            // împărțire proporțională, cu cel mai mare rest
-            const cote = judete.map(j => locuri * j.populatie / (reg.populatie || 1));
-            const impartite = cote.map(Math.floor);
-            cote.map((c, k) => ({ k: k, rest: c - Math.floor(c) })).sort((a, b) => b.rest - a.rest)
-                .slice(0, locuri - impartite.reduce((a, v) => a + v, 0)).forEach(x => { impartite[x.k]++; });
-            return {
-                nume: reg.nume, populatie: reg.populatie, locuri: locuri,
-                judete: judete.map((j, k) => ({ nume: j.nume, populatie: j.populatie, locuri: impartite[k] }))
-                    .sort((a, b) => b.locuri - a.locuri)
-            };
-        });
+        const consiliiRegionale = INST.consiliiRegionale(date, FACTOR_CONSILIERI);
+        // viceprimarii (Codul administrativ, art. 152), azi și pe unitățile noi, după aceeași regulă
+        const viceAzi = uatAcum.reduce((a, u) => a + INST.viceprimari(u), 0);
+        const viceDupa = r.grupuri.reduce((a, g) => a + (g.membri.some(i => INST.viceprimari(date.uat[i]) === 2) ? 2 : 1), 0) +
+            r.neacoperite.reduce((a, i) => a + INST.viceprimari(date.uat[i]), 0);
         // ca la județ: consilierii, plus președintele
         const regionali = consiliiRegionale.reduce((a, x) => a + x.locuri + 1, 0);
 
@@ -226,6 +214,9 @@ window.AdpRaport = function() {
             unitati: { inainte: uatAcum.length, dupa: r.grupuri.length + r.neacoperite.length },
             primari: { inainte: uatAcum.length, dupa: r.grupuri.length + r.neacoperite.length },
             consilieriLocali: { inainte: consilieriAcum, dupa: consilieriDupa },
+            viceprimari: { inainte: viceAzi, dupa: viceDupa },
+            // președintele și cei doi vicepreședinți ai fiecărui consiliu județean / regional
+            conducereSuperioara: { inainte: date.judete.filter(j => j.n !== "București").length * (1 + INST.VICEPRESEDINTI_CJ), dupa: regiuni.length * (1 + INST.VICEPRESEDINTI_CJ) },
             consilieriSuperiori: { inainte: judeteni, dupa: regionali },
             alesi: {
                 inainte: uatAcum.length + consilieriAcum + judeteni,
@@ -351,12 +342,15 @@ window.AdpRaport = function() {
                 <tbody>
                     <tr><th scope="row">Scrutine locale</th><td>3 (primar, consiliu local, consiliu județean + președinte)</td><td>2 (primar și consiliu local; consiliu regional)</td></tr>
                     <tr><th scope="row">Primari</th><td>${NF.format(s.primari.inainte)}</td><td>${NF.format(s.primari.dupa)}</td></tr>
+                    <tr><th scope="row">Viceprimari <small>(art. 152: unul; doi în municipiul reședință de județ)</small></th><td>${NF.format(s.viceprimari.inainte)}</td><td>${NF.format(s.viceprimari.dupa)}</td></tr>
                     <tr><th scope="row">Consilieri locali</th><td>${NF.format(s.consilieriLocali.inainte)}</td><td>${NF.format(s.consilieriLocali.dupa)}</td></tr>
+                    <tr><th scope="row">Președinți și vicepreședinți de consiliu județean → regional</th><td>${NF.format(s.conducereSuperioara.inainte)}</td><td>${NF.format(s.conducereSuperioara.dupa)}</td></tr>
                     <tr><th scope="row">Consilieri județeni → regionali</th><td>${NF.format(s.mandateJudetene)}</td><td>${NF.format(s.mandateRegionale)}</td></tr>
                     <tr><th scope="row">Locuri în consiliile de district</th><td>—</td><td>${NF.format(s.primari.dupa)} (toți primarii, neremunerat)</td></tr>
                     <tr><th scope="row">Aparatul consiliilor județene</th><td>${lei(c.aparatCJ)} pe an</td><td>${lei(c.aparatCJ * COTA_CJ_PASTRATA)} pe an</td></tr>
                     <tr><th scope="row"><b>Economie totală pe an</b></th><td>—</td><td><b>${lei(c.economie)}</b>
-                        <small>(${lei(c.economiePrimarii)} din primării, ${lei(c.economieCJ)} din consiliile județene)</small></td></tr>
+                        <small>(${lei(c.economiePrimarii)} din primării, ${lei(c.economieCJ)} din consiliile județene); cu serviciile
+                        statului din județe (ipoteză: o cincime din personal), <b>${lei(c.economie + (c.economieStat || 0))}</b></small></td></tr>
                 </tbody>
             </table>
             <h3>Consiliile regionale: locurile, pe județe</h3>
@@ -644,13 +638,10 @@ window.AdpRaport = function() {
     function costUnitati(grupuri, executie) {
         let acum = 0, dupa = 0;
         grupuri.forEach(g => {
-            const ale = g.membri.map(i => executie.get(i)).filter(Boolean);
-            if (!ale.length) return;
-            acum += ale.reduce((a, e) => a + (e.cheltuieliAparat || 0), 0);
-            const sediu = executie.get(g.sediu);
-            const altele = ale.filter(e => e !== sediu);
-            dupa += (sediu ? sediu.cheltuieliAparat || 0 : Math.max(...ale.map(e => e.cheltuieliAparat || 0))) +
-                COTA_BIROURI * altele.reduce((a, e) => a + (e.cheltuieliAparat || 0), 0);
+            const c = window.AdpReorganizare.aparatUnitate(g.membri, g.sediu, i => executie.get(i), COTA_BIROURI);
+            if (!c) return;
+            acum += c.acum;
+            dupa += c.dupa;
         });
         return { acum: acum, dupa: dupa, economie: acum - dupa };
     }
@@ -1002,39 +993,6 @@ window.AdpRaport = function() {
     }
 
     /**
-     * Unde ar sta instituțiile regionale ale unei regiuni: fiecare grup de instituții într-o
-     * reședință de județ, ca regiunea să nu aibă un singur oraș care adună tot. Trei grupuri au
-     * ancoră — stau unde statul a pus deja structura regională; restul merg, pe rând, în reședința
-     * cea mai puțin încărcată, la egalitate în cea mai mare.
-     */
-    function sediiRegionale(date, regional, lista, adr) {
-        const resedinte = date.uat.filter(u => u.adr === adr.c && (u.r || u.t === "municipiu" && u.n === "București"))
-            .sort((a, b) => (b.pop || 0) - (a.pop || 0));
-        const gazduieste = new Map(resedinte.map(u => [u.s, []]));
-        const sistem = cod => ((regional && regional.sisteme) || []).find(s => s.cod === cod);
-        const sediul = cod => ((sistem(cod) || {}).sedii || []).map(x => x.siruta).find(s => gazduieste.has(s));
-        const celMaiLiber = () => resedinte.reduce((a, u) =>
-            gazduieste.get(u.s).length < gazduieste.get(a.s).length ? u : a).s;
-        lista.grupuri.forEach(g => {
-            let unde;
-            if (g.ancora === "medical") unde = (resedinte.find(u => lista.centreMedicale.includes(u.n)) || {}).s;
-            else if (g.ancora) unde = sediul(g.ancora);
-            if (unde === undefined) unde = celMaiLiber();
-            gazduieste.get(unde).push(g.nume);
-        });
-        const curti = new Set(((sistem("curte-apel") || {}).sedii || []).map(x => x.siruta));
-        return resedinte.map(u => ({
-            uat: u,
-            grupuri: gazduieste.get(u.s),
-            azi: [
-                sediul("adr") === u.s ? "agenția de dezvoltare regională" : "",
-                sediul("dgrfp") === u.s ? "direcția regională a finanțelor" : "",
-                curti.has(u.s) ? "curte de apel" : ""
-            ].filter(Boolean)
-        }));
-    }
-
-    /**
      * Județ cu județ: câți oameni lucrează în administrația publică și cât costă, azi și după.
      * Salariații și câștigul vin din INS; cheltuiala de personal a primăriilor și a consiliului
      * județean, din execuția bugetară. Numărul de oameni al primăriilor și al consiliului județean
@@ -1229,82 +1187,6 @@ window.AdpRaport = function() {
                 propunere de pornire, de negociat în fiecare regiune.</p>`;
     }
 
-    // Atribuțiile consiliului județean și unde se mută (pasul 4 din sinteza.html). Gruparea e o propunere,
-    // așezată pe tabelul de mutări din sinteză; destinațiile (clasificația funcțională din execuția
-    // bugetară) se potrivesc după început. `sector`: secțiunea din statistica de personal al cărei câștig
-    // mediu dă numărul de oameni.
-    const ATRIBUTII_CJ = [
-        { cod: "aparat", nume: "Aparatul consiliului județean", merge: "aparat", sector: "O",
-            prefixe: ["autoritati executive", "alte servicii publice generale"] },
-        { cod: "evidenta", nume: "Evidența persoanelor", merge: "district", sector: "O",
-            prefixe: ["servicii publice comunitare de evidenta"] },
-        { cod: "drumuri", nume: "Drumuri județene și transport local", merge: "district", sector: "O",
-            prefixe: ["drumuri si poduri", "alte cheltuieli in domeniul transporturilor", "transport in comun"] },
-        { cod: "mediu", nume: "Mediu, utilități, protecție civilă, ordine publică", merge: "district", sector: "O",
-            prefixe: ["colectarea, tratarea", "salubritate", "alimentare cu apa", "alimantare cu gaze", "canalizarea",
-                "reducerea si controlul poluarii", "alte servicii in domeniul protectiei mediului", "protectia biosferei",
-                "alte servicii in domeniile locuintelor", "intretinere gradini", "iluminat public",
-                "dezvoltarea sistemului de locuinte", "protectie civila", "aparare nationala", "politie locala",
-                "alte cheltuieli in domeniul ordinii publice", "prevenire si combatere inundatii"] },
-        { cod: "sanatate", nume: "Spitale și sănătate", merge: "regiune", sector: "Q",
-            prefixe: ["spitale", "alte institutii si actiuni sanitare", "servicii de sanatate publica",
-                "unitati de asistenta medico-sociale", "unitati medico-sociale"] },
-        { cod: "social", nume: "Asistență socială și protecția copilului", merge: "regiune", sector: "Q",
-            prefixe: ["asistenta sociala", "asistenta acordata persoanelor in varsta",
-                "alte cheltuieli in domeniul asigurarilor si asistentei sociale", "ajutor social",
-                "transferuri din bugetele consiliilor judetene pentru finantarea centrelor pentru protectia copilului"] },
-        { cod: "cultura", nume: "Cultură, sport, tineret, turism", merge: "regiune", sector: "O",
-            prefixe: ["muzee", "institutii publice de spectacole", "biblioteci", "centre culturale",
-                "centre pentru conservarea", "scoli populare de arta", "alte servicii culturale",
-                "alte servicii in domeniile culturii", "consolidarea si restaurarea", "servicii religioase", "sport",
-                "tineret", "turism", "edituri", "presa"] },
-        { cod: "invatamant", nume: "Învățământ", merge: "regiune", sector: "P",
-            prefixe: ["invatamant", "alte cheltuieli in domeniul invatamantului", "internate si cantine"] },
-        { cod: "aeroporturi", nume: "Aeroporturi și aviație civilă", merge: "regiune", sector: "O",
-            prefixe: ["aeroporturi", "aviatia civila"] },
-        { cod: "dezvoltare", nume: "Dezvoltare economică și regională", merge: "regiune", sector: "O",
-            prefixe: ["alte actiuni economice", "alte cheltuieli pentru actiuni generale economice",
-                "programe de dezvoltare regionala", "proiecte de dezvoltare multifunctionale",
-                "alte cheltuieli in domeniul agriculturii", "protectia plantelor", "zone libere"] },
-        { cod: "datorie", nume: "Datoria publică și împrumuturile", merge: "regiune", sector: "O",
-            prefixe: ["tranzactii privind datoria publica"] }
-    ];
-    const ATRIBUTIE_NEPLASATA = { cod: "alte", nume: "Alte destinații (de stabilit)", merge: "de stabilit", sector: "O" };
-
-    /** Atribuția unei destinații bugetare, după începutul denumirii (fără diacritice în sursă). */
-    function atributieDestinatiei(nume) {
-        const t = nume.replace(/\s+/g, " ").trim().toLowerCase();
-        return ATRIBUTII_CJ.find(a => a.prefixe.some(p => t.startsWith(p))) || ATRIBUTIE_NEPLASATA;
-    }
-
-    /**
-     * Ce mută fiecare consiliu județean: pe atribuții, cu banii și oamenii (estimați din cheltuiala de personal,
-     * la câștigul mediu al județului în sectorul atribuției). Banii se mută odată cu atribuția; economia
-     * vine doar din aparat.
-     */
-    function mutariCJ(date, cj, personal) {
-        return date.judete.map(j => {
-            const c = cj.judete[j.c];
-            if (!c) return null;
-            const castig = ((personal && personal.judete && personal.judete[j.c]) || {}).castigBrut || {};
-            const grupuri = new Map([...ATRIBUTII_CJ, ATRIBUTIE_NEPLASATA].map(a => [a.cod, { a: a, lei: 0, personal: 0, oameni: 0 }]));
-            c.destinatii.forEach(d => {
-                const g = grupuri.get(atributieDestinatiei(d.nume).cod);
-                g.lei += d.total;
-                g.personal += d.personal;
-                const cost = castig[g.a.sector] ? castig[g.a.sector] * 12 * COST_ANGAJATOR : null;
-                if (cost) g.oameni += d.personal / cost;
-            });
-            const dupaDestinatie = merge => Array.from(grupuri.values()).filter(g => g.a.merge === merge)
-                .reduce((t, g) => ({ lei: t.lei + g.lei, oameni: t.oameni + g.oameni }), { lei: 0, oameni: 0 });
-            return {
-                cod: j.c, nume: j.n, adr: date.uat.find(u => u.j === j.c).adr, total: c.total, grupuri: grupuri,
-                aparat: dupaDestinatie("aparat"), district: dupaDestinatie("district"),
-                regiune: dupaDestinatie("regiune"), neplasat: dupaDestinatie("de stabilit")
-            };
-        }).filter(Boolean);
-    }
-
     function randeazaTransfer(date, cj, personal) {
         const cont = $("#transfer-cifre");
         if (!cont) return;
@@ -1404,7 +1286,7 @@ window.AdpRaport = function() {
      * Fișele de județ (pasul 3 din sinteza.html): pentru fiecare județ, ce devin UAT-urile lui, lista
      * derogărilor unitate cu unitate și alegerile de mână. Deasupra, tabelul celor 41 de județe.
      */
-    function randeazaFiseJudet(date, r, executie, alegeri, regula) {
+    function randeazaFiseJudet(date, r, executie, alegeri, regula, surse) {
         const cont = $("#judete-cifre");
         if (!cont) return;
         const pMin = r.parametri.pMin;
@@ -1463,12 +1345,22 @@ window.AdpRaport = function() {
                             ${randTabel("Timp mediu sat → reședință", NF1.format(f.ind.inainte.timpMediu) + " min", NF1.format(f.ind.dupa.timpMediu) + " min")}
                             ${randTabel(`Sate (≥ ${r.parametri.pSatMin} loc.) la peste ${r.parametri.tMax} min`, NF.format(f.ind.inainte.pesteTMax), NF.format(f.ind.dupa.pesteTMax))}
                             ${randTabel("Aparatul primăriilor", lei(f.aparat.acum), lei(f.aparat.dupa))}
+                            ${(() => {
+                                // deasupra primăriilor: consiliul județean și serviciile statului (js/adp-institutii.js)
+                                const sus = surse && surse.finante ? INST.economiiJudete(date, [f.j.c], surse.finante, surse.personal) : null;
+                                if (!sus) return "";
+                                return randTabel("Aparatul consiliului județean", lei(sus.aparatCJ), lei(sus.aparatCJ - sus.economieCJ)) +
+                                    randTabel(`Personalul serviciilor statului <small>(estimat, −${Math.round(100 * REDUCERE_STAT)}%)</small>`,
+                                        lei(sus.personalStat), lei(sus.personalStat - sus.economieStat)) +
+                                    randTabel("Economie pe an, în total", "—", lei(f.aparat.economie + sus.economieCJ + sus.economieStat));
+                            })()}
                             ${randTabel(`Peste ${regula.prag}% din veniturile proprii`, NF.format(f.pesteAzi), NF.format(f.cuTermen) + ` <small>(${regula.termenAni} ani să coboare)</small>`)}
                             ${randTabel("Districte", "—", NF.format(f.districte))}
                         </tbody>
                     </table></div>
                     <p class="nota"><a href="index.html#judet=${f.j.c}">Pe hartă, pas cu pas</a>: același județ,
                         cu regulile tale, și harta de azi lângă cea propusă.</p>
+                    <div class="fisa-inst" data-judet="${f.j.c}"><p class="nota">Aleșii și instituțiile județului apar la deschiderea fișei.</p></div>
                     <h4>Derogări</h4>
                     ${derogari}
                     <h4>Alegeri de mână</h4>
@@ -1513,6 +1405,13 @@ window.AdpRaport = function() {
                 de două ori. „Sub pragul unității” e ${NF.format(pMin)} de locuitori, sau ${NF.format(r.parametri.pMinOras)} pentru o unitate cu oraș. Fișa fiecărui județ se deschide din tabel și arată, unitate cu unitate, ce
                 derogare are și de ce.</p>
             ${regiuni.map(x => `<h3>${esc(x.a.n === "București-Ilfov" ? "București–Ilfov" : x.a.n)}</h3>${x.ale.map(fisa).join("")}`).join("")}`;
+        // aleșii și instituțiile județului (js/adp-institutii.js): se calculează când se deschide fișa
+        cont.querySelectorAll("details.strat").forEach(d => d.addEventListener("toggle", () => {
+            const tinta = d.querySelector(".fisa-inst");
+            if (!d.open || !tinta || tinta.dataset.gata) return;
+            tinta.innerHTML = INST.fisaJudet(date, r, Number(tinta.dataset.judet), surse, { clasa: "tabel-doc", titlu: "h4" });
+            tinta.dataset.gata = "1";
+        }));
         window.addEventListener("hashchange", deschideFisa);
         deschideFisa();
     }
@@ -1747,6 +1646,8 @@ window.AdpRaport = function() {
                 transferuri: (alegeri && alegeri.transferuri) || []
             });
             const c = costuri(date, r, executie, finante);
+            // serviciile statului din județe (ipoteză: −20% personal), ca în sinteză și pe hartă
+            c.economieStat = INST.economiiJudete(date, date.judete.map(j => j.c), finante, personal).economieStat;
             const regional = institutii ? regionalizeaza(date, vecini, institutii, dependente) : null;
             const s = structura(date, r, regional);
 
@@ -1763,7 +1664,10 @@ window.AdpRaport = function() {
             randeazaGal(date, r, gal);
             randeazaOrganizare(date, r, s, gal);
             randeazaStatut(r);
-            randeazaFiseJudet(date, r, executie, alegeri, dependente.reorganizare.REGULA_FINANCIARA);
+            randeazaFiseJudet(date, r, executie, alegeri, dependente.reorganizare.REGULA_FINANCIARA, {
+                judecatorii: judecatorii, gal: gal, institutii: institutii, lista: institutiiJudetene,
+                cj: cj, personal: personal, infra: infra, finante: finante
+            });
             randeazaInstitutii(date, r, institutii, institutiiJudetene);
             randeazaPersonal(date, r, executie, finante, personal);
             randeazaTransfer(date, cj, personal);
