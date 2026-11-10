@@ -45,7 +45,9 @@ window.AdpRaport = function() {
     const CONSILIERI_JUDETENI = INST.CONSILIERI_JUDETENI;
     // ipoteza de cost: unitatea nouă păstrează aparatul reședinței, plus un sfert din
     // aparatul fiecărei primării desființate, pentru punctele de lucru din sate
-    const COTA_BIROURI = 0.25;
+    // reglabilă din cursorul din capul paginii (#f-birou): cifrele care depind de ea se refac pe loc
+    const COTA_BIROURI_IMPLICITA = window.AdpReorganizare.REGULA_FINANCIARA.cotaBirouri;
+    let cotaBirouri = COTA_BIROURI_IMPLICITA;
     const PRAG_ADMINISTRATIE = 30;   // % din veniturile proprii (Republica Moldova)
     // propunerea de reducere a reprezentării: dublarea populației pentru un consilier
     const FACTOR_CONSILIERI = window.AdpReorganizare.FACTOR_CONSILIERI;
@@ -116,7 +118,7 @@ window.AdpRaport = function() {
             const ale = g.membri.map(i => executie.get(i)).filter(Boolean);
             if (!ale.length) return;
             cuDateDupa++;
-            const cost = window.AdpReorganizare.aparatUnitate(g.membri, g.sediu, i => executie.get(i), COTA_BIROURI).dupa;
+            const cost = window.AdpReorganizare.aparatUnitate(g.membri, g.sediu, i => executie.get(i), cotaBirouri).dupa;
             const venituri = ale.reduce((a, e) => a + (e.venituriProprii || 0), 0);
             aparatDupa += cost;
             if (venituri > 0 && 100 * cost / venituri > PRAG_ADMINISTRATIE) pesteDupa++;
@@ -380,7 +382,7 @@ window.AdpRaport = function() {
                     ${randPereche("Districte în afara pragurilor europene", "—", NF.format(s.districtePragUE), "LEADER: 10.000–150.000 loc. în comune și orașe sub 20.000; orașele mai mari merg pe strategia lor urbană")}
                     ${randPereche("Nivel superior", "41 de consilii județene alese", s.regiuni + " consilii regionale alese", "cele 8 regiuni de dezvoltare de azi (Legea 315/2004), cu București–Ilfov ca Metropolă")}
                     ${randPereche("Sedii administrative", NF.format(s.oficii.inainte), NF.format(s.oficii.dupa), "primării + CJ + prefecturi → primării + districte + oficii județene + regiuni")}
-                    ${randPereche("Costul aparatului (an)", lei(c.aparat.inainte), lei(c.aparat.dupa), `ipoteză: unitatea nouă păstrează aparatul reședinței + ${Math.round(COTA_BIROURI * 100)}% din al fiecărei primării desființate`)}
+                    ${randPereche("Costul aparatului (an)", lei(c.aparat.inainte), lei(c.aparat.dupa), `ipoteză: unitatea nouă păstrează aparatul reședinței + ${Math.round(cotaBirouri * 100)}% din al fiecărei primării desființate`)}
                     ${randPereche("Drum mediu la reședință", NF1.format(r.inainte.timpMediu) + " min", NF1.format(r.dupa.timpMediu) + " min", "timpi rutieri OSRM")}
                     ${randPereche(`Sate la peste ${r.parametri.tMax} min`, NF.format(r.inainte.pesteTMax), NF.format(r.dupa.pesteTMax), "sate cu cel puțin 50 de locuitori")}
                     ${randPereche("Sate cu delegat și fond propriu", "0", NF.format(r.sate.length), "Codul administrativ, art. 142 + fond sătesc")}
@@ -428,7 +430,7 @@ window.AdpRaport = function() {
                     Veniturile proprii = toate capitolele de venituri, mai puțin sumele defalcate din TVA,
                     subvențiile, fondurile europene și operațiunile financiare.</li>
                 <li><b>Ipoteza de după comasare</b>: unitatea nouă păstrează aparatul primăriei-reședință și
-                    ${Math.round(COTA_BIROURI * 100)}% din aparatul fiecărei primării desființate, pentru punctele
+                    ${Math.round(cotaBirouri * 100)}% din aparatul fiecărei primării desființate, pentru punctele
                     de lucru din sate. E o ipoteză prudentă: reformele din Danemarca și Estonia au arătat economii
                     mai mari pe funcțiile administrative, dar și costuri de tranziție în primii ani, care nu sunt
                     estimate aici.</li>
@@ -630,7 +632,7 @@ window.AdpRaport = function() {
     function costUnitati(grupuri, executie) {
         let acum = 0, dupa = 0;
         grupuri.forEach(g => {
-            const c = window.AdpReorganizare.aparatUnitate(g.membri, g.sediu, i => executie.get(i), COTA_BIROURI);
+            const c = window.AdpReorganizare.aparatUnitate(g.membri, g.sediu, i => executie.get(i), cotaBirouri);
             if (!c) return;
             acum += c.acum;
             dupa += c.dupa;
@@ -1278,9 +1280,11 @@ window.AdpRaport = function() {
      * Fișele de județ (pasul 3 din sinteza.html): pentru fiecare județ, ce devin UAT-urile lui, lista
      * derogărilor unitate cu unitate și alegerile de mână. Deasupra, tabelul celor 41 de județe.
      */
+    let fiseLegate = false;
     function randeazaFiseJudet(date, r, executie, alegeri, regula, surse) {
         const cont = $("#judete-cifre");
         if (!cont) return;
+        const deschise = Array.from(cont.querySelectorAll("details.strat[open]")).map(d => d.id);
         const pMin = r.parametri.pMin;
         const dupaSiruta = new Map(date.uat.map((u, i) => [u.s, i]));
         const alegeriJudet = (lista, camp, cod) => (lista || []).filter(a => {
@@ -1404,8 +1408,12 @@ window.AdpRaport = function() {
             tinta.innerHTML = INST.fisaJudet(date, r, Number(tinta.dataset.judet), surse, { clasa: "tabel-doc", titlu: "h4" });
             tinta.dataset.gata = "1";
         }));
-        window.addEventListener("hashchange", deschideFisa);
-        deschideFisa();
+        deschise.forEach(id => { const d = document.getElementById(id); if (d) d.open = true; });
+        if (!fiseLegate) {
+            fiseLegate = true;
+            window.addEventListener("hashchange", deschideFisa);
+            deschideFisa();
+        }
     }
 
     /** Un link spre `#judet-XX` deschide și fișa județului, nu doar derulează până la ea. */
@@ -1637,39 +1645,56 @@ window.AdpRaport = function() {
                 comasari: (alegeri && alegeri.comasari) || [],
                 transferuri: (alegeri && alegeri.transferuri) || []
             });
-            const c = costuri(date, r, executie, finante);
-            // serviciile statului din județe (ipoteză: −20% personal), ca în sinteză și pe hartă
-            c.economieStat = INST.economiiJudete(date, date.judete.map(j => j.c), finante, personal).economieStat;
             const regional = institutii ? regionalizeaza(date, vecini, institutii, dependente) : null;
             const s = structura(date, r, regional);
-
-            randeazaRezumat(r, c, s);
-            randeazaDiagnostic(c, r, date, executie, dependente.reorganizare.REGULA_FINANCIARA);
-            randeazaImpact(c);
-            randeazaGuvernanta(r, c, s);
-            randeazaComparatie(r, c, s, dotari);
-            randeazaRepere(r, s, c);
-            randeazaIpoteze(r, c, s);
             const I = dependente.infrastructura;
+            const R = dependente.reorganizare;
+            const forme = infra && I ? formeInfrastructura(date, r, infra, finante, I) : null;
+
+            // ce nu depinde de ipoteza de cost se desenează o singură dată
             randeazaInfrastructura(date, r, infra, finante, I);
             randeazaZonare(date, r, infra, finante, I, judecatorii);
             randeazaGal(date, r, gal);
             randeazaOrganizare(date, r, s, gal);
             randeazaStatut(r);
-            randeazaFiseJudet(date, r, executie, alegeri, dependente.reorganizare.REGULA_FINANCIARA, {
-                judecatorii: judecatorii, gal: gal, institutii: institutii, lista: institutiiJudetene,
-                cj: cj, personal: personal, infra: infra, finante: finante
-            });
             randeazaInstitutii(date, r, institutii, institutiiJudetene);
-            randeazaPersonal(date, r, executie, finante, personal);
             randeazaTransfer(date, cj, personal);
-            const dateDistricte = dateExplorator(date, r, executie, infra, finante, I, gal);
-            if (dependente.explorator) {
-                dependente.explorator.porneste(dateDistricte);
-            }
-            randeazaPlanRegional(dateDistricte, date);
-            randeazaSumarHarta(date, r, c, s, infra && I ? formeInfrastructura(date, r, infra, finante, I) : null);
-            infasoaraTabele();
+
+            // ce depinde de cât păstrează biroul local din primăria desființată se reface la fiecare
+            // mișcare a cursorului; harta (comasările, districtele) rămâne aceeași
+            const randeazaBani = () => {
+                const c = costuri(date, r, executie, finante);
+                // serviciile statului din județe (ipoteză: −20% personal), ca în sinteză și pe hartă
+                c.economieStat = INST.economiiJudete(date, date.judete.map(j => j.c), finante, personal).economieStat;
+                randeazaRezumat(r, c, s);
+                randeazaDiagnostic(c, r, date, executie, R.REGULA_FINANCIARA);
+                randeazaImpact(c);
+                randeazaGuvernanta(r, c, s);
+                randeazaComparatie(r, c, s, dotari);
+                randeazaRepere(r, s, c);
+                randeazaIpoteze(r, c, s);
+                randeazaFiseJudet(date, r, executie, alegeri, R.REGULA_FINANCIARA, {
+                    judecatorii: judecatorii, gal: gal, institutii: institutii, lista: institutiiJudetene,
+                    cj: cj, personal: personal, infra: infra, finante: finante
+                });
+                randeazaPersonal(date, r, executie, finante, personal);
+                const dateDistricte = dateExplorator(date, r, executie, infra, finante, I, gal);
+                if (dependente.explorator) {
+                    dependente.explorator.porneste(dateDistricte);
+                }
+                randeazaPlanRegional(dateDistricte, date);
+                randeazaSumarHarta(date, r, c, s, forme);
+                infasoaraTabele();
+                notaCota();
+            };
+            randeazaBani();
+            leagaCursorul(cota => {
+                cotaBirouri = cota;
+                // testul de 30% pe unitățile noi, cu aceeași ipoteză de cost
+                r.grupuri.forEach(g => { g.financiar = R.testFinanciar(g.membri, g.sediu, g.populatie, executie, cotaBirouri); });
+                r.financiar = R.sumarFinanciar(r.grupuri);
+                randeazaBani();
+            });
         } catch (e) {
             console.error(`[ro-adp] Raportul nu a putut fi calculat (${e.message}).`);
             document.querySelectorAll("#rezumat-cifre, #diagnostic-cifre, #comparatie-tabel, #repere-tabel, #ipoteze, #infrastructura-cifre, #sumar-harta-cifre, #tabel-districte, #gal-cifre, #institutii-cifre, #organizare-cifre, #statut-cifre, #personal-cifre, #transfer-cifre, #plan-regional-cifre, #judete-cifre")
@@ -1678,6 +1703,44 @@ window.AdpRaport = function() {
                         Pagina trebuie servită prin HTTP, iar datele generate cu scripturile din <code>unelte/</code>.</p>`;
                 });
         }
+    }
+
+    /**
+     * Cursorul din capul paginii: cât păstrează biroul local din aparatul primăriei desființate.
+     * Pornește mereu de la calculul de bază, ca cifrele din pagină să se potrivească cu sinteza.
+     */
+    function leagaCursorul(laSchimbare) {
+        const cursor = $("#f-birou");
+        if (!cursor) return;
+        cursor.value = String(Math.round(cotaBirouri * 100));
+        cursor.disabled = false;
+        const eticheta = () => {
+            const v = Number(cursor.value);
+            $("#f-birou-val").textContent = `${v}%` + (v === Math.round(COTA_BIROURI_IMPLICITA * 100) ? " (calculul de bază)" : "");
+        };
+        eticheta();
+        let temporizator = null;
+        cursor.addEventListener("input", () => {
+            eticheta();
+            document.body.classList.add("se-recalculeaza");
+            clearTimeout(temporizator);
+            temporizator = setTimeout(() => {
+                laSchimbare(Number(cursor.value) / 100);
+                document.body.classList.remove("se-recalculeaza");
+            }, 250);
+        });
+    }
+
+    /** Nota din „Verdictul în cifre”: ce ipoteză de cost stă sub cifrele din pagină. */
+    function notaCota() {
+        const nota = $("#nota-cota");
+        if (!nota) return;
+        const v = Math.round(cotaBirouri * 100), baza = Math.round(COTA_BIROURI_IMPLICITA * 100);
+        nota.innerHTML = `Ipoteza de cost a cifrelor din pagină: unitatea nouă păstrează aparatul primăriei-reședință și
+            <b>${v}%</b> din al fiecărei primării desființate, pentru biroul local` +
+            (v === baza ? ` — calculul de bază, același ca în <a href="sinteza.html#cifre">sinteză</a>.`
+                : ` — <b>nu</b> calculul de bază (${baza}%), deci cifrele diferă de <a href="sinteza.html#cifre">sinteză</a>.`) +
+            ` O schimbi din <a href="#tablou">cursorul de sus</a>.`;
     }
 
     /** Simularea regională, pe aceleași date ca stratul de pe hartă. */

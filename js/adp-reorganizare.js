@@ -1679,6 +1679,8 @@ window.AdpReorganizare = function() {
     return {
         PARAMETRI_IMPLICITI: PARAMETRI_IMPLICITI,
         aparatUnitate: aparatUnitate,
+        testFinanciar: testFinanciar,
+        sumarFinanciar: sumarFinanciar,
         CONSILIERI_LOCALI: CONSILIERI_LOCALI,
         FACTOR_CONSILIERI: FACTOR_CONSILIERI,
         consilieriLocali: consilieriLocali,

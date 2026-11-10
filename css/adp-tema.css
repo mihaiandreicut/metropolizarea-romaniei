@@ -2286,3 +2286,24 @@ label.inactiv {
     border-top: 1px solid var(--axa);
     font-weight: 600;
 }
+
+/* raport: cursorul ipotezei de cost (cât păstrează biroul local) */
+.ipoteza-cost {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    margin: 10px 0 4px;
+    font-size: 14px;
+}
+
+.ipoteza-cost input[type="range"] {
+    width: min(260px, 100%);
+}
+
+body.se-recalculeaza .document,
+body.se-recalculeaza #carduri,
+body.se-recalculeaza #tabel-teritorii {
+    opacity: 0.55;
+    transition: opacity 0.15s;
+}

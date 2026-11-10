@@ -381,9 +381,13 @@ window.AdpExplorator = function() {
             d.nrActiuni = d.actiuni.length;
             d.cautare = simplu(d.cautare);
         });
-        leaga();
+        if (!legat) {
+            leaga();
+            legat = true;
+        }
         randeaza();
     }
+    let legat = false;   // evenimentele filtrelor, legate la prima pornire; apoi doar datele se schimbă
 
     return {
         porneste: porneste
