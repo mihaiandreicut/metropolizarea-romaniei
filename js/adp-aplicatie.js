@@ -116,7 +116,7 @@ window.AdpAplicatie = function() {
             stil: u => `--secv-${clasa(u.pop, CLASE_POPULATIE)}`,
             limite: { uat: true, judet: true },
             legenda: () => legendaSecventiala(CLASE_POPULATIE, "locuitori", u => clasa(u.pop, CLASE_POPULATIE)),
-            nota: "Populația după domiciliu la 1 ianuarie 2026 (INS, POP107D). Pragul de 3.000 de locuitori, minimul comunei în propunere, separă treptele 2 și 3; 5.000, folosit des ca minim pentru o comună viabilă, separă treptele 3 și 4.",
+            nota: "Populația rezidentă estimată la 1 ianuarie 2026: recensământul 2021, cu evoluția după domiciliu, adus la totalurile rezidente ale INS pe județe. Pragul de 3.000 de locuitori, minimul comunei în propunere, separă treptele 2 și 3; 5.000, folosit des ca minim pentru o comună viabilă, separă treptele 3 și 4.",
             etichete: () => eticheteGrup(u => u.j, k => numeJudet(k), "e-judet")
         },
         densitate: {
@@ -277,7 +277,7 @@ window.AdpAplicatie = function() {
         const u = date.uat[idx];
         const adr = date.adr.find(r => r.c === u.adr);
         const d = densitate(u);
-        const evolutie = u.p11d ? (100 * (u.pop - u.p11d) / u.p11d) : null;
+        const evolutie = u.p11d ? (100 * ((u.pd || u.pop) - u.p11d) / u.p11d) : null;
         const et = u.et || {};
         const minoritate = et.min && et.pmin >= 1 ? `${esc(et.min)} ${NF1.format(et.pmin)}%${et.pmin >= 20 ? ` <span class="eticheta-stare atentie" title="Peste 20%: drept la folosirea limbii materne în administrație (Codul administrativ)">≥ 20%</span>` : ""}` : "—";
         const html = `
@@ -287,7 +287,8 @@ window.AdpAplicatie = function() {
                 ${rand("Regiune de dezvoltare", esc(adr ? adr.n : "—"))}
                 ${rand("Regiune istorică", esc(u.ist))}
                 ${rand("Județ interbelic (1930)", esc(u.j30))}
-                ${rand("Populație după domiciliu, 1 ianuarie 2026", NF.format(u.pop))}
+                ${rand("Populație rezidentă estimată, 1 ianuarie 2026", NF.format(u.pop))}
+                ${u.pd ? rand("Populație după domiciliu, 1 ianuarie 2026", NF.format(u.pd)) : ""}
                 ${rand("Populație rezidentă 2021 (recensământ)", NF.format(u.p21))}
                 ${rand("Evoluție 2011–2026 (domiciliu)", evolutie === null ? "—" : `${evolutie > 0 ? "+" : ""}${NF1.format(evolutie)}%`)}
                 ${rand("Suprafață", `${NF1.format(u.a)} km²`)}
@@ -326,7 +327,7 @@ window.AdpAplicatie = function() {
                     <td style="width:34%"><span style="display:block;height:6px;border-radius:3px;background:var(--accent);width:${Math.max(2, 100 * (s.p || 0) / max)}%"></span></td>
                 </tr>`).join("")}
             </table>
-            <p class="nota" style="margin-top:6px">Populația: după domiciliu la 1 ianuarie 2026 (INS, POP107D); rezidentă 2021 din recensământ (RPL 2021, tab. 1.22). Punctele de pe hartă: coordonate Wikidata.</p>`;
+            <p class="nota" style="margin-top:6px">Populația rezidentă la 1 ianuarie 2026 e estimată: recensământul 2021 (RPL 2021, tab. 1.22), cu evoluția după domiciliu (INS, POP107D), adus la totalurile rezidente pe județe și medii (INS, POP105A). Domiciliul îi numără și pe cei plecați din țară. Punctele de pe hartă: coordonate Wikidata.</p>`;
         sate.forEach(s => {
             if (!s.e) return;
             Harta.punct(s.e, {

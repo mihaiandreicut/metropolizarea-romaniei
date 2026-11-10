@@ -12,4 +12,4 @@ Pagini:
 
 Site static, fără build: se deschide prin orice server HTTP (`python -m http.server`) sau direct prin GitHub Pages. Salvarea alegerilor de pe hartă (`date/corectii-districte.json`) cere `python unelte/server.py 8781`.
 
-Scripturile de prelucrare a datelor sunt în `unelte/`. Populația de referință (domiciliul la 1 ianuarie, ultimul an publicat de INS) se actualizează cu `python unelte/populatie.py`; cifrele citate în sinteză se refac cu `node unelte/cifre.js`. Datele vin din surse publice: INS TEMPO, data.gov.ro, geo-spatial.org, OpenStreetMap, Wikipedia (CC BY-SA 3.0) și execuția bugetară a UAT-urilor.
+Scripturile de prelucrare a datelor sunt în `unelte/`. Populația de referință (rezidenții estimați pe UAT la 1 ianuarie, ultimul an publicat de INS: recensământul 2021, cu evoluția după domiciliu, adus la populația rezidentă pe județe) se actualizează cu `python unelte/populatie.py`; cifrele citate în sinteză se refac cu `node unelte/cifre.js`. Datele vin din surse publice: INS TEMPO, data.gov.ro, geo-spatial.org, OpenStreetMap, Wikipedia (CC BY-SA 3.0) și execuția bugetară a UAT-urilor.

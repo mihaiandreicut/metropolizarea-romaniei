@@ -25,7 +25,7 @@
         prag e cea unde comasarea ar coborî o minoritate sub 20% (derogare).
 
    Pragul e DURABIL: se compară cu populația de azi ȘI cu proiecția la 2050
-   (ritmul 2011→2024 pe populația de domiciliu, plafonat și corectat cu
+   (ritmul 2011→2026 pe populația de domiciliu, plafonat și corectat cu
    îmbătrânirea). O unitate nouă trebuie să treacă pragul în ambele.
 
    Fiecare unitate propusă își păstrează jurnalul deciziilor (`dosar`) și lista
@@ -92,7 +92,7 @@ window.AdpReorganizare = function() {
         transferuri: null
     };
     const TIP_RESEDINTA = [9, 17, 22];
-    const AN_BAZA = 2026;          // anul populației de referință (u.pop, domiciliul la 1 ianuarie)
+    const AN_BAZA = 2026;          // anul populației de referință (u.pop, rezidenții estimați la 1 ianuarie)
     const RITM_MIN = -0.03;        // declinul anual nu se extrapolează sub -3%
     const RITM_MAX = 0.01;         // nici creșterea peste +1%: 30 de ani de creștere mare nu se presupun
     const NF = new Intl.NumberFormat("ro-RO");
@@ -156,8 +156,10 @@ window.AdpReorganizare = function() {
      * suficient ca pragul să nu fie trecut azi și ratat peste 25 de ani.
      */
     function ritmAnual(u) {
-        if (!u.p11d || !u.pop) return 0;
-        let r = Math.pow(u.pop / u.p11d, 1 / (AN_BAZA - 2011)) - 1;
+        // tendința se ia pe aceeași serie (domiciliul 2011 → 2026); se aplică populației rezidente
+        const domiciliu = u.pd || u.pop;
+        if (!u.p11d || !domiciliu) return 0;
+        let r = Math.pow(domiciliu / u.p11d, 1 / (AN_BAZA - 2011)) - 1;
         const imbatranire = u.v014 > 0 ? u.v65 / u.v014 : 3;
         r -= 0.002 * Math.max(0, imbatranire - 1.5);
         return Math.max(RITM_MIN, Math.min(RITM_MAX, r));

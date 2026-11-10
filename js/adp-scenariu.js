@@ -640,7 +640,7 @@ window.AdpScenariu = function() {
         r.districte.forEach(d => {
             const e = D.date.uat[d.sediu].e;
             if (!e || (ales && !(ales.tip === "adr" ? D.date.uat[d.sediu].adr === ales.cod : D.date.uat[d.sediu].j === ales.cod))) return;
-            D.harta.eticheta(e, `${D.esc(d.nume)}<br><small>${NF.format(d.populatie)} loc.</small>`, "e-scenariu")
+            D.harta.eticheta(e, `${D.esc(d.nume)}<br><small>${d.tip === "metropolitan" ? "zona metropolitană" : "districtul"}: ${NF.format(d.populatie)} loc.</small>`, "e-scenariu")
                 .addTo(stratNume);
         });
     }
@@ -1739,7 +1739,7 @@ window.AdpScenariu = function() {
                 ${rand(`UAT-uri sub ${NF.format(P.pMin)} de locuitori`, NF.format(pops.filter(p => p < P.pMin).length))}
                 ${b ? rand("Aparatul primăriilor, pe an", milioane(b.aparat)) : ""}
             </table>
-            <p class="nota">Populația după domiciliu la 1 ianuarie 2026 (INS); banii, din execuția bugetară 2025.
+            <p class="nota">Populația rezidentă estimată la 1 ianuarie 2026 (INS); banii, din execuția bugetară 2025.
                 ${tipPas(cheie) === "judet" ? "" : "Calculul pe mai multe județe durează câteva secunde."}</p>`;
     }
 
@@ -2006,7 +2006,7 @@ window.AdpScenariu = function() {
             ${lista}
             <p class="nota">Regulile: comuna ${NF.format(P.pMin)}–${NF.format(P.pTinta)} de locuitori, unitatea cu oraș
                 ${NF.format(P.pMinOras)}–${NF.format(P.pTintaOras)}, cel mult ${P.tMax} de minute până la reședință.
-                Populația: după domiciliu la 1 ianuarie 2026 (INS). Costul: execuția bugetară 2025; unitatea nouă
+                Populația: rezidentă, estimată la 1 ianuarie 2026 din recensământ și datele INS. Costul: execuția bugetară 2025; unitatea nouă
                 păstrează aparatul primăriei-reședință și un sfert din al fiecărei primării desființate. Consilierii:
                 Codul administrativ, art. 112, cu un consilier la dublul populației în propunere.
                 <a href="#sc-rezultat" id="pp-detalii">Toate detaliile: banii, districtele, satele</a> ·

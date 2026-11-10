@@ -18,7 +18,7 @@ window.AdpTopologie = function() {
 
     /** Decodifică arcele în liste de [lat, lng] și indexează folosirea lor. */
     function decodeaza(date) {
-        // populația de referință: „pop” (unelte/populatie.py, domiciliul la 1 ianuarie, ultimul an INS);
+        // populația de referință: „pop” (unelte/populatie.py, rezidenții estimați la 1 ianuarie, ultimul an INS);
         // în datele fără ea, recensământul din 2021
         date.uat.forEach(u => { if (u.pop === undefined || u.pop === null) u.pop = u.p21; });
         const q = date.cuanta;

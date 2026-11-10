@@ -381,8 +381,8 @@ window.AdpRaport = function() {
                 <thead><tr><th>Reper</th><th>azi</th><th>propus</th><th>sursa / ipoteza</th></tr></thead>
                 <tbody>
                     ${randPereche("Unități de bază", NF.format(s.unitati.inainte), NF.format(s.unitati.dupa), "scenariul implicit, calculat în pagină")}
-                    ${randPereche("Populația mediană", NF.format(r.inainte.mediana), NF.format(r.dupa.mediana), "INS, domiciliu 1 ianuarie 2026")}
-                    ${randPereche("Unități sub 3.000 loc.", NF.format(r.inainte.sub3000), NF.format(r.dupa.sub3000), "INS, domiciliu 1 ianuarie 2026")}
+                    ${randPereche("Populația mediană", NF.format(r.inainte.mediana), NF.format(r.dupa.mediana), "INS, rezidenți estimați la 1 ianuarie 2026")}
+                    ${randPereche("Unități sub 3.000 loc.", NF.format(r.inainte.sub3000), NF.format(r.dupa.sub3000), "INS, rezidenți estimați la 1 ianuarie 2026")}
                     ${randPereche(`Unități sub prag în ${r.parametri.anProiectie}`, NF.format(r.inainte.subPrag2050), NF.format(r.dupa.subPrag2050), "proiecție pe trendul 2011–2026 (domiciliu)")}
                     ${randPereche("Primari", NF.format(s.primari.inainte), NF.format(s.primari.dupa), "unul pe unitate")}
                     ${randPereche("Consilieri locali", NF.format(s.consilieriLocali.inainte), NF.format(s.consilieriLocali.dupa), "Codul administrativ, art. 112")}

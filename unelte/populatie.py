@@ -1,27 +1,34 @@
 # -*- coding: utf-8 -*-
 """
-populatie.py — populația de referință a fiecărui UAT: populația după domiciliu la
-1 ianuarie, ultimul an publicat de INS (TEMPO, matricea POP107D).
+populatie.py — populația de referință a fiecărui UAT: populația rezidentă estimată la
+1 ianuarie, ultimul an publicat de INS.
 
-Scrie date/populatie-uat.json și adaugă câmpul „pop” (plus metadatele „populatie”)
-în date/romania-uat.json, fără să atingă restul fișierului. Harta, raportul și
-scripturile din unelte/ folosesc „pop” ca populație de azi; „p21” rămâne
-recensământul din 2021, pentru structura etnică și pe vârste.
+INS publică anual populația rezidentă (cei care locuiesc efectiv aici de cel puțin 12 luni)
+doar pe județe, iar pe UAT doar populația după domiciliu, care îi numără și pe cei plecați
+din țară fără să-și schimbe buletinul — în zonele de emigrare, cu până la jumătate peste
+cei care locuiesc acolo. De aceea, populația unui UAT se estimează:
 
-Sursa, în ordinea în care se încearcă:
-  1. --csv FIȘIER: un export POP107D pe localități, cu coloanele
-     grupe/AGE, Sexe/SEX, Localitati/REF_AREA_2 („1017 MUNICIPIUL ALBA IULIA”),
-     Ani/TIME_PERIOD („2026” sau „Anul 2026”) și valoarea (OBS_VALUE/Valoare);
-     se însumează toate grupele de vârstă și ambele sexe. Exportul se face din
-     TEMPO-Online (statistici.insse.ro:8077), matricea POP107D.
-  2. Oglinda publică a bazei TEMPO (api-ins.gov2.ro, proiectul gov2-ro/tempo-ins-dump),
-     setul POP107D_grupe_localitate.
+    1. punctul de plecare e recensământul din 2021 (populația rezidentă, p21);
+    2. se aplică evoluția UAT-ului după domiciliu între anul recensământului și anul cerut
+       (TEMPO, POP107D): pondere = p21 × domiciliu(an) / domiciliu(2021);
+    3. ponderile se aduc, pe fiecare județ și mediu (urban / rural), la populația rezidentă
+       publicată de INS pentru anul cerut (TEMPO, POP105A).
 
-Verificări: fiecare UAT din hartă are valoare; totalul pe țară se tipărește, ca să
-fie comparat cu comunicatul de presă al INS (1 ianuarie 2026: 21.646,2 mii persoane).
+Scrie date/populatie-uat.json și adaugă în date/romania-uat.json câmpurile „pop” (populația
+rezidentă estimată, cea folosită de hartă, raport și unelte) și „pd” (populația după
+domiciliu, ca informație), plus metadatele „populatie”, fără să atingă restul fișierului.
+
+Sursele, în ordinea în care se încearcă:
+  1. --csv-domiciliu / --csv-rezidenti: exporturile POP107D (pe localități, anii 2021 și
+     anul cerut) și POP105A (pe județe și medii, anul cerut) din TEMPO-Online
+     (statistici.insse.ro:8077); se însumează grupele de vârstă, sexele (și mediile, unde e cazul).
+  2. Oglinda publică a bazei TEMPO (api-ins.gov2.ro, proiectul gov2-ro/tempo-ins-dump).
+
+Verificări: fiecare UAT are valoare; totalurile pe țară se tipăresc, ca să fie comparate cu
+comunicatele INS (1 ianuarie 2026: rezidenți 19.041.322, după domiciliu 21.646.220).
 
 Independent: doar biblioteca standard.
-Rulare:  python unelte/populatie.py [--an 2026] [--csv FIȘIER]
+Rulare:  python unelte/populatie.py [--an 2026] [--csv-domiciliu F] [--csv-rezidenti F]
 """
 
 import argparse
@@ -32,6 +39,7 @@ import os
 import re
 import sys
 import time
+import unicodedata
 import urllib.parse
 import urllib.request
 from collections import defaultdict
@@ -39,9 +47,9 @@ from collections import defaultdict
 RADACINA = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CALE_UAT = os.path.join(RADACINA, "date", "romania-uat.json")
 CALE_IESIRE = os.path.join(RADACINA, "date", "populatie-uat.json")
-OGLINDA = "https://api-ins.gov2.ro/api/datasets/POP107D_grupe_localitate"
+OGLINDA = "https://api-ins.gov2.ro/api/datasets/"
 AGENT = "ro-adp/1.0 (harta administrativa)"
-SURSA = "INS — TEMPO, POP107D: populația după domiciliu la 1 ianuarie, pe localități"
+AN_RECENSAMANT = 2021
 
 
 def coloana(rand, *nume):
@@ -52,36 +60,51 @@ def coloana(rand, *nume):
     return None
 
 
-def citeste_csv(text, an):
-    """Însumează vârstele și sexele pe cod SIRUTA, pentru anul cerut."""
-    pop, randuri = defaultdict(float), defaultdict(int)
+def fara_diacritice(text):
+    t = unicodedata.normalize("NFD", str(text or ""))
+    return "".join(c for c in t if unicodedata.category(c) != "Mn").upper().replace("MUNICIPIUL ", "").strip()
+
+
+def randuri(text):
+    """Rândurile unui export TEMPO, fără totalurile (care s-ar aduna peste detalii)."""
     for rand in csv.DictReader(io.StringIO(text)):
-        loc = coloana(rand, "REF_AREA_2", "Localitati", "localitate")
-        an_rand = coloana(rand, "TIME_PERIOD", "Ani", "Perioade")
-        valoare = coloana(rand, "OBS_VALUE", "Valoare", "valoare")
         varsta = (coloana(rand, "AGE", "grupe", "Varste si grupe de varsta") or "").strip().lower()
         sex = (coloana(rand, "SEX", "Sexe") or "").strip().lower()
-        if not loc or not an_rand or valoare in (None, ""):
+        mediu = (coloana(rand, "RESIDENCE", "Medii de rezidenta") or "").strip().lower()
+        valoare = coloana(rand, "OBS_VALUE", "Valoare", "valoare")
+        if valoare in (None, "") or varsta == "total" or sex in ("total", "ambele sexe") or mediu == "total":
             continue
-        # totalurile, dacă exportul le are, nu se adună peste detalii
-        if varsta == "total" or sex in ("total", "ambele sexe"):
-            continue
-        m = re.match(r"\s*(\d+)\s", loc)
-        if not m or int(re.sub(r"\D", "", an_rand) or 0) != an:
-            continue
-        cod = int(m.group(1))
-        pop[cod] += float(valoare)
-        randuri[cod] += 1
-    return pop, randuri
+        an = int(re.sub(r"\D", "", coloana(rand, "TIME_PERIOD", "Ani", "Perioade") or "0") or 0)
+        yield rand, an, float(valoare), mediu
 
 
-def din_oglinda(an):
-    filtre = urllib.parse.quote(json.dumps({"TIME_PERIOD": [str(an)]}))
-    url = f"{OGLINDA}/download?format=csv&lang=ro&filters={filtre}"
+def domiciliu(text):
+    """POP107D: {(siruta, an): populația după domiciliu}."""
+    pop = defaultdict(float)
+    for rand, an, valoare, _ in randuri(text):
+        m = re.match(r"\s*(\d+)\s", coloana(rand, "REF_AREA_2", "Localitati", "localitate") or "")
+        if m:
+            pop[(int(m.group(1)), an)] += valoare
+    return pop
+
+
+def rezidenti(text):
+    """POP105A: {(județ fără diacritice, "urban" | "rural", an): populația rezidentă}."""
+    pop = defaultdict(float)
+    for rand, an, valoare, mediu in randuri(text):
+        judet = fara_diacritice(coloana(rand, "REF_AREA", "judete", "Judete") or "")
+        if judet and mediu in ("urban", "rural"):
+            pop[(judet, mediu, an)] += valoare
+    return pop
+
+
+def din_oglinda(set_date, ani):
+    filtre = urllib.parse.quote(json.dumps({"TIME_PERIOD": [str(a) for a in ani]}))
+    url = f"{OGLINDA}{set_date}/download?format=csv&lang=ro&filters={filtre}"
     for k in range(3):
         try:
             cerere = urllib.request.Request(url, headers={"User-Agent": AGENT})
-            with urllib.request.urlopen(cerere, timeout=300) as r:
+            with urllib.request.urlopen(cerere, timeout=600) as r:
                 return r.read().decode("utf-8")
         except Exception:
             if k == 2:
@@ -90,51 +113,86 @@ def din_oglinda(an):
     return ""
 
 
+def citeste(cale):
+    with open(cale, encoding="utf-8-sig") as f:
+        return f.read()
+
+
 def principal():
     a = argparse.ArgumentParser(description=__doc__.split("\n")[1])
     a.add_argument("--an", type=int, default=2026)
-    a.add_argument("--csv", help="export POP107D descărcat manual")
+    a.add_argument("--csv-domiciliu", help="export POP107D (localități; anii 2021 și --an)")
+    a.add_argument("--csv-rezidenti", help="export POP105A (județe și medii; anul --an)")
     a = a.parse_args()
 
-    if a.csv:
-        with open(a.csv, encoding="utf-8-sig") as f:
-            text = f.read()
-        sursa = f"{SURSA} (export TEMPO-Online)"
-    else:
-        print(f"descarc POP107D, anul {a.an}, din oglinda TEMPO …")
-        text = din_oglinda(a.an)
-        sursa = f"{SURSA} (prin oglinda publică api-ins.gov2.ro, proiectul gov2-ro/tempo-ins-dump)"
-    pop, randuri = citeste_csv(text, a.an)
+    oglinda = not (a.csv_domiciliu and a.csv_rezidenti)
+    if oglinda:
+        print(f"descarc POP107D ({AN_RECENSAMANT}, {a.an}) și POP105A ({a.an}) din oglinda TEMPO …")
+    dom = domiciliu(citeste(a.csv_domiciliu) if a.csv_domiciliu
+                    else din_oglinda("POP107D_grupe_localitate", [AN_RECENSAMANT, a.an]))
+    rez = rezidenti(citeste(a.csv_rezidenti) if a.csv_rezidenti
+                    else din_oglinda("POP105A_judete_grupe", [a.an]))
 
     with open(CALE_UAT, encoding="utf-8") as f:
         harta = json.load(f)
-    coduri = [u["s"] for u in harta["uat"]]
-    lipsa = [c for c in coduri if c not in pop]
+    nume_judet = {j["c"]: fara_diacritice(j["n"]) for j in harta["judete"]}
+    lipsa = [u["s"] for u in harta["uat"] if (u["s"], a.an) not in dom]
     if lipsa:
-        print(f"EROARE: {len(lipsa)} UAT-uri fără valoare în {a.an}: {lipsa[:10]}", file=sys.stderr)
+        print(f"EROARE: {len(lipsa)} UAT-uri fără domiciliu în {a.an}: {lipsa[:10]}", file=sys.stderr)
         return 1
-    total = sum(pop[c] for c in coduri)
-    print(f"{len(coduri)} UAT-uri; total pe țară la 1 ianuarie {a.an}: {round(total):,}".replace(",", "."))
 
+    # pondere = recensământul × evoluția după domiciliu de la recensământ încoace
+    pondere, grupe = {}, defaultdict(list)
+    for u in harta["uat"]:
+        d0, d1 = dom.get((u["s"], AN_RECENSAMANT)), dom[(u["s"], a.an)]
+        baza = u.get("p21") or d1
+        pondere[u["s"]] = baza * (d1 / d0 if d0 else 1)
+        mediu = "rural" if u["t"] == "comună" else "urban"
+        grupe[(nume_judet[u["j"]], mediu)].append(u["s"])
+    estimat = {}
+    for (judet, mediu), coduri in grupe.items():
+        tinta = rez.get((judet, mediu, a.an))
+        if tinta is None:
+            print(f"EROARE: lipsește populația rezidentă {judet} / {mediu} / {a.an}", file=sys.stderr)
+            return 1
+        suma = sum(pondere[c] for c in coduri) or 1
+        for c in coduri:
+            estimat[c] = tinta * pondere[c] / suma
+
+    total_rez = sum(estimat.values())
+    total_dom = sum(dom[(u["s"], a.an)] for u in harta["uat"])
+    fmt = lambda v: f"{round(v):,}".replace(",", ".")
+    print(f"{len(estimat)} UAT-uri; la 1 ianuarie {a.an}: rezidenți {fmt(total_rez)}, după domiciliu {fmt(total_dom)}")
+
+    sursa = ("INS — TEMPO: recensământul 2021 (RPL 2021), evoluția după domiciliu pe localități (POP107D) "
+             f"și populația rezidentă pe județe și medii (POP105A), 1 ianuarie {a.an}"
+             + (" — prin oglinda publică api-ins.gov2.ro (gov2-ro/tempo-ins-dump)" if oglinda else " — exporturi TEMPO-Online"))
     iesire = {
-        "versiune": 1,
+        "versiune": 2,
         "generat": time.strftime("%Y-%m-%d"),
         "an": a.an,
         "referinta": f"1 ianuarie {a.an}",
+        "tip": "populația rezidentă estimată",
         "sursa": sursa,
-        "nota": "Populația după domiciliu e mai mare decât cea rezidentă acolo unde mulți locuitori "
-                "au plecat fără să-și schimbe domiciliul. INS calculează populația rezidentă doar pe județe.",
-        "total": round(total),
-        "uat": {str(c): round(pop[c]) for c in coduri},
+        "metoda": "Recensământul 2021 al fiecărui UAT, înmulțit cu evoluția lui după domiciliu de atunci, "
+                  "apoi adus, pe fiecare județ și mediu (urban / rural), la populația rezidentă publicată de INS.",
+        "nota": "Populația după domiciliu (câmpul „domiciliu”) e mai mare decât cea rezidentă acolo unde mulți "
+                "au plecat fără să-și schimbe domiciliul; INS publică populația rezidentă doar pe județe.",
+        "totalRezident": round(total_rez),
+        "totalDomiciliu": round(total_dom),
+        "uat": {str(u["s"]): round(estimat[u["s"]]) for u in harta["uat"]},
+        "domiciliu": {str(u["s"]): round(dom[(u["s"], a.an)]) for u in harta["uat"]},
     }
     with open(CALE_IESIRE, "w", encoding="utf-8") as f:
         json.dump(iesire, f, ensure_ascii=False, separators=(",", ":"))
     print("scris", CALE_IESIRE)
 
-    # romania-uat.json: același format compact, doar câmpul „pop” și metadatele în plus
-    harta["populatie"] = {"camp": "pop", "an": a.an, "referinta": iesire["referinta"], "sursa": sursa}
+    # romania-uat.json: același format compact, doar câmpurile „pop”, „pd” și metadatele
+    harta["populatie"] = {"camp": "pop", "an": a.an, "referinta": iesire["referinta"], "tip": iesire["tip"],
+                          "sursa": sursa}
     for u in harta["uat"]:
         u["pop"] = iesire["uat"][str(u["s"])]
+        u["pd"] = iesire["domiciliu"][str(u["s"])]
     with open(CALE_UAT, "w", encoding="utf-8") as f:
         json.dump(harta, f, ensure_ascii=False, separators=(",", ":"))
     print("actualizat", CALE_UAT)
