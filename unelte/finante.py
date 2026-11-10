@@ -19,12 +19,22 @@ Platforma de transparență refuză conexiunile TLS din afara unui browser, deci
 pasul 2 are nevoie de un fișier descărcat manual; scriptul spune exact ce
 așteaptă și unde.
 
+Execuția se potrivește pe SIRUTA după numele primăriei, în județul ei: cu diacriticele
+scoase, cu „â” citit și ca „i” (sursa scrie „Hopirta” pentru Hopârta), fără punctele din
+inițiale (C.A.Rosetti) și fără precizările din paranteză; ce rămâne se potrivește aproximativ,
+tot în județ (Rametea → Rimetea). Bucureștiul nu intră: execuția lui e pe primăria generală
+și pe sectoare. Un UAT care tot nu are execuție primește o estimare din curba costului —
+media pe locuitor a clasei lui de mărime — marcată „estimat”, ca să nu fie numărat la testul
+de 30%, dar să nu lipsească din costul unităților noi.
+
 Independent: doar biblioteca standard. Cititoarele de .xls/.xlsx sunt cele din
 unelte/prelucrare.py, încărcate din fișier, ca să nu existe două implementări.
 Rulare:  python unelte/finante.py [--surse DIR] [--forteaza]
+         python unelte/finante.py --doar-potrivire   (refă doar potrivirea pe SIRUTA, fără rețea)
 """
 
 import argparse
+import difflib
 import json
 import os
 import re
@@ -311,11 +321,128 @@ def executie_primarii(surse, forteaza, pauza=0.1):
     return rezultat, judete_cj
 
 
+# clasele de mărime ale curbei costului (aceleași ca în sinteză, unelte/cifre.js)
+CLASE_CURBA = (0, 1500, 3000, 5000, 7000, 10000, 20000, 50000)
+CAMPURI_CURBA = ("venituriProprii", "cheltuieliAparat", "cheltuieliTotal", "investitii",
+                 "personalAparat", "personalTotal")
+DIACRITICE = str.maketrans("ĂÂÎȘŞȚŢ", "AAISSTT")
+
+
+def cheie_nume(text, a_ca_i=False):
+    """Numele primăriei sau al UAT-ului, redus la cuvintele lui, fără tipul de unitate."""
+    t = str(text or "").upper()
+    if a_ca_i:
+        t = t.replace("Â", "I")
+    t = re.sub(r"\(.*?\)", " ", t).translate(DIACRITICE).replace(".", " ").replace("-", " ")
+    for cuvant in ("PRIMARIA", "MUNICIPIULUI", "MUNICIPIUL", "ORASULUI", "ORASUL", "COMUNEI", "COMUNA"):
+        t = re.sub(r"\b" + cuvant + r"\b", " ", t)
+    return " ".join(t.split())
+
+
+def potriveste_executia(date, executie):
+    """
+    {siruta: execuția}, potrivită după nume în județ. Întoarce și potrivirile aproximative
+    (de verificat) și execuțiile rămase fără UAT.
+    """
+    dupa_auto = {j["auto"]: j["c"] for j in date["judete"]}
+    bucuresti = next((j["c"] for j in date["judete"] if j["n"] == "București"), None)
+    chei = {}
+    for u in date["uat"]:
+        if u["j"] == bucuresti:
+            continue
+        for a_ca_i in (False, True):
+            chei.setdefault((u["j"], cheie_nume(u["n"], a_ca_i)), u["s"])
+    potrivite, ramase = {}, []
+    for cif, e in executie.items():
+        cod = dupa_auto.get(str(e.get("judet", "")).upper())
+        siruta = chei.get((cod, cheie_nume(e["nume"])))
+        if siruta is None or siruta in potrivite:
+            ramase.append((cod, cif))
+        else:
+            potrivite[siruta] = cif
+    # aproximativ, doar în același județ, doar între cele rămase de o parte și de alta
+    aproximative = []
+    for u in date["uat"]:
+        if u["s"] in potrivite or u["j"] == bucuresti:
+            continue
+        candidati = {cheie_nume(executie[cif]["nume"]): cif for cod, cif in ramase
+                     if cod == u["j"] and cif not in potrivite.values()}
+        gasite = difflib.get_close_matches(cheie_nume(u["n"], True), list(candidati), n=2, cutoff=0.8)
+        if len(gasite) == 1 or (len(gasite) == 2 and difflib.SequenceMatcher(
+                None, cheie_nume(u["n"], True), gasite[0]).ratio() > difflib.SequenceMatcher(
+                None, cheie_nume(u["n"], True), gasite[1]).ratio()):
+            potrivite[u["s"]] = candidati[gasite[0]]
+            aproximative.append({"siruta": u["s"], "uat": u["n"], "sursa": executie[candidati[gasite[0]]]["nume"]})
+    folosite = set(potrivite.values())
+    fara_uat = [executie[cif]["nume"] for cod, cif in ramase if cif not in folosite]
+    executie_uat = {}
+    for siruta, cif in potrivite.items():
+        e = executie[cif]
+        executie_uat[siruta] = {
+            "venituriProprii": e["venituriProprii"],
+            "cheltuieliAparat": e["cheltuieliAparat"],
+            "cheltuieliTotal": e.get("cheltuieliTotal"),
+            "investitii": e.get("investitii"),
+            "domenii": e.get("domenii"),
+            "personalAparat": e.get("personalAparat"),
+            "personalTotal": e.get("personalTotal"),
+            "pondere": e["pondere"],
+        }
+    return executie_uat, aproximative, fara_uat
+
+
+def completeaza_din_curba(date, executie_uat):
+    """
+    UAT-urile fără execuție (în afară de București) primesc, pe fiecare câmp, media pe locuitor
+    a clasei lor de mărime (suma pe clasă / populația clasei, doar din execuțiile reale),
+    înmulțită cu populația lor. Ponderea rămâne goală: estimarea nu intră la testul de 30%.
+    """
+    bucuresti = next((j["c"] for j in date["judete"] if j["n"] == "București"), None)
+    clasa = lambda p: max(k for k, prag in enumerate(CLASE_CURBA) if p >= prag)
+    suma = {}
+    for u in date["uat"]:
+        e = executie_uat.get(u["s"])
+        p = u.get("pop") or 0
+        if not e or e.get("estimat") or p <= 0:
+            continue
+        s = suma.setdefault(clasa(p), {"pop": 0, **{c: 0.0 for c in CAMPURI_CURBA}})
+        s["pop"] += p
+        for c in CAMPURI_CURBA:
+            s[c] += e.get(c) or 0
+    estimate = []
+    for u in date["uat"]:
+        p = u.get("pop") or 0
+        if u["s"] in executie_uat or u["j"] == bucuresti or p <= 0:
+            continue
+        s = suma.get(clasa(p))
+        if not s or not s["pop"]:
+            continue
+        executie_uat[u["s"]] = dict({c: round(p * s[c] / s["pop"], 2) for c in CAMPURI_CURBA},
+                                    domenii={}, pondere=None, estimat="curba")
+        estimate.append(u["s"])
+    return estimate
+
+
+def potrivire_pe_siruta(date, executie):
+    """Potrivirea, apoi curba pentru ce lipsește; tipărește ce a făcut."""
+    executie_uat, aproximative, fara_uat = potriveste_executia(date, executie)
+    print(f"   execuție potrivită pe SIRUTA: {len(executie_uat)}" +
+          (f"; aproximativ: {', '.join(a['uat'] + ' ← ' + a['sursa'] for a in aproximative)}" if aproximative else "") +
+          (f"; execuții fără UAT: {', '.join(fara_uat[:8])}{' …' if len(fara_uat) > 8 else ''}" if fara_uat else ""))
+    estimate = completeaza_din_curba(date, executie_uat)
+    nume = {u["s"]: u["n"] for u in date["uat"]}
+    print(f"   estimate din curba costului: {len(estimate)}" +
+          (f" ({', '.join(nume[s] for s in estimate[:8])}{' …' if len(estimate) > 8 else ''})" if estimate else ""))
+    return executie_uat, {"aproximative": aproximative, "estimate": estimate, "executiiFaraUat": fara_uat}
+
+
 def principal():
     ap = argparse.ArgumentParser(description="Datele financiare pentru criteriul de capacitate administrativă.")
     ap.add_argument("--surse", default=os.path.join(tempfile.gettempdir(), "ro-adp-surse"))
     ap.add_argument("--forteaza", action="store_true", help="descarcă din nou, ignorând copiile locale")
     ap.add_argument("--repede", action="store_true", help="fără pauză între cereri (folosește cu cap)")
+    ap.add_argument("--doar-potrivire", action="store_true",
+                    help="refă doar potrivirea pe SIRUTA, din execuția deja salvată (fără rețea)")
     arg = ap.parse_args()
 
     if not os.path.exists(CALE_UAT):
@@ -323,6 +450,14 @@ def principal():
         return 1
     with open(CALE_UAT, encoding="utf-8") as f:
         date = json.load(f)
+    if arg.doar_potrivire:
+        with open(CALE_IESIRE, encoding="utf-8") as f:
+            iesire = json.load(f)
+        iesire["executieUat"], iesire["potrivire"] = potrivire_pe_siruta(date, iesire["executie"])
+        with open(CALE_IESIRE, "w", encoding="utf-8") as f:
+            json.dump(iesire, f, ensure_ascii=False, separators=(",", ":"))
+        print(f"scris {CALE_IESIRE}")
+        return 0
     os.makedirs(arg.surse, exist_ok=True)
     citeste_xls, citeste_xlsx = citeste_tabele()
 
@@ -377,33 +512,7 @@ def principal():
     # execuția, potrivită pe SIRUTA: numele primăriei, în județul ei. Potrivirea se face
     # aici, o singură dată, ca modulele din pagină să caute direct după cod.
     dupa_auto = {j["auto"]: j["c"] for j in date["judete"]}
-    curat = lambda t: " ".join(str(t or "").upper().translate(tabel)
-                               .replace("PRIMARIA", " ").replace("MUNICIPIUL", " ")
-                               .replace("ORASUL", " ").replace("COMUNA", " ")
-                               .replace("-", " ").split())
-    dupa_cheie = {}
-    for u in date["uat"]:
-        dupa_cheie.setdefault((u["j"], curat(u["n"])), u["s"])
-    executie_uat, fara_uat = {}, []
-    for cif, e in executie.items():
-        # g4d dă județul prin numărul de înmatriculare (SB), nu prin nume
-        cod = dupa_auto.get(e["judet"].upper())
-        siruta = dupa_cheie.get((cod, curat(e["nume"])))
-        if siruta is None:
-            fara_uat.append(e["nume"])
-            continue
-        executie_uat[siruta] = {
-            "venituriProprii": e["venituriProprii"],
-            "cheltuieliAparat": e["cheltuieliAparat"],
-            "cheltuieliTotal": e.get("cheltuieliTotal"),
-            "investitii": e.get("investitii"),
-            "domenii": e.get("domenii"),
-            "personalAparat": e.get("personalAparat"),
-            "personalTotal": e.get("personalTotal"),
-            "pondere": e["pondere"],
-        }
-    print(f"   execuție potrivită pe SIRUTA: {len(executie_uat)}" +
-          (f"; nepotrivite: {', '.join(fara_uat[:4])}{' …' if len(fara_uat) > 4 else ''}" if fara_uat else ""))
+    executie_uat, potrivire = potrivire_pe_siruta(date, executie)
 
     iesire = {
         "versiune": 1,
@@ -415,6 +524,7 @@ def principal():
         "anExecutie": AN_EXECUTIE,
         "executie": executie,
         "executieUat": executie_uat,
+        "potrivire": potrivire,
         "consiliiJudetene": {str(dupa_auto[c]): v for c, v in consilii_judetene.items() if c in dupa_auto},
         "uat": uat,
         "surse": [

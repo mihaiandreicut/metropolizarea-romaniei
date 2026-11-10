@@ -197,7 +197,8 @@ window.AdpReorganizare = function() {
 
     function testFinanciar(lista, sediu, populatie, executie) {
         const ale = lista.map(i => executie.get(i)).filter(Boolean);
-        if (!ale.length) return null;
+        // fără nicio execuție reală (doar estimări din curba costului), testul nu se face
+        if (!ale.some(e => !e.estimat)) return null;
         const aparat = aparatUnitate(lista, sediu, i => executie.get(i)).dupa;
         const venituri = ale.reduce((a, e) => a + (e.venituriProprii || 0), 0);
         return {

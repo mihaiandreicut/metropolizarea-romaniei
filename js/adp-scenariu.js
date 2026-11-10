@@ -1888,8 +1888,8 @@ window.AdpScenariu = function() {
         const b = bani(r.uat);
         if (!executie || !c || !b) return null;
         const prag = D.reorganizare.REGULA_FINANCIARA.prag;
-        const cuDate = r.uat.filter(i => executie[D.date.uat[i].s]);
-        const locuitori = cuDate.reduce((s, i) => s + (D.date.uat[i].pop || 0), 0);
+        const cuDate = r.uat.filter(i => executie[D.date.uat[i].s] && !executie[D.date.uat[i].s].estimat);
+        const locuitori = r.uat.filter(i => executie[D.date.uat[i].s]).reduce((s, i) => s + (D.date.uat[i].pop || 0), 0);
         const cuDateDupa = r.grupuri.filter(g => g.financiar && g.financiar.pondere !== null);
         // deasupra primăriilor: jumătate din aparatul consiliilor județene și 20% din personalul
         // serviciilor statului (js/adp-institutii.js); nu depind de regulile de comasare

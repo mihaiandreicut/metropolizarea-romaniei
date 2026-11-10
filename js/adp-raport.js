@@ -91,22 +91,11 @@ window.AdpRaport = function() {
 
     /** Execuția bugetară a unui UAT, potrivită după numele primăriei din județul lui. */
     function indexeazaExecutia(date, finante) {
-        if (!finante || !finante.executie) return new Map();
-        const tabel = str => str.toUpperCase()
-            .replace(/[ĂÂ]/g, "A").replace(/Î/g, "I").replace(/[ȘŞ]/g, "S").replace(/[ȚŢ]/g, "T")
-            .replace(/^(PRIMARIA|MUNICIPIUL|ORASUL|COMUNA)\s+/g, "").replace(/[\s-]+/g, " ").trim();
-        const dupaJudet = new Map();
-        date.judete.forEach(j => dupaJudet.set(j.auto, j.c));
-        const cauta = new Map();
-        Object.values(finante.executie).forEach(e => {
-            const judet = dupaJudet.get(e.judet);
-            if (judet === undefined) return;
-            cauta.set(`${judet}|${tabel(e.nume)}`, e);
-        });
+        // potrivirea pe SIRUTA e făcută o singură dată, în unelte/finante.py
+        const pe = (finante && finante.executieUat) || {};
         const index = new Map();
         date.uat.forEach((u, i) => {
-            const e = cauta.get(`${u.j}|${tabel(u.n)}`);
-            if (e) index.set(i, e);
+            if (pe[u.s]) index.set(i, pe[u.s]);
         });
         return index;
     }
@@ -117,6 +106,8 @@ window.AdpRaport = function() {
         executie.forEach(e => {
             aparatAcum += e.cheltuieliAparat || 0;
             venituriAcum += e.venituriProprii || 0;
+            // o estimare din curba costului intră în bani, nu și la testul de 30%
+            if (e.estimat) return;
             if (e.pondere !== null && e.pondere > PRAG_ADMINISTRATIE) pesteAcum++;
             cuDate++;
         });
@@ -273,6 +264,7 @@ window.AdpRaport = function() {
         // regula financiară (regula 7 din sinteză): azi, pe primării; după, pe unitățile noi
         let aziTrec = 0, aziSubTinta = 0;
         executie.forEach((e, i) => {
+            if (e.estimat) return;
             if (e.pondere !== null && e.pondere <= regula.prag) aziTrec++;
             const p = date.uat[i].pop;
             if (p > 0 && (e.cheltuieliAparat || 0) / p <= regula.tinta) aziSubTinta++;

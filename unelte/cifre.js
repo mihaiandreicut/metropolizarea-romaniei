@@ -43,19 +43,10 @@ const finante = json("date/finante-uat.json");
 
 /** Execuția bugetară pe UAT, potrivită după nume, ca în raport (adp-raport.js). */
 function indexeazaExecutia() {
-    const tabel = s => s.toUpperCase()
-        .replace(/[ĂÂ]/g, "A").replace(/Î/g, "I").replace(/[ȘŞ]/g, "S").replace(/[ȚŢ]/g, "T")
-        .replace(/^(PRIMARIA|MUNICIPIUL|ORASUL|COMUNA)\s+/g, "").replace(/[\s-]+/g, " ").trim();
-    const dupaJudet = new Map(date.judete.map(j => [j.auto, j.c]));
-    const cauta = new Map();
-    Object.values(finante.executie).forEach(e => {
-        const judet = dupaJudet.get(e.judet);
-        if (judet !== undefined) cauta.set(`${judet}|${tabel(e.nume)}`, e);
-    });
+    // potrivirea pe SIRUTA e făcută o singură dată, în unelte/finante.py
     const index = new Map();
     date.uat.forEach((u, i) => {
-        const e = cauta.get(`${u.j}|${tabel(u.n)}`);
-        if (e) index.set(i, e);
+        if (finante.executieUat[u.s]) index.set(i, finante.executieUat[u.s]);
     });
     return index;
 }
@@ -105,7 +96,8 @@ const t0 = Date.now();
 const r = ruleaza();
 const P = r.parametri;
 const fin = r.financiar;
-const azi = Array.from(executie.entries());
+// la testul de 30% și la curba costului intră doar execuțiile reale, nu estimările din curbă
+const azi = Array.from(executie.entries()).filter(([, e]) => !e.estimat);
 const cifre = {
     parametri: { pMin: P.pMin, pTinta: P.pTinta, pMinOras: P.pMinOras, pTintaOras: P.pTintaOras,
         pOrasAutonom: P.praguriLegale ? "pe rang" : P.pOrasAutonom, absorbtieUrbana: P.absorbtieUrbana, tMax: P.tMax },
