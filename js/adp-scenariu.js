@@ -235,6 +235,8 @@ window.AdpScenariu = function() {
                 : $("#sc-baza").value === "gal" ? D.reorganizare.alegeriCuGal(D.date, gal, corectii) : corectii,
             comasari: comasari,
             transferuri: transferuri,
+            // ipoteza de cost pentru testul de 30%: aceeași cotă ca în bani
+            cotaBirouri: cotaBirouri(),
             districte: true
         };
     }
@@ -341,6 +343,8 @@ window.AdpScenariu = function() {
             `${NF.format(b.pMinOras)}–${NF.format(b.pTintaOras)} cu oraș`;
         $("#sc-tmax-val").textContent = $("#sc-tmax").value;
         $("#sc-oras-val").textContent = NF.format(Number($("#sc-oras").value));
+        const birou = Number($("#sc-birou").value);
+        $("#sc-birou-val").textContent = `${birou}%` + (birou === 25 ? " (un sfert, calculul de bază)" : birou === 0 ? " (nimic: plafonul teoretic)" : "");
         $("#sc-pmax-val").textContent = NF.format(Number($("#sc-pmax").value));
         $("#sc-tfortat-val").textContent = $("#sc-tfortat").value;
         // pragul unic de autonomie e înlocuit de pragurile de rang, când sunt active
@@ -969,9 +973,14 @@ window.AdpScenariu = function() {
     }
 
     // ipoteza de cost (aceeași ca în raport): unitatea nouă păstrează aparatul
-    // primăriei-reședință și un sfert din al fiecărei primării desființate, pentru
-    // oficiile multifuncționale rămase în sate
-    const COTA_BIROURI = 0.25;
+    // primăriei-reședință și o parte din al fiecărei primării desființate, pentru
+    // oficiile multifuncționale rămase în sate — un sfert în calculul de bază, reglabilă
+    // din cursorul pasului 2 (0–50%)
+    const COTA_BIROURI_IMPLICITA = window.AdpReorganizare.REGULA_FINANCIARA.cotaBirouri;
+    const cotaBirouri = () => {
+        const el = $("#sc-birou");
+        return el ? Number(el.value) / 100 : COTA_BIROURI_IMPLICITA;
+    };
     const ANI_PROIECTIE = [1, 5, 10, 25];
 
     const INFLATIE = 0.03;         // pentru economia cumulată pe 10 ani
@@ -1039,7 +1048,7 @@ window.AdpScenariu = function() {
         const al = i => finante.executieUat[D.date.uat[i].s];
         let acum = 0, dupa = 0, cu = 0;
         grupuri.forEach(g => {
-            const c = D.reorganizare.aparatUnitate(g.membri, g.sediu, al, COTA_BIROURI);
+            const c = D.reorganizare.aparatUnitate(g.membri, g.sediu, al, cotaBirouri());
             if (!c) return;
             cu += c.membri;
             acum += c.acum;
@@ -1125,7 +1134,7 @@ window.AdpScenariu = function() {
             </table>
             ${!c ? "" : `<table class="tabel-atribute">
                 ${rand("Aparat administrativ, după comasare", milioane(c.dupa),
-                    `ipoteză: reședința plus ${Math.round(COTA_BIROURI * 100)}% din fiecare primărie desființată`)}
+                    `ipoteză: reședința plus ${Math.round(cotaBirouri() * 100)}% din fiecare primărie desființată`)}
                 ${rand("Economie anuală", milioane(c.economie),
                     c.acum ? `${NF1.format(100 * c.economie / c.acum)}% din cheltuiala de azi` : "")}
                 ${c.proiectie.map(x => rand(`Economie cumulată la ${x.ani} ${x.ani === 1 ? "an" : "ani"}`,
@@ -2047,7 +2056,8 @@ window.AdpScenariu = function() {
             <p class="nota">Regulile: comuna ${NF.format(P.pMin)}–${NF.format(P.pTinta)} de locuitori, unitatea cu oraș
                 ${NF.format(P.pMinOras)}–${NF.format(P.pTintaOras)}, cel mult ${P.tMax} de minute până la reședință.
                 Populația: rezidentă, estimată la 1 ianuarie 2026 din recensământ și datele INS. Costul: execuția bugetară 2025; unitatea nouă
-                păstrează aparatul primăriei-reședință și un sfert din al fiecărei primării desființate. Consilierii:
+                păstrează aparatul primăriei-reședință și ${Math.round(cotaBirouri() * 100)}% din al fiecărei primării desființate${
+                    Math.round(cotaBirouri() * 100) === Math.round(COTA_BIROURI_IMPLICITA * 100) ? "" : ` (în calculul de bază, ${Math.round(COTA_BIROURI_IMPLICITA * 100)}%)`}. Consilierii:
                 Codul administrativ, art. 112, cu un consilier la dublul populației în propunere.
                 <a href="#sc-rezultat" id="pp-detalii">Toate detaliile: banii, districtele, satele</a> ·
                 <a href="raport.html#judete">fișele de județ din raport</a>.</p>`;
@@ -2207,7 +2217,7 @@ window.AdpScenariu = function() {
         stratNume = D.harta.stratNou("puncte");
         D.adaugaTooltip(tooltipScenariu);
         D.adaugaClic(clicPeHarta);
-        ["#sc-pmin", "#sc-tmax", "#sc-oras", "#sc-pmax", "#sc-tfortat"].forEach(id =>
+        ["#sc-pmin", "#sc-tmax", "#sc-oras", "#sc-pmax", "#sc-tfortat", "#sc-birou"].forEach(id =>
             $(id).addEventListener("input", recalculeazaCurand));
         ["#sc-urban", "#sc-minoritati", "#sc-proiectie", "#sc-fortare", "#sc-legal", "#sc-istorice", "#sc-district", "#sc-baza",
             "#sc-uniri-orase", "#sc-leader", "#sc-resedinta"]

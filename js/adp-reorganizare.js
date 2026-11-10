@@ -195,11 +195,11 @@ window.AdpReorganizare = function() {
         return { acum: acum, dupa: aparatul(resedinta) + c * (acum - aparatul(resedinta)), membri: cu.length };
     }
 
-    function testFinanciar(lista, sediu, populatie, executie) {
+    function testFinanciar(lista, sediu, populatie, executie, cota) {
         const ale = lista.map(i => executie.get(i)).filter(Boolean);
         // fără nicio execuție reală (doar estimări din curba costului), testul nu se face
         if (!ale.some(e => !e.estimat)) return null;
-        const aparat = aparatUnitate(lista, sediu, i => executie.get(i)).dupa;
+        const aparat = aparatUnitate(lista, sediu, i => executie.get(i), cota).dupa;
         const venituri = ale.reduce((a, e) => a + (e.venituriProprii || 0), 0);
         return {
             aparat: aparat,
@@ -830,7 +830,7 @@ window.AdpReorganizare = function() {
             });
             const subPrag = pReferinta < pragUnitate(lista);
             const motive = subPrag ? motiveSubPrag(id, lista) : [];
-            const fin = P.executie ? testFinanciar(lista, s, pTot, P.executie) : null;
+            const fin = P.executie ? testFinanciar(lista, s, pTot, P.executie, P.cotaBirouri) : null;
 
             // --- dosarul: jurnalul deciziilor + reședința aleasă + derogările
             const ev = evalueazaSedii(lista);
