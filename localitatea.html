@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Localitatea mea — ce se schimbă pentru satul, comuna sau orașul tău</title>
+    <meta name="description" content="Caută-ți satul, comuna sau orașul și vezi pe loc ce se schimbă: cu cine se unește, cât de departe e primăria, câți bani se eliberează și ce se poate face cu ei.">
+    <meta name="theme-color" content="#2a78d6">
+
+    <!-- Open Graph (fără og:url / og:image până nu există un domeniu public) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="ro-adp">
+    <meta property="og:locale" content="ro_RO">
+    <meta property="og:title" content="Localitatea mea — ce se schimbă pentru satul tău">
+    <meta property="og:description" content="Cu cine se unește comuna ta, cât de departe e primăria, câți bani se eliberează și ce se poate face cu ei: apă, canalizare, drumuri.">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Localitatea mea — ce se schimbă pentru satul tău">
+    <meta name="twitter:description" content="Caută-ți localitatea și vezi pe loc ce se schimbă și ce se poate face cu banii eliberați.">
+
+    <link rel="stylesheet" href="css/adp-tema.css">
+</head>
+
+<body>
+    <a class="sari-la-continut" href="#continut">Sari la conținut</a>
+    <header class="antet">
+        <h1>Localitatea mea</h1>
+        <span class="subtitlu">ce se schimbă pentru satul, comuna sau orașul tău</span>
+        <nav aria-label="Pagini">
+            <a href="localitatea.html" aria-current="page">Localitatea mea</a>
+            <a href="index.html">Harta</a>
+            <a href="metodologie.html">Reorganizare: metodologie</a>
+            <a href="raport.html">Raport</a>
+            <a href="principii.html">Principii</a>
+        </nav>
+    </header>
+
+    <main id="continut" class="loc-pagina">
+        <section class="loc-erou" aria-labelledby="loc-titlu">
+            <h2 id="loc-titlu">Ce se schimbă pentru localitatea ta?</h2>
+            <p class="loc-intro">Scrie numele satului, al comunei sau al orașului. Vezi pe loc cu cine se unește, cât de
+                departe ajunge primăria, câți bani se eliberează în fiecare an și ce se poate face cu ei.</p>
+            <div class="loc-cautare">
+                <div class="loc-camp">
+                    <input id="loc-q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search"
+                        placeholder="de exemplu: Viscri, Hopârta, Agnita" aria-label="Caută o localitate"
+                        role="combobox" aria-expanded="false" aria-controls="loc-sugestii" aria-autocomplete="list">
+                    <ul id="loc-sugestii" class="loc-sugestii" role="listbox" hidden></ul>
+                </div>
+                <button id="loc-aici" class="buton" type="button">Unde sunt acum</button>
+            </div>
+            <p id="loc-stare" class="nota" role="status" aria-live="polite">Se încarcă localitățile…</p>
+            <p class="loc-exemple nota">Încearcă:
+                <a href="#sat=40759">Viscri</a> ·
+                <a href="#uat=4703">Hopârta (Alba)</a> ·
+                <a href="#uat=143682">Agnita</a> ·
+                <a href="#uat=57706">Florești (Cluj)</a> ·
+                <a href="#uat=77812">Târgu Jiu</a></p>
+        </section>
+
+        <section id="loc-fisa" class="loc-fisa" aria-live="polite" hidden></section>
+
+        <section id="loc-tara" class="loc-tara" aria-labelledby="loc-tara-titlu">
+            <h2 id="loc-tara-titlu">Ce cumpără reforma pentru România</h2>
+            <div id="loc-tara-cifre"><p class="nota">Se calculează…</p></div>
+        </section>
+
+        <section class="loc-note">
+            <h2>Cum s-au calculat cifrele</h2>
+            <ul>
+                <li><b>Cine cu cine se unește:</b> regulile propuse (v2) — comuna are cel puțin 3.000 de locuitori, orașul
+                    10.000, iar primăria rămâne la cel mult 30 de minute de orice sat. Sunt aceleași reguli ca pe
+                    <a href="index.html">hartă</a>, unde le poți schimba și vedea ce iese.</li>
+                <li><b>Drumul până la primărie:</b> cu mașina, pe rețeaua rutieră reală (OpenStreetMap), de la fiecare sat
+                    până la localitatea-reședință.</li>
+                <li><b>Costul primăriei:</b> execuția bugetară pe 2025 a fiecărei primării (Ministerul Finanțelor), capitolele
+                    de administrație. Unitatea nouă păstrează aparatul primăriei-reședință și un sfert din al fiecărei
+                    primării care se desființează, pentru birourile din sate.</li>
+                <li><b>Ce se poate face cu banii:</b> standardele de cost ale Programului „Anghel Saligny”
+                    (Ordinul MDLPA nr. 1321/2021) — <span id="loc-standarde"></span>. Sunt valori maxime din 2021, deci dau
+                    un ordin de mărime, nu un deviz. „Fără rețea” înseamnă comunele și orașele în care INS nu înregistrează
+                    niciun kilometru de rețea; cei din localitățile cu rețea incompletă nu sunt numărați aici.</li>
+                <li><b>Ce nu e în calcul:</b> economia nu se strânge de la sine. Banii ajung în apă și canalizare doar
+                    dacă legea îi leagă de investiții, iar o parte din aceste rețele se face deja din fonduri europene
+                    și din programele naționale.</li>
+            </ul>
+            <p class="nota">Tot calculul, cu ipotezele lui: <a href="sinteza.html">sinteza</a>,
+                <a href="raport.html">raportul</a>, <a href="metodologie.html">metodologia</a>.</p>
+        </section>
+    </main>
+
+    <script src="js/adp-localitatea.js"></script>
+</body>
+
+</html>

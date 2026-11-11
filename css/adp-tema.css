@@ -2227,6 +2227,18 @@ label.inactiv {
         display: none;
     }
 
+    /* meniul stă pe un rând al lui și se derulează, în loc să scoată pagina din ecran */
+    .antet nav {
+        margin-left: 0;
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .antet nav a {
+        white-space: nowrap;
+    }
+
     .document {
         grid-template-columns: 1fr;
         gap: 8px;
@@ -2386,4 +2398,343 @@ body.se-recalculeaza #tabel-teritorii {
     display: block;
     font-weight: 400;
     color: var(--text-2);
+}
+
+/* ------------------------------------------------------------------ „Localitatea mea” (localitatea.html) */
+.loc-pagina {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 20px 72px;
+    display: grid;
+    gap: 28px;
+}
+
+.loc-erou h2 {
+    margin: 0 0 8px;
+    font-size: clamp(28px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.loc-intro {
+    margin: 0 0 18px;
+    font-size: 17px;
+    color: var(--text-2);
+    max-width: 62ch;
+}
+
+.loc-cautare {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.loc-camp {
+    position: relative;
+    flex: 1 1 320px;
+}
+
+.loc-camp input {
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    font-size: 19px;
+    padding: 14px 16px;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    background: var(--panou);
+    color: var(--text);
+}
+
+.loc-cautare .buton {
+    font-size: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
+}
+
+.loc-sugestii {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 40;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 12px;
+    box-shadow: var(--umbra);
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.loc-sugestii li {
+    display: grid;
+    gap: 1px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.loc-sugestii li small {
+    color: var(--text-2);
+}
+
+.loc-sugestii li[aria-selected="true"],
+.loc-sugestii li[role="option"]:hover {
+    background: var(--accent-fundal);
+}
+
+.loc-sugestii li.gol {
+    cursor: default;
+    color: var(--text-2);
+}
+
+.loc-exemple {
+    margin: 10px 0 0;
+}
+
+.loc-card,
+.loc-tara,
+.loc-note {
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 16px;
+    box-shadow: var(--umbra);
+    padding: 24px;
+}
+
+.loc-card {
+    border-top: 6px solid var(--accent);
+}
+
+.loc-unde {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 14px;
+}
+
+.loc-card h2 {
+    margin: 2px 0 10px;
+    font-size: clamp(26px, 4.5vw, 38px);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+}
+
+.loc-verdict {
+    margin: 0 0 6px;
+    font-size: clamp(18px, 2.6vw, 22px);
+    line-height: 1.35;
+    font-weight: 600;
+}
+
+.loc-explicatie {
+    margin: 0 0 18px;
+    color: var(--text-2);
+    font-size: 16px;
+    max-width: 68ch;
+}
+
+.loc-cifre {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+    margin: 0 0 6px;
+}
+
+.loc-cifra {
+    display: grid;
+    align-content: start;
+    gap: 3px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--suprafata);
+    border: 1px solid var(--linie);
+    border-top: 4px solid var(--accent);
+}
+
+.loc-cifra.bun {
+    border-top-color: var(--serie-3);
+}
+
+.loc-cifra.atentie {
+    border-top-color: var(--serie-4);
+}
+
+.loc-cifra strong {
+    font-size: 25px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.loc-cifra small {
+    color: var(--text-2);
+    font-size: 13px;
+}
+
+.loc-spre {
+    color: var(--text-3);
+    font-weight: 400;
+}
+
+.loc-card h3,
+.loc-tara h3 {
+    margin: 22px 0 8px;
+    font-size: 18px;
+}
+
+.loc-lucrari,
+.loc-trepte {
+    margin: 0;
+    padding-left: 20px;
+    display: grid;
+    gap: 7px;
+    font-size: 16px;
+}
+
+.loc-ani {
+    color: var(--bun-text);
+    font-weight: 600;
+}
+
+.loc-sus {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--accent-fundal);
+    font-size: 15px;
+}
+
+.loc-actiuni {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+.loc-actiuni .buton {
+    text-decoration: none;
+    font-size: 15px;
+    padding: 10px 14px;
+}
+
+.loc-tara h2,
+.loc-note h2 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+}
+
+.loc-teza {
+    margin: 0 0 18px;
+    font-size: clamp(20px, 3.2vw, 28px);
+    line-height: 1.28;
+    letter-spacing: -0.01em;
+    max-width: 32ch;
+}
+
+.loc-cifre-tara {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.loc-cale {
+    margin: 18px 0;
+}
+
+.loc-cale-bara {
+    display: flex;
+    gap: 3px;
+    height: 22px;
+}
+
+.loc-cale-bara span {
+    border-radius: 5px;
+    min-width: 8px;
+}
+
+.loc-cale .apa {
+    background: var(--serie-1);
+}
+
+.loc-cale .canal {
+    background: var(--serie-3);
+}
+
+.loc-cale-legenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-2);
+}
+
+.loc-cale-legenda i {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    margin-right: 5px;
+    vertical-align: -1px;
+}
+
+.loc-cale-legenda .total {
+    margin-left: auto;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.loc-note ul {
+    margin: 0 0 10px;
+    padding-left: 20px;
+    display: grid;
+    gap: 8px;
+    color: var(--text-2);
+}
+
+.loc-note b {
+    color: var(--text);
+}
+
+@media (max-width: 600px) {
+    .loc-pagina {
+        padding: 18px 14px 56px;
+        gap: 20px;
+    }
+
+    .loc-card,
+    .loc-tara,
+    .loc-note {
+        padding: 18px 16px;
+    }
+
+    .loc-cautare .buton {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
+
+    .loc-cale-legenda .total {
+        margin-left: 0;
+        flex-basis: 100%;
+    }
+}
+
+/* harta: trimiterea spre „Localitatea mea” */
+.trimitere-localitate {
+    margin: 10px 0 14px;
+}
+
+.trimitere-localitate a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--accent-fundal);
+    color: var(--accent-text);
+    text-decoration: none;
+}
+
+.trimitere-localitate a:hover {
+    text-decoration: underline;
 }
