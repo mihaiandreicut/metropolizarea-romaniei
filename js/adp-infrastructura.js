@@ -29,6 +29,16 @@ window.AdpInfrastructura = function() {
         educatie: "Programul Educație și Ocupare; Programul Regional",
         cultura: "LEADER, prin grupul de acțiune locală"
     };
+    // Standardele de cost ale Programului „Anghel Saligny” (Ordinul MDLPA nr. 1321/2021): valori maxime,
+    // fără TVA, din 2021 — un ordin de mărime, nu un deviz. Singura copie din proiect: le folosesc planul
+    // de acțiuni, raportul și fișele localităților (unelte/fise-localitati.js).
+    const STANDARDE = {
+        apa: 1250,            // euro pe locuitor care beneficiază
+        canalizare: 2500,     // euro pe locuitor echivalent
+        drumComunal: 330000,  // euro pe kilometru; folosit și pentru străzile orășenești, care nu au standard al lor
+        curs: 5.1,            // lei pe euro, orientativ
+        sursa: "Ordinul MDLPA nr. 1321/2021, standardele de cost ale Programului „Anghel Saligny” (valori maxime, fără TVA)"
+    };
     const PRAG_STRAZI = 75;      // % străzi orășenești modernizate sub care apare acțiunea
     const PRAG_CANALIZARE = 60;  // % canalizare față de rețeaua de apă, în km
     const DOMENII = ["drumuri", "apaCanal", "educatie", "cultura"];
@@ -176,15 +186,17 @@ window.AdpInfrastructura = function() {
         const unde = lista => lista.length <= 4 && numeUat ? lista.map(numeUat).join(", ")
             : `${NF.format(lista.length)} UAT-uri`;
         const lista = [];
+        // costul, unde există un standard: rețele noi, pe locuitor; străzi, pe kilometru
+        const lei = euro => Math.round(euro * STANDARDE.curs);
         if (a.fara.apa.length) {
             lista.push({
-                tip: "apa", populatie: a.faraPop.apa, fond: FONDURI.apa,
+                tip: "apa", populatie: a.faraPop.apa, fond: FONDURI.apa, cost: lei(a.faraPop.apa * STANDARDE.apa),
                 text: `Rețea publică de apă în ${unde(a.fara.apa)}`
             });
         }
         if (a.fara.canal.length) {
             lista.push({
-                tip: "canal", populatie: a.faraPop.canal, fond: FONDURI.canal,
+                tip: "canal", populatie: a.faraPop.canal, fond: FONDURI.canal, cost: lei(a.faraPop.canal * STANDARDE.canalizare),
                 text: `Canalizare în ${unde(a.fara.canal)}`
             });
         } else if (a.apa.km && 100 * a.canal.km / a.apa.km < PRAG_CANALIZARE) {
@@ -208,6 +220,7 @@ window.AdpInfrastructura = function() {
         if (a.strazi && 100 * a.straziModernizate / a.strazi < PRAG_STRAZI) {
             lista.push({
                 tip: "strazi", populatie: a.populatie, fond: FONDURI.strazi,
+                cost: lei((a.strazi - a.straziModernizate) * STANDARDE.drumComunal),
                 text: `Modernizarea străzilor orășenești: ${NF.format(Math.round(a.strazi - a.straziModernizate))} km rămași`
             });
         }
@@ -232,7 +245,9 @@ window.AdpInfrastructura = function() {
         if (!lista.length) return "";
         return `<h4 class="subtitlu-sectiune">${esc(titlu)}</h4>
             <ol class="pasi-dosar">${lista.map(x => `<li><b>${esc(x.text)}</b>${x.populatie
-                ? ` — ${NF.format(x.populatie)} loc.` : ""}<br><small>${esc(x.fond)}</small></li>`).join("")}</ol>`;
+                ? ` — ${NF.format(x.populatie)} loc.` : ""}${x.cost ? `, cam ${milioane(x.cost)}` : ""}<br><small>${esc(x.fond)}</small></li>`).join("")}</ol>
+            ${lista.some(x => x.cost) ? `<p class="nota">Sumele: standardele de cost „Anghel Saligny” (Ordinul MDLPA nr. 1321/2021), valori
+                maxime din 2021 — un ordin de mărime, nu un deviz.</p>` : ""}`;
     }
 
     /** Fișa ca tabel HTML, cu aceleași clase ca dosarul unei unități. */
@@ -247,7 +262,10 @@ window.AdpInfrastructura = function() {
             <table class="tabel-atribute tabel-dosar"><tbody>${linii}</tbody></table>`;
     }
 
+    const milioane = v => v >= 1e9 ? `${NF1.format(v / 1e9)} mld. lei` : `${NF1.format(v / 1e6)} mil. lei`;
+
     return {
+        STANDARDE: STANDARDE,
         agrega: agrega,
         randuri: randuri,
         tabel: tabel,

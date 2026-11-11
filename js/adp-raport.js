@@ -29,6 +29,8 @@ window.AdpRaport = function() {
     // calculele comune cu fișa de instituții a județului (js/adp-institutii.js)
     const INST = window.AdpInstitutii;
     const { ATRIBUTII_CJ, ATRIBUTIE_NEPLASATA, mutariCJ, sediiRegionale } = INST;
+    // standardele de cost (js/adp-infrastructura.js), citite la nevoie: modulul se încarcă după acesta
+    const INFRA_STANDARDE = () => window.AdpInfrastructura.STANDARDE;
     // costul unui salariat pentru angajator: câștigul brut plus contribuția asiguratorie pentru muncă
     const COST_ANGAJATOR = INST.COST_ANGAJATOR;
     // ipoteză pentru instituțiile statului din județ: conducerea și funcțiile de suport (economic,
@@ -684,17 +686,21 @@ window.AdpRaport = function() {
             if (!cu.length) return "";
             return `<tr><th scope="row">${esc(nume)}</th><td class="num">${NF.format(cu.length)}</td>
                 <td class="num">${cu.some(x => x.populatie) ? NF.format(suma(cu, x => x.populatie || 0)) : "—"}</td>
+                <td class="num">${cu.some(x => x.cost) ? lei(suma(cu, x => x.cost || 0)) : "—"}</td>
                 <td><small>${esc(cu[0].fond)}</small></td></tr>`;
         };
+        // costul estimat: apă și canalizare noi, străzi orășenești (standardele „Anghel Saligny”)
+        const costDistrict = d => suma(d.actiuni, x => x.cost || 0);
+        const costRetele = lista => suma(lista, d => suma(d.actiuni.filter(x => x.tip === "apa" || x.tip === "canal"), x => x.cost || 0));
         const fisaRegiune = x => `<details class="strat serie-${((x.a.c - 1) % 8) + 1}" id="plan-${x.a.c}">
             <summary>${esc(numeRegiune(x.a))}
                 <small>${NF.format(x.ale.length)} districte · ${NF.format(suma(x.ale, d => d.populatie))} loc. ·
                 ${NF.format(suma(x.ale, d => d.microregiuni.length))} microregiuni (grupuri de acțiune locală) ·
-                ${NF.format(suma(x.ale, d => d.actiuni.length))} acțiuni</small></summary>
+                ${NF.format(suma(x.ale, d => d.actiuni.length))} acțiuni · cam ${lei(suma(x.ale, costDistrict))}</small></summary>
             <div class="strat-continut">
                 <h4>Ce e de făcut în regiune</h4>
                 <div class="tabel-derulant"><table class="tabel-doc tabel-harta">
-                    <thead><tr><th>Acțiunea</th><th>Districte</th><th>Locuitori vizați</th><th>Din ce fond</th></tr></thead>
+                    <thead><tr><th>Acțiunea</th><th>Districte</th><th>Locuitori vizați</th><th>Cost estimat</th><th>Din ce fond</th></tr></thead>
                     <tbody>${TIPURI_ACTIUNE.map(([tip, nume]) => randTip(x.ale, tip, nume)).join("")}</tbody>
                 </table></div>
                 <h4>Districtele regiunii</h4>
@@ -719,6 +725,9 @@ window.AdpRaport = function() {
                     <strong>${NF.format(districte.length)}</strong><small>în ${NF.format(regiuni.length)} regiuni</small></div>
                 <div class="card-cifra"><span class="card-eticheta">Acțiuni în plan</span>
                     <strong>${NF.format(suma(districte, d => d.actiuni.length))}</strong><small>deduse din golurile de infrastructură</small></div>
+                <div class="card-cifra"><span class="card-eticheta">Apă și canalizare noi, cost estimat</span>
+                    <strong>${lei(costRetele(districte))}</strong>
+                    <small>în localitățile fără nicio rețea; cu străzile orășenești, ${lei(suma(districte, costDistrict))}</small></div>
                 <div class="card-cifra"><span class="card-eticheta">Grupuri de acțiune locală propuse</span>
                     <strong>${NF.format(suma(districte, d => d.strategie.microregiuni))}</strong>
                     <small>${NF.format(suma(districte, d => d.strategie.microInBanda))} în pragurile LEADER</small></div>
@@ -728,7 +737,12 @@ window.AdpRaport = function() {
             <p class="nota">Fișa completă a fiecărui district — criteriile, comunele, grupurile de acțiune locală de azi și
                 strategia — se deschide din <a href="#tablou">tabloul cu filtre</a>. Prioritățile sunt primele trei din
                 planul de acțiuni, în ordinea urgenței: apă, canalizare, sănătate, educație, străzi, cultură; registrul
-                drumurilor comunale e o lipsă de date și rămâne doar în listă. Sursa de finanțare e cea din programele 2021–2027; sumele nu sunt estimate, fiindcă nu există devize.</p>`;
+                drumurilor comunale e o lipsă de date și rămâne doar în listă. Sursa de finanțare e cea din programele 2021–2027.
+                Sumele sunt estimate cu standardele de cost ale Programului „Anghel Saligny” (Ordinul MDLPA nr. 1321/2021):
+                ${NF.format(INFRA_STANDARDE().apa)} de euro pe locuitor pentru apă, ${NF.format(INFRA_STANDARDE().canalizare)} pentru canalizare,
+                ${NF.format(INFRA_STANDARDE().drumComunal)} de euro pe kilometrul de stradă, la ${NF1.format(INFRA_STANDARDE().curs)} lei pentru un euro.
+                Sunt valori maxime din 2021, deci un ordin de mărime, nu un deviz. Sănătatea, educația și cultura nu au
+                standard de cost și rămân fără sumă.</p>`;
         $("#plan-export").addEventListener("click", () => exportaFise(dateDistricte, date));
     }
 
@@ -739,12 +753,13 @@ window.AdpRaport = function() {
         const celula = v => `"${String(v === null || v === undefined ? "" : v).replace(/"/g, '""')}"`;
         const antet = ["Regiunea", "Județul", "Districtul", "Reședința", "Tipul", "Locuitori", "UAT-uri", "Unități după comasare",
             "Microregiuni", "Microregiuni în pragurile LEADER", "Instrument", "Acțiuni", "Prioritatea 1", "Prioritatea 2",
-            "Prioritatea 3", "Fonduri", "Aparatul azi (lei)", "Aparatul după (lei)"];
+            "Prioritatea 3", "Fonduri", "Aparatul azi (lei)", "Aparatul după (lei)", "Cost estimat al acțiunilor (lei)"];
         const randuri = dateDistricte.districte.slice().sort((p, q) => p.adr - q.adr || q.populatie - p.populatie).map(d => [
             numeRegiune.get(d.adr), numeJudet.get(d.judet), d.nume, d.resedinta, d.tip, d.populatie, d.nrUat, d.nrUnitati,
             d.strategie.microregiuni, d.strategie.microInBanda, d.strategie.instrument, d.actiuni.length,
             ...[0, 1, 2].map(k => d.strategie.prioritati[k] ? d.strategie.prioritati[k].text : ""),
-            d.strategie.fonduri.join("; "), Math.round(d.costAcum), Math.round(d.costDupa)
+            d.strategie.fonduri.join("; "), Math.round(d.costAcum), Math.round(d.costDupa),
+            d.actiuni.reduce((t, x) => t + (x.cost || 0), 0)
         ]);
         const continut = "﻿" + [antet].concat(randuri).map(r => r.map(celula).join(";")).join("\r\n");
         const legatura = document.createElement("a");
@@ -1347,7 +1362,8 @@ window.AdpRaport = function() {
                         </tbody>
                     </table></div>
                     <p class="nota"><a href="index.html#judet=${f.j.c}">Pe hartă, pas cu pas</a>: același județ,
-                        cu regulile tale, și harta de azi lângă cea propusă.</p>
+                        cu regulile tale, și harta de azi lângă cea propusă. Ceva nu se potrivește cu ce știi despre
+                        județ? <a href="${esc(sesizareJudet(f))}" target="_blank" rel="noopener">Semnalează o greșeală</a>.</p>
                     <div class="fisa-inst" data-judet="${f.j.c}"><p class="nota">Aleșii și instituțiile județului apar la deschiderea fișei.</p></div>
                     <h4>Derogări</h4>
                     ${derogari}
@@ -1406,6 +1422,22 @@ window.AdpRaport = function() {
             window.addEventListener("hashchange", deschideFisa);
             deschideFisa();
         }
+    }
+
+    /** Sesizare publică despre fișa unui județ: un issue nou pe GitHub, cu cifrele deja completate. */
+    function sesizareJudet(f) {
+        const corp = [
+            `Județul: ${f.j.n}`,
+            `Fișa: ${new URL("raport.html#judet-" + f.j.auto, location.href).href}`,
+            "",
+            `Ce arată fișa: ${f.nrUat} UAT-uri devin ${f.grupuri.length} unități; ${f.derogari.length} derogări; ${f.districte} districte.`,
+            "",
+            "Ce e greșit, după ce știi tu (comune care n-ar trebui unite, o reședință greșită, un district tras prost, cifre care nu se potrivesc):",
+            "",
+            "Cine ești (opțional: consiliul județean, ADR, primar, cetățean):"
+        ].join("\n");
+        return `https://github.com/mihaiandreicut/metropolizarea-romaniei/issues/new?title=${encodeURIComponent("Sesizare: județul " + f.j.n)}` +
+            `&body=${encodeURIComponent(corp)}`;
     }
 
     /** Un link spre `#judet-XX` deschide și fișa județului, nu doar derulează până la ea. */

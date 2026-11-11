@@ -26,19 +26,14 @@ const json = p => JSON.parse(fs.readFileSync(path.join(RADACINA, p), "utf8"));
 
 // modulele paginii sunt scrise pentru browser: se încarcă pe un `window` fals (doar fișierele proiectului)
 global.window = {};
-["js/adp-topologie.js", "js/adp-reorganizare.js", "js/adp-institutii.js"]
+["js/adp-topologie.js", "js/adp-reorganizare.js", "js/adp-institutii.js", "js/adp-infrastructura.js"]
     .forEach(f => eval(fs.readFileSync(path.join(RADACINA, f), "utf8")));
-const { AdpTopologie, AdpReorganizare, AdpInstitutii } = global.window;
+const { AdpTopologie, AdpReorganizare, AdpInstitutii, AdpInfrastructura } = global.window;
 
-// Standardele de cost ale Programului „Anghel Saligny” (Ordinul MDLPA nr. 1321/2021): valori maxime,
-// fără TVA. Sunt din 2021, deci dau un ordin de mărime, nu un deviz.
-const STANDARDE = {
-    apa: 1250,            // euro pe locuitor care beneficiază
-    canalizare: 2500,     // euro pe locuitor echivalent
-    drumComunal: 330000,  // euro pe kilometru
-    sursa: "Ordinul MDLPA nr. 1321/2021, standardele de cost ale Programului „Anghel Saligny” (valori maxime, fără TVA)"
-};
-const CURS = 5.1;   // lei pe euro, orientativ
+// standardele de cost „Anghel Saligny”: o singură copie, în js/adp-infrastructura.js
+const STANDARDE = { apa: AdpInfrastructura.STANDARDE.apa, canalizare: AdpInfrastructura.STANDARDE.canalizare,
+    drumComunal: AdpInfrastructura.STANDARDE.drumComunal, sursa: AdpInfrastructura.STANDARDE.sursa };
+const CURS = AdpInfrastructura.STANDARDE.curs;
 
 const date = json("date/romania-uat.json");
 const vecini = AdpTopologie.vecini(AdpTopologie.decodeaza(date));

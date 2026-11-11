@@ -14,6 +14,8 @@
 (function() {
     "use strict";
     const CALE = "date/fise-localitati.json";
+    // sesizările publice: un issue nou pe GitHub, cu localitatea și cifrele deja completate
+    const SESIZARI = "https://github.com/mihaiandreicut/metropolizarea-romaniei/issues/new";
     const NF = new Intl.NumberFormat("ro-RO");
     const NF1 = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 1 });
     const $ = sel => document.querySelector(sel);
@@ -267,6 +269,7 @@
                     ${!g ? "" : PE_HARTA ? `<a class="buton" href="#judet=${u.j}">Simulează județul ${esc(j.n)}</a>`
                         : `<a class="buton" href="index.html#judet=${u.j}">Vezi pe hartă</a>`}
                     ${g ? `<a class="buton" href="raport.html#judet-${esc(j.auto)}">Fișa județului ${esc(j.n)}</a>` : ""}
+                    <a class="buton" href="${esc(sesizare(f))}" target="_blank" rel="noopener">Semnalează o greșeală</a>
                 </div>
                 <p class="nota" id="loc-mesaj" role="status"></p>
             </div>`;
@@ -297,6 +300,23 @@
         ales = null;
         $("#loc-q").value = "";
         document.dispatchEvent(new CustomEvent("ro-adp:localitate", { detail: { uat: null } }));
+    }
+
+    /** Adresa unei sesizări publice despre localitate, cu ce arată fișa deja completat. */
+    function sesizare(f) {
+        const randuri = [
+            `Localitatea: ${f.titlu} (${f.subtitlu}), SIRUTA ${f.sat ? f.sat.s : f.u.s}`,
+            `Fișa: ${f.adresa}`,
+            "",
+            `Ce arată fișa: ${f.verdict}`,
+            f.drum ? `Drumul până la primărie: ${f.drum}` : "",
+            f.cost ? `Primăria, pe locuitor, pe an: ${f.cost}` : "",
+            "",
+            "Ce e greșit, după ce știi tu (un drum care lipsește, un sat care merge în altă parte, o comună cu care v-ați asociat deja):",
+            "",
+            "Cine ești (opțional: locuitor, primar, consilier, funcționar):"
+        ].filter((r, k, a) => r !== "" || a[k - 1] !== "");
+        return `${SESIZARI}?title=${encodeURIComponent("Sesizare: " + f.titlu)}&body=${encodeURIComponent(randuri.join("\n"))}`;
     }
 
     // ------------------------------------------------------------ distribuirea
