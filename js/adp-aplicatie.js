@@ -492,6 +492,13 @@ window.AdpAplicatie = function() {
             (dependente.extensii || []).forEach(x => x.initializeaza(context));
             initControale();
             initCautare();
+            // caseta „Caută-ți localitatea” (js/adp-localitatea.js): harta merge la UAT-ul ales și îl conturează
+            document.addEventListener("ro-adp:localitate", e => {
+                const cod = e.detail && e.detail.uat;
+                const idx = cod ? date.uat.findIndex(u => u.s === cod) : -1;
+                Harta.selecteaza(idx >= 0 ? idx : null);
+                if (idx >= 0) Harta.zoomLa(idx, 12);
+            });
             aplicaMod(mod);
             $("#incarcare").remove();
             incarcaLocalitati();

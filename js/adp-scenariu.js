@@ -2195,12 +2195,17 @@ window.AdpScenariu = function() {
         arataPas(1);
         // legătura directă: index.html#tara, #regiune=N sau #judet=N (din fișele de județ ale
         // raportului) — teritoriul ales și raportul calculat cu regulile implicite
-        const m = location.hash.match(/^#(?:(tara)|regiune=(\d+)|judet=(\d+))$/);
-        const cheie = !m ? null : m[1] ? TOATA_TARA : m[2] ? PREFIX_ADR + m[2] : m[3];
-        if (cheie && cheieValida(cheie)) {
-            alegeTeritoriuPas(cheie);
-            genereazaPas();
-        }
+        const dinAdresa = () => {
+            const m = location.hash.match(/^#(?:(tara)|regiune=(\d+)|judet=(\d+))$/);
+            const cheie = !m ? null : m[1] ? TOATA_TARA : m[2] ? PREFIX_ADR + m[2] : m[3];
+            if (cheie && cheieValida(cheie) && cheie !== pasCheie) {
+                alegeTeritoriuPas(cheie);
+                genereazaPas();
+            }
+        };
+        dinAdresa();
+        // și când adresa se schimbă în pagină (butonul „Simulează județul” din fișa localității)
+        window.addEventListener("hashchange", dinAdresa);
     }
 
     function initializeaza(context) {

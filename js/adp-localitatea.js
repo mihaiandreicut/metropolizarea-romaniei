@@ -6,7 +6,10 @@
    primărie, costul primăriei, banii eliberați și ce se poate face cu ei. Toate
    cifrele sunt precalculate de unelte/fise-localitati.js, cu aceleași module ca
    harta și raportul; pagina doar le caută și le așază.
-   Modul independent: nu are nevoie de hartă și nici de algoritm.
+   Modul independent: nu are nevoie de hartă și nici de algoritm. Rulează pe două
+   pagini: pe localitatea.html, de sine stătător, și pe prima pagină (index.html),
+   unde caseta de căutare stă peste hartă, fișa apare în panou, iar harta e
+   anunțată prin evenimentul „ro-adp:localitate” ca să meargă la localitatea aleasă.
    ========================================================================== */
 (function() {
     "use strict";
@@ -27,6 +30,9 @@
     const insira = lista => lista.length <= 1 ? lista.join("") : lista.slice(0, -1).join(", ") + " și " + lista[lista.length - 1];
     const ani = v => v < 1 ? "mai puțin de un an" : v < 1.5 ? "un an" : cate(Math.round(v), "an", "ani");
 
+    // pe prima pagină: caseta stă peste hartă, iar adresa paginii e a simulării (#judet=N), nu a localității
+    const PE_HARTA = !!document.getElementById("harta");
+    const spune = text => { const el = $("#loc-stare"); if (el) el.textContent = text; };
     let D = null;        // date/fise-localitati.json
     let cautare = [];    // indexul de căutare: UAT-uri și sate
     let ales = null;     // { uat: SIRUTA, sat: rândul satului sau null }
@@ -95,12 +101,11 @@
 
     // ------------------------------------------------------------ locul în care ești
     function cautaAici() {
-        const stare = $("#loc-stare");
         if (!navigator.geolocation) {
-            stare.textContent = "Browserul nu știe unde ești. Scrie numele localității.";
+            spune("Browserul nu știe unde ești. Scrie numele localității.");
             return;
         }
-        stare.textContent = "Caut localitatea în care ești…";
+        spune("Caut localitatea în care ești…");
         navigator.geolocation.getCurrentPosition(poz => {
             const lat = poz.coords.latitude, lng = poz.coords.longitude, c = Math.cos(lat * Math.PI / 180);
             let best = null, dMin = Infinity;
@@ -111,14 +116,14 @@
             });
             // peste ~25 km de orice sat din date: nu ești în România
             if (!best || Math.sqrt(dMin) * 111 > 25) {
-                stare.textContent = "Nu ești lângă nicio localitate din date. Scrie numele ei.";
+                spune("Nu ești lângă nicio localitate din date. Scrie numele ei.");
                 return;
             }
-            stare.textContent = "";
+            spune("");
             $("#loc-q").value = best[1];
             arata({ uat: best[2], sat: best }, true);
         }, () => {
-            stare.textContent = "Nu am primit locația. Scrie numele localității.";
+            spune("Nu am primit locația. Scrie numele localității.");
         }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
     }
 
@@ -243,8 +248,11 @@
                     ${esc(j.n)} rămâne pe hartă, ca identitate și circumscripție electorală.</li>
             </ul>`;
 
+        const ancora = sel.sat ? `sat=${sel.sat[0]}` : `uat=${sel.uat}`;
+        f.adresa = new URL("localitatea.html#" + ancora, location.href).href;
         cutie.innerHTML = `
             <div class="loc-card">
+                ${PE_HARTA ? `<button type="button" class="loc-inchide" id="loc-inchide" aria-label="Închide fișa localității">×</button>` : ""}
                 <p class="loc-unde">${esc(f.subtitlu)} · ${NF.format(u.p)} de locuitori${f.sat && f.sat.p ? ` · ${esc(f.sat.n)}: ${NF.format(f.sat.p)} la recensământ` : ""}</p>
                 <h2>${esc(f.titlu)}</h2>
                 <p class="loc-verdict">${esc(f.verdict)}</p>
@@ -256,19 +264,34 @@
                 <div class="loc-actiuni">
                     <button type="button" class="buton principal" id="loc-distribuie">Distribuie</button>
                     <button type="button" class="buton" id="loc-imagine">Descarcă imaginea</button>
-                    <a class="buton" href="index.html#judet=${u.j}">Vezi pe hartă</a>
+                    ${!g ? "" : PE_HARTA ? `<a class="buton" href="#judet=${u.j}">Simulează județul ${esc(j.n)}</a>`
+                        : `<a class="buton" href="index.html#judet=${u.j}">Vezi pe hartă</a>`}
                     ${g ? `<a class="buton" href="raport.html#judet-${esc(j.auto)}">Fișa județului ${esc(j.n)}</a>` : ""}
                 </div>
                 <p class="nota" id="loc-mesaj" role="status"></p>
             </div>`;
         cutie.hidden = false;
-        $("#loc-stare").textContent = "";
+        spune("");
         $("#loc-distribuie").addEventListener("click", () => distribuie(f));
         $("#loc-imagine").addEventListener("click", () => descarcaImaginea(f));
-        const ancora = sel.sat ? `sat=${sel.sat[0]}` : `uat=${sel.uat}`;
-        if (location.hash.slice(1) !== ancora) history.replaceState(null, "", "#" + ancora);
-        document.title = `${f.titlu} — ce se schimbă`;
+        if (PE_HARTA) {
+            $("#loc-inchide").addEventListener("click", inchideFisa);
+            // harta merge la localitate și îi conturează comuna (js/adp-aplicatie.js)
+            document.dispatchEvent(new CustomEvent("ro-adp:localitate", { detail: { uat: sel.uat } }));
+        } else {
+            if (location.hash.slice(1) !== ancora) history.replaceState(null, "", "#" + ancora);
+            document.title = `${f.titlu} — ce se schimbă`;
+        }
         if (deruleaza) cutie.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    function inchideFisa() {
+        const cutie = $("#loc-fisa");
+        cutie.hidden = true;
+        cutie.innerHTML = "";
+        ales = null;
+        $("#loc-q").value = "";
+        document.dispatchEvent(new CustomEvent("ro-adp:localitate", { detail: { uat: null } }));
     }
 
     // ------------------------------------------------------------ distribuirea
@@ -277,7 +300,7 @@
 
     async function distribuie(f) {
         const mesaj = $("#loc-mesaj");
-        const date = { title: `${f.titlu} — ce se schimbă`, text: textDistribuire(f), url: location.href };
+        const date = { title: `${f.titlu} — ce se schimbă`, text: textDistribuire(f), url: f.adresa };
         try {
             if (navigator.share) {
                 await navigator.share(date);
@@ -287,7 +310,7 @@
             mesaj.textContent = "Am copiat textul și linkul. Lipește-le unde vrei.";
         } catch (e) {
             if (e && e.name === "AbortError") return;
-            mesaj.textContent = "Nu am putut copia. Linkul e în bara de adrese.";
+            mesaj.innerHTML = `Nu am putut copia. Linkul fișei: <a href="${esc(f.adresa)}">${esc(f.adresa)}</a>`;
         }
     }
 
@@ -372,7 +395,7 @@
             // pe telefon, direct în foaia de distribuire; altfel, descărcare
             if (navigator.canShare && navigator.canShare({ files: [fisier] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
                 try {
-                    await navigator.share({ files: [fisier], title: f.titlu, text: textDistribuire(f), url: location.href });
+                    await navigator.share({ files: [fisier], title: f.titlu, text: textDistribuire(f), url: f.adresa });
                     return;
                 } catch (e) {
                     if (e && e.name === "AbortError") return;
@@ -391,6 +414,7 @@
 
     // ------------------------------------------------------------ țara
     function randeazaTara() {
+        if (!$("#loc-tara-cifre")) return;
         const n = D.national, st = D.standarde, curs = D.curs;
         const total = n.economiePrimarii + n.economieCJ + n.economieStat;
         const sigur = n.economiePrimarii + n.economieCJ;
@@ -472,7 +496,7 @@
         });
         document.addEventListener("click", e => { if (!e.target.closest(".loc-camp")) inchideSugestii(); });
         $("#loc-aici").addEventListener("click", cautaAici);
-        window.addEventListener("hashchange", dinAdresa);
+        if (!PE_HARTA) window.addEventListener("hashchange", dinAdresa);
     }
 
     fetch(CALE).then(r => {
@@ -483,11 +507,11 @@
         construiesteIndexul();
         leaga();
         randeazaTara();
-        $("#loc-stare").textContent = "";
+        spune("");
         dinAdresa();
     }).catch(e => {
         console.error(`[ro-adp] Fișele localităților nu au putut fi încărcate (${e.message}).`);
-        $("#loc-stare").textContent = "Datele nu au putut fi încărcate. Rulează „node unelte/fise-localitati.js”.";
-        $("#loc-tara-cifre").innerHTML = "";
+        spune("Căutarea de localități nu a putut fi încărcată. Rulează „node unelte/fise-localitati.js”.");
+        if ($("#loc-tara-cifre")) $("#loc-tara-cifre").innerHTML = "";
     });
 })();

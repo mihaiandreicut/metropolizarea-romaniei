@@ -61,19 +61,30 @@
     <main class="aplicatie">
         <section class="zona-harta" aria-label="Harta României">
             <div id="harta" class="harta"></div>
+            <div class="cautare-harta" role="search" aria-label="Caută o localitate">
+                <div class="loc-camp">
+                    <input id="loc-q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search"
+                        placeholder="Caută-ți satul sau orașul" aria-label="Caută o localitate: sat, comună sau oraș"
+                        role="combobox" aria-expanded="false" aria-controls="loc-sugestii" aria-autocomplete="list">
+                    <ul id="loc-sugestii" class="loc-sugestii" role="listbox" hidden></ul>
+                </div>
+                <button id="loc-aici" class="buton" type="button" title="Găsește localitatea în care sunt acum" aria-label="Unde sunt acum">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                </button>
+                <p id="loc-stare" class="cautare-harta-stare" role="status" aria-live="polite"></p>
+            </div>
             <div id="incarcare" class="incarcare">Se încarcă harta…</div>
             <div id="tooltip" class="tooltip" role="status" hidden></div>
             <div id="sc-legenda" class="legenda-harta" hidden aria-label="Legenda hărții"></div>
         </section>
 
         <aside id="panou" class="panou" aria-label="Panou de control">
+            <section id="loc-fisa" class="loc-fisa loc-in-panou" aria-live="polite" hidden></section>
             <section>
                 <h2>Metropolizarea României</h2>
                 <p class="nota">Comunele se comasează după reguli publice, verificabile pe date, iar consiliile
                     județene și prefecturile urcă la regiune. Încearcă pe un județ, pe o regiune sau pe toată țara, în trei pași. Metoda:
                     <a href="metodologie.html#metoda">metodologie</a>; cifrele pe toată țara: <a href="raport.html">raport</a>.</p>
-                <p class="trimitere-localitate"><a href="localitatea.html"><b>Vrei doar răspunsul pentru satul tău?</b>
-                    Caută-ți localitatea →</a></p>
 
                 <div id="pp" class="pas-cu-pas">
                     <ol class="pp-pasi">
@@ -340,6 +351,7 @@
     <script src="js/adp-regionalizare.js"></script>
     <script src="js/adp-regiuni.js"></script>
     <script src="js/adp-aplicatie.js"></script>
+    <script src="js/adp-localitatea.js"></script>
     <script>
         // compunerea paginii: singurul loc care leagă modulele între ele
         document.addEventListener("DOMContentLoaded", () => AdpAplicatie.porneste({

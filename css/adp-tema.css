@@ -2721,20 +2721,116 @@ body.se-recalculeaza #tabel-teritorii {
     }
 }
 
-/* harta: trimiterea spre „Localitatea mea” */
-.trimitere-localitate {
-    margin: 10px 0 14px;
+/* prima pagină: caseta „Caută-ți localitatea”, peste hartă, și fișa ei, în panou */
+.cautare-harta {
+    position: absolute;
+    top: 10px;
+    left: 54px;
+    z-index: 1001;
+    width: min(440px, calc(100% - 64px));
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
-.trimitere-localitate a {
-    display: block;
-    padding: 10px 12px;
+.cautare-harta .loc-camp {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.cautare-harta .loc-camp input {
+    font-size: 16px;
+    padding: 10px 14px;
+    border: 1px solid var(--margine);
     border-radius: 10px;
-    background: var(--accent-fundal);
-    color: var(--accent-text);
-    text-decoration: none;
+    box-shadow: var(--umbra);
 }
 
-.trimitere-localitate a:hover {
-    text-decoration: underline;
+.cautare-harta .loc-camp input:focus {
+    border-color: var(--accent);
+}
+
+.cautare-harta .buton {
+    padding: 0 11px;
+    border-radius: 10px;
+    box-shadow: var(--umbra);
+}
+
+.cautare-harta-stare {
+    flex-basis: 100%;
+    margin: 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--panou);
+    box-shadow: var(--umbra);
+    font-size: 13px;
+    color: var(--text-2);
+}
+
+.cautare-harta-stare:empty {
+    display: none;
+}
+
+.loc-in-panou {
+    margin: 12px 0 4px;
+}
+
+.loc-in-panou .loc-card {
+    position: relative;
+    padding: 16px 16px 14px;
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+.loc-in-panou .loc-card h2 {
+    font-size: 24px;
+    padding-right: 30px;
+    /* titlurile panoului sunt mici și cu majuscule; al fișei e numele localității */
+    text-transform: none;
+    letter-spacing: -0.01em;
+    color: var(--text);
+}
+
+.loc-in-panou .loc-verdict {
+    font-size: 17px;
+}
+
+.loc-in-panou .loc-explicatie,
+.loc-in-panou .loc-lucrari,
+.loc-in-panou .loc-trepte {
+    font-size: 14.5px;
+}
+
+.loc-in-panou .loc-cifre {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+}
+
+.loc-in-panou .loc-cifra strong {
+    font-size: 21px;
+}
+
+.loc-in-panou .loc-actiuni .buton {
+    font-size: 14px;
+    padding: 8px 11px;
+}
+
+.loc-inchide {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.loc-inchide:hover {
+    background: var(--accent-fundal);
+    color: var(--text);
 }
