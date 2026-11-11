@@ -137,8 +137,10 @@
         const j = J(u.j);
         const g = u.g >= 0 ? D.unitati[u.g] : null;
         const titlu = sat && simplu(sat.n) !== simplu(u.n) ? `${sat.n}, ${TIP[u.t]} ${u.n}` : `${cuMajuscula(TIP[u.t])} ${u.n}`;
-        const baza = { u: u, sat: sat, j: j, g: g, titlu: titlu, subtitlu: `județul ${j.n}` };
+        const baza = { u: u, sat: sat, j: j, g: g, titlu: titlu,
+            subtitlu: j.n === "București" ? "Capitala" : `județul ${j.n}` };
         const sus = j.cj + j.stat;     // consiliul județean și serviciile statului, în județ
+        if (g && g.k) return Object.assign(baza, fisaCapitala(u, g, sat));
         if (!g) {
             return Object.assign(baza, { verdict: `${cuMajuscula(TIP[u.t])} ${u.n} rămâne cum e: nu intră în comasare.`,
                 explicatie: "Capitala are organizarea ei, pe sectoare, și nu face parte din calcul.", economie: 0, sus: sus });
@@ -199,10 +201,55 @@
         });
     }
 
+    /**
+     * Capitala: Bucureștiul preia toate UAT-urile lipite de el. Aparatul primăriei generale și al
+     * sectoarelor nu e în execuția pe UAT, deci nu se arată un cost pe locuitor; banii eliberați
+     * sunt cei din primăriile preluate (rămâne un sfert, pentru ghișeele de sector).
+     */
+    function fisaCapitala(u, g, sat) {
+        const preluate = g.m.filter(s => s !== g.s).map(U).sort((a, b) => b.p - a.p);
+        const popPreluate = preluate.reduce((a, x) => a + x.p, 0);
+        const economie = Math.max(0, g.a[0] - g.a[1]);
+        const st = D.standarde;
+        const lucrari = [];
+        if (economie > 0 && g.fc) {
+            const cost = g.fc * st.canalizare * D.curs;
+            lucrari.push({ ce: "Canalizare", text: `pentru cei ${NF.format(g.fc)} de locuitori care azi nu au deloc`, cost: cost, ani: cost / economie });
+        }
+        if (economie > 0 && g.fa) {
+            const cost = g.fa * st.apa * D.curs;
+            lucrari.push({ ce: "Apă curentă", text: `pentru cei ${NF.format(g.fa)} de locuitori care azi nu au rețea`, cost: cost, ani: cost / economie });
+        }
+        const eCapitala = u.s === g.s;
+        const resedinta = U(g.s);
+        const tA = sat ? sat.tA : u.tA;
+        return {
+            capitala: true, unit: true, eResedinta: eCapitala, resedinta: resedinta, tipUnitate: "municipiul",
+            altii: eCapitala ? preluate.map(x => x.n) : [resedinta.n],
+            verdict: eCapitala
+                ? `Bucureștiul preia toate cele ${NF.format(preluate.length)} UAT-uri lipite de el: ${insira(preluate.map(x => x.n))}.`
+                : `${cuMajuscula(TIP[u.t])} ${u.n} trece la București, împreună cu celelalte ${NF.format(preluate.length - 1)} UAT-uri lipite de Capitală.`,
+            explicatie: eCapitala
+                ? `Capitala ajunge la ${NF.format(g.p)} de locuitori, dintre care ${NF.format(popPreluate)} vin din Ilfov. ` +
+                    "Primăriile preluate devin ghișee ale sectoarelor; primăria generală și sectoarele rămân."
+                : `Primăria din ${u.n} devine ghișeu al unui sector al Capitalei, cu drumul de azi. Locuitorii votează ` +
+                    "primarul general și Consiliul General, iar taxele locale se plătesc Bucureștiului.",
+            // drumul rămâne cel de azi, până la fosta primărie, devenită ghișeu de sector
+            drum: tA === null || eCapitala ? null : tA < 0.5 ? (sat ? "în localitate" : "sub 1 min") : `${NF.format(Math.round(tA))} min`,
+            tA: tA, tN: tA, cost: null, costAzi: null, costDupa: null,
+            economie: economie, sus: 0, lucrari: lucrari,
+            kmDrum: economie / (st.drumComunal * D.curs),
+            primarii: preluate.length, popPreluate: popPreluate
+        };
+    }
+
     function arata(sel, deruleaza) {
         ales = sel;
         const f = fisa(sel);
         const u = f.u, g = f.g, j = f.j;
+        // simularea și fișa din raport: Capitala stă la Ilfov, de unde vin UAT-urile preluate
+        const codJudet = f.capitala ? U(g.m.find(s => s !== g.s)).j : u.j;
+        const jr = Object.assign({ c: codJudet }, J(codJudet));
         const cutie = $("#loc-fisa");
         const tile = (eticheta, valoare, nota, clasa) => `<div class="loc-cifra${clasa ? " " + clasa : ""}">
             <span class="card-eticheta">${eticheta}</span><strong>${valoare}</strong><small>${nota || ""}</small></div>`;
@@ -222,7 +269,12 @@
             tiles.push(tile("Primăria costă, pe locuitor", cuSageata(f.cost),
                 f.unit ? "aparatul primăriei, pe an; execuția bugetară 2025" : "pe an; neschimbat, fiindcă primăria rămâne aceeași", scade ? "bun" : ""));
         }
-        if (g && f.unit) {
+        if (g && f.capitala) {
+            tiles.push(tile("Bani eliberați în fiecare an", lei(f.economie),
+                `din aparatul celor ${NF.format(f.primarii)} primării preluate: ${NF.format(Math.round(f.economie / f.popPreluate))} lei pe locuitorul lor`, "bun"));
+            tiles.push(tile("Aleși", sageata(cate(f.primarii, "primar", "primari"), "0"),
+                `și ${NF.format(g.c[0])} de consilieri locali; îi reprezintă Consiliul General și consiliile de sector`));
+        } else if (g && f.unit) {
             tiles.push(tile("Bani eliberați în fiecare an", lei(f.economie),
                 `în unitatea nouă: ${NF.format(Math.round(f.economie / g.p))} lei pe locuitor`, "bun"));
             tiles.push(tile("Aleși", sageata(cate(g.m.length, "primar", "primari"), "1"),
@@ -238,9 +290,14 @@
                     de drum comunal modernizat în fiecare an.</li>
                 <li><b>În zece ani:</b> ${lei(f.economie * 10)} pentru investiții, în loc să se ducă pe administrație.</li>
             </ul>`;
-        const deSus = !g ? "" : `<p class="loc-sus">În plus, în județul ${esc(j.n)}, consiliul județean și serviciile statului costă cu
+        const deSus = !g || !f.sus ? "" : `<p class="loc-sus">În plus, în județul ${esc(j.n)}, consiliul județean și serviciile statului costă cu
             <b>${lei(f.sus)}</b> mai puțin pe an — ${NF.format(Math.round(f.sus / j.p))} lei pentru fiecare locuitor.</p>`;
-        const maiSus = !g || !g.d ? "" : `
+        const maiSus = f.capitala ? `
+            <h3>Mai sus de primărie</h3>
+            <ul class="loc-trepte">
+                <li><b>Metropola București–Ilfov</b>: regiunea Capitalei preia ce face azi consiliul județean Ilfov;
+                    județul rămâne pe hartă, ca identitate și circumscripție electorală.</li>
+            </ul>` : !g || !g.d ? "" : `
             <h3>Mai sus de primărie</h3>
             <ul class="loc-trepte">
                 <li><b>${g.d[1] ? "Zona metropolitană" : "Districtul"} ${esc(g.d[0])}</b>${g.d[2] !== g.d[0] ? `, cu reședința la ${esc(g.d[2])}` : ""}:
@@ -266,9 +323,9 @@
                 <div class="loc-actiuni">
                     <button type="button" class="buton principal" id="loc-distribuie">Distribuie</button>
                     <button type="button" class="buton" id="loc-imagine">Descarcă imaginea</button>
-                    ${!g ? "" : PE_HARTA ? `<a class="buton" href="#judet=${u.j}">Simulează județul ${esc(j.n)}</a>`
+                    ${!g ? "" : PE_HARTA ? `<a class="buton" href="#judet=${jr.c}">Simulează județul ${esc(jr.n)}</a>`
                         : `<a class="buton" href="index.html#judet=${u.j}">Vezi pe hartă</a>`}
-                    ${g ? `<a class="buton" href="raport.html#judet-${esc(j.auto)}">Fișa județului ${esc(j.n)}</a>` : ""}
+                    ${g ? `<a class="buton" href="raport.html#judet-${esc(jr.auto)}">Fișa județului ${esc(jr.n)}</a>` : ""}
                     <a class="buton" href="${esc(sesizare(f))}" target="_blank" rel="noopener">Semnalează o greșeală</a>
                 </div>
                 <p class="nota" id="loc-mesaj" role="status"></p>

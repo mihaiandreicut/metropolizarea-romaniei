@@ -93,6 +93,9 @@ window.AdpReorganizare = function() {
         // comasările alese de mână: [{ uat, cu }], coduri SIRUTA — cele două UAT-uri ajung în
         // aceeași unitate, oricum ar fi ieșit din calcul; criteriile se verifică la fel
         comasari: null,
+        // Capitala: Bucureștiul preia toate UAT-urile lipite de el (Metropola). Primăriile lor devin
+        // ghișee ale sectoarelor, iar satele lor păstrează drumul de azi până la ele.
+        capitala: true,
         // satele mutate de mână: [{ sat, uat }], coduri SIRUTA — satul trece în unitatea în care e
         // UAT-ul `uat` (din același județ); limitele rămân pe UAT-uri, nu există limite oficiale de sat
         transferuri: null
@@ -187,8 +190,8 @@ window.AdpReorganizare = function() {
     /**
      * Costul aparatului unei unități noi, din execuția bugetară a membrilor: azi, suma lor; după,
      * aparatul primăriei-reședință plus `cota` din al fiecărei primării desființate (biroul local).
-     * Când reședința nu are date, îi ține locul membrul cu aparatul cel mai mare. Membrii fără date
-     * nu intră nici azi, nici după. `ia(i)` = execuția UAT-ului i, sau nimic. Singura implementare a
+     * Reședința fără date (Bucureștiul: primăria generală și sectoarele nu sunt în execuția pe UAT) nu
+     * intră nici azi, nici după, ca și membrii fără date. `ia(i)` = execuția UAT-ului i, sau nimic. Singura implementare a
      * ipotezei de cost: o folosesc testul financiar, harta, raportul și unelte/cifre.js.
      */
     function aparatUnitate(lista, sediu, ia, cota) {
@@ -196,9 +199,9 @@ window.AdpReorganizare = function() {
         const cu = lista.filter(i => ia(i));
         if (!cu.length) return null;
         const aparatul = i => ia(i).cheltuieliAparat || 0;
-        const resedinta = ia(sediu) ? sediu : cu.reduce((a, i) => aparatul(i) > aparatul(a) ? i : a);
+        const aparatResedinta = ia(sediu) ? aparatul(sediu) : 0;
         const acum = cu.reduce((s, i) => s + aparatul(i), 0);
-        return { acum: acum, dupa: aparatul(resedinta) + c * (acum - aparatul(resedinta)), membri: cu.length };
+        return { acum: acum, dupa: aparatResedinta + c * (acum - aparatResedinta), membri: cu.length };
     }
 
     function testFinanciar(lista, sediu, populatie, executie, cota) {
@@ -234,10 +237,12 @@ window.AdpReorganizare = function() {
      * @param optiuni  parametri (vezi PARAMETRI_IMPLICITI); `executie` (Map UAT -> execuția bugetară)
      *                 adaugă regula financiară în condițiile fiecărei unități
      */
-    function calculeaza(date, vecini, ex, optiuni) {
+    function calculeazaJudet(date, vecini, ex, optiuni) {
         const P = Object.assign({}, PARAMETRI_IMPLICITI, optiuni || {});
+        // UAT-urile scoase din calculul județului (cele preluate de Capitală)
+        const exclus = new Set(P.exclude || []);
         const uatJud = [];
-        date.uat.forEach((u, i) => { if (u.j === ex.judet) uatJud.push(i); });
+        date.uat.forEach((u, i) => { if (u.j === ex.judet && !exclus.has(i)) uatJud.push(i); });
         const inJud = new Set(uatJud);
         const coloana = new Map(ex.resedinte.map((s, k) => [s, k]));
 
@@ -740,6 +745,7 @@ window.AdpReorganizare = function() {
         // --- diagnostic pe localități
         const sate = ex.sate.map((s, k) => {
             const i = idxDupaSiruta.get(s.u);
+            if (i === undefined) return null;   // satele UAT-urilor scoase din calcul
             const tAcum = timp(k, col.get(i));
             const tNou = timp(k, col.get(grup.get(i)));
             // alternativa: reședința unui grup vecin cu UAT-ul satului
@@ -756,7 +762,7 @@ window.AdpReorganizare = function() {
                 depasire: tNou > P.tMax && (s.p || 0) >= P.pSatMin,
                 transfer: transfer
             };
-        });
+        }).filter(Boolean);
 
         // satele mutate de mână: trec în unitatea aleasă, cu drumul până la reședința ei și cu
         // populația lor (din recensământ, adusă la anul populației de referință a UAT-ului)
@@ -1044,6 +1050,128 @@ window.AdpReorganizare = function() {
         };
     }
 
+    /** Indicatorii unei liste de unități ({populatie, populatieProiectata}) și ai satelor lor. */
+    function indicatoriUnitati(lista, sate, tCamp, P) {
+        const pops = lista.map(x => x.populatie).sort((a, b) => a - b);
+        const proiectii = lista.map(x => x.populatieProiectata);
+        const greutate = sate.reduce((a, x) => a + Math.max(1, x.p || 0), 0) || 1;
+        return {
+            unitati: lista.length,
+            subPrag: pops.filter(p => p < P.pMin).length,
+            subPrag2050: proiectii.filter(p => p < P.pMin).length,
+            sub3000: pops.filter(p => p < 3000).length,
+            mediana: pops[Math.floor(lista.length / 2)],
+            timpMediu: sate.reduce((a, x) => a + x[tCamp] * Math.max(1, x.p || 0), 0) / greutate,
+            pesteTMax: sate.filter(x => x[tCamp] > P.tMax && (x.p || 0) >= P.pSatMin).length,
+            popPesteTMax: sate.filter(x => x[tCamp] > P.tMax).reduce((a, x) => a + (x.p || 0), 0)
+        };
+    }
+
+    /** Indexul Bucureștiului în date.uat, sau -1. */
+    const indexCapitala = date => date.uat.findIndex(u => u.t === "municipiu" && u.n === "București");
+
+    /**
+     * Județul în care se raportează o unitate: al reședinței, iar Capitala la județul UAT-urilor pe care
+     * le preia (Ilfov) — acolo sunt aparatul lor și satele lor; Bucureștiul nu are date de comasare.
+     */
+    function judetulUnitatii(date, g) {
+        if (g.capitala) {
+            const preluat = g.membri.find(i => i !== g.sediu);
+            if (preluat !== undefined) return date.uat[preluat].j;
+        }
+        return date.uat[g.sediu].j;
+    }
+
+    /**
+     * Calculul pe un județ. Cu `capitala` (implicit), UAT-urile județului lipite de București nu intră
+     * în comasarea județului: Capitala le preia pe toate, ca unitate a ei. Primăriile lor devin ghișee
+     * ale sectoarelor, iar satele lor păstrează drumul de azi până la ele (Bucureștiul nu are date de
+     * acces pe sate). Restul județului se comasează ca de obicei, fără ele.
+     */
+    function calculeaza(date, vecini, ex, optiuni) {
+        const P = Object.assign({}, PARAMETRI_IMPLICITI, optiuni || {});
+        const cap = P.capitala ? indexCapitala(date) : -1;
+        const preluate = cap < 0 ? [] : vecini[cap].filter(i => date.uat[i].j === ex.judet);
+        if (!preluate.length) return calculeazaJudet(date, vecini, ex, P);
+        const r = calculeazaJudet(date, vecini, ex, Object.assign({}, P, { exclude: preluate }));
+
+        // satele UAT-urilor preluate: drumul de azi până la primăria lor, care devine ghișeu de sector
+        const coloana = new Map(ex.resedinte.map((s, k) => [s, k]));
+        const dupaSiruta = new Map(preluate.map(i => [date.uat[i].s, i]));
+        const colUat = new Map();
+        ex.sate.forEach(s => {
+            const i = dupaSiruta.get(s.u);
+            if (i !== undefined && TIP_RESEDINTA.includes(s.t)) colUat.set(i, coloana.get(s.s));
+        });
+        const sateCapitala = [];
+        ex.sate.forEach((s, k) => {
+            const i = dupaSiruta.get(s.u);
+            if (i === undefined) return;
+            const v = ex.timp[k][colUat.get(i)];
+            const t = v === null || v === undefined ? 0 : v;
+            sateCapitala.push({ k: k, s: s.s, n: s.n, p: s.p, e: s.e, uat: i, grup: cap, tAcum: t, tNou: t,
+                depasire: false, transfer: null, capitala: true });
+        });
+        const membri = [cap].concat(preluate);
+        const pop = i => date.uat[i].pop || 0;
+        const popTot = membri.reduce((a, i) => a + pop(i), 0);
+        const popPreluate = preluate.reduce((a, i) => a + pop(i), 0);
+        const greutate = sateCapitala.reduce((a, x) => a + Math.max(1, x.p || 0), 0) || 1;
+        const numePreluate = preluate.slice().sort((a, b) => pop(b) - pop(a)).map(i => date.uat[i].n);
+        const proiectat = membri.reduce((a, i) => a + proiecteaza(date.uat[i], P.anProiectie), 0);
+        r.grupuri.push({
+            id: "capitala",
+            sediu: cap,
+            nume: date.uat[cap].n,
+            urban: true,
+            capitala: true,
+            membri: membri,
+            populatie: popTot,
+            populatieProiectata: proiectat,
+            populatieReferinta: P.proiectie ? Math.min(popTot, proiectat) : popTot,
+            sateMutate: 0,
+            suprafata: membri.reduce((a, i) => a + date.uat[i].a, 0),
+            nrSate: sateCapitala.length,
+            timpMediu: sateCapitala.reduce((a, x) => a + x.tNou * Math.max(1, x.p || 0), 0) / greutate,
+            timpMax: Math.max(0, ...sateCapitala.filter(x => (x.p || 0) >= P.pSatMin).map(x => x.tNou)),
+            depasiri: 0,
+            transferuri: 0,
+            birouri: preluate.slice(),
+            subPrag: false,
+            motive: [],
+            riscMinoritate: [],
+            // aparatul Bucureștiului nu e în date (primăria generală și sectoarele): fără testul de 30%
+            financiar: null,
+            istorice: Array.from(new Set(membri.map(i => date.uat[i].ist))),
+            dosar: [{
+                regula: "Capitala",
+                text: `${date.uat[cap].n} preia ${cate(preluate.length, "UAT lipit", "UAT-uri lipite")} de el ` +
+                    `(${numePreluate.join(", ")}): ${NF.format(popPreluate)} loc. Primăriile lor devin ghișee ale ` +
+                    `sectoarelor, iar satele lor păstrează drumul de azi până la ele.`
+            }],
+            conditii: [{
+                nume: "Capitala", valoare: `${NF.format(popTot)} loc.`,
+                prag: "Bucureștiul și toate UAT-urile lipite de el", stare: "info"
+            }],
+            derogari: [],
+            tipuriDerogari: []
+        });
+        r.grupuri.sort((a, b) => b.populatie - a.populatie);
+        membri.forEach(i => {
+            r.grup.set(i, cap);
+            r.proiectat.set(i, proiecteaza(date.uat[i], P.anProiectie));
+        });
+        r.uat = r.uat.concat(membri);
+        r.sate = r.sate.concat(sateCapitala);
+        r.capitala = { sediu: cap, preluate: preluate };
+        // azi: UAT-urile județului (fără Bucureștiul, care nu e al lui); după: unitățile, cu Capitala
+        r.inainte = indicatoriUnitati(r.uat.filter(i => i !== cap)
+            .map(i => ({ populatie: pop(i), populatieProiectata: r.proiectat.get(i) })), r.sate, "tAcum", P);
+        r.dupa = indicatoriUnitati(r.grupuri, r.sate, "tNou", P);
+        r.financiar = sumarFinanciar(r.grupuri);
+        return r;
+    }
+
     /** Comparație lexicografică pe chei numerice: e `a` mai bună (mai mică) decât `b`? */
     function maiBun(a, b) {
         for (let i = 0; i < a.length; i++) {
@@ -1099,7 +1227,8 @@ window.AdpReorganizare = function() {
         // pragurile districtei vin separat (`optiuni.district`): altfel pragul comunei,
         // cu același nume, le-ar suprascrie
         const P = Object.assign({}, PARAMETRI_DISTRICT, (optiuni || {}).district || {});
-        const unitati = r.grupuri;
+        // Capitala e Metropola, nu intră într-un district
+        const unitati = r.grupuri.filter(g => !g.capitala);
         const indexUnitate = new Map(unitati.map((g, k) => [g.sediu, k]));
         const timp = (a, b) => {
             const v = ex.timp[r.satResedinta.get(unitati[a].sediu)][r.col.get(unitati[b].sediu)];
@@ -1603,7 +1732,7 @@ window.AdpReorganizare = function() {
     /**
      * Rulează calculul pe mai multe județe și le unește într-un singur rezultat, cu
      * aceeași formă ca `calculeaza`, plus `judete` (indicatorii fiecărui județ).
-     * UAT-urile din afara județelor calculate (București) rămân unități neschimbate
+     * UAT-urile din afara județelor calculate rămân unități neschimbate (Bucureștiul, doar fără regula Capitalei)
      * și intră în totaluri așa cum sunt.
      */
     function calculeazaNational(date, vecini, exemple, optiuni) {
@@ -1704,6 +1833,7 @@ window.AdpReorganizare = function() {
         REGULA_FINANCIARA: REGULA_FINANCIARA,
         testFinanciar: testFinanciar,
         calculeaza: calculeaza,
+        judetulUnitatii: judetulUnitatii,
         calculeazaDistrict: calculeazaDistrict,
         calculeazaNational: calculeazaNational,
         alegeriCuCircumscriptii: alegeriCuCircumscriptii,

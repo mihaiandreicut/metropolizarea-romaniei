@@ -571,7 +571,9 @@ window.AdpScenariu = function() {
         if (national || !exCurent) return;   // la scară națională nu se desenează cele ~14.000 de sate
         const ex = exCurent;
         const esteResedinta = k => RESEDINTE.includes(ex.sate[k].t);
-        const satResedinta = uatIdx => ex.sate.find(x => x.u === D.date.uat[uatIdx].s && RESEDINTE.includes(x.t));
+        // Bucureștiul (Capitala) nu are localități în datele județului: eticheta stă în centrul lui
+        const satResedinta = uatIdx => ex.sate.find(x => x.u === D.date.uat[uatIdx].s && RESEDINTE.includes(x.t)) ||
+            { e: D.date.uat[uatIdx].e };
 
         // candidații la transfer: linie punctată spre reședința propusă
         r.sate.filter(s => s.transfer).forEach(s => {
@@ -1123,7 +1125,7 @@ window.AdpScenariu = function() {
         const prag = finante.pragAdministratie || 30;
         return `<h3 class="subtitlu-sectiune">${titlu} <small class="nota">— execuția ${finante.anExecutie || ""}</small></h3>
             <table class="tabel-atribute">
-                ${rand("Venituri proprii", milioane(b.venituri), `${NF.format(b.cu)} de primării cu date`)}
+                ${rand("Venituri proprii", milioane(b.venituri), `${cate(b.cu, "primărie cu date", "primării cu date")}`)}
                 ${rand("Cheltuieli totale", milioane(b.total))}
                 ${rand("Aparat administrativ", milioane(b.aparat),
                     b.pondere === null ? "" : `${NF1.format(b.pondere)}% din veniturile proprii, prag ${prag}%`)}
@@ -1418,7 +1420,7 @@ window.AdpScenariu = function() {
             </ul>`;
     }
 
-    /** Ce rămâne în afara calculului: Bucureștiul, plus județele fără date generate încă. */
+    /** Ce rămâne în afara calculului: Bucureștiul, dacă regula Capitalei e oprită, plus județele fără date generate încă. */
     function neacoperite(r) {
         if (!r.neacoperite.length) return "";
         if (r.neacoperite.length === 1) return `; ${D.esc(D.date.uat[r.neacoperite[0]].n)} rămâne neschimbat`;
@@ -2015,8 +2017,8 @@ window.AdpScenariu = function() {
                     <td>${x.timpAzi === null ? "—" : `${NF1.format(x.timpAzi)} → <b>${NF1.format(x.timpDupa)}</b>`}</td></tr>`).join("")}</tbody>
             </table></div>
             ${tip === "tara" || codAdrPas(pasCheie) === (D.date.uat.find(u => u.j === 40) || {}).adr
-                ? `<p class="nota">Bucureștiul rămâne cum e: municipiul nu are date de accesibilitate pe sate și
-                    nu se comasează.</p>` : ""}`;
+                ? `<p class="nota">Bucureștiul preia toate UAT-urile lipite de el; se numără la Ilfov, de unde vin.
+                    Primăriile lor devin ghișee ale sectoarelor, iar satele lor păstrează drumul de azi.</p>` : ""}`;
         const lista = tip !== "judet" ? "" : `
             <h4>Cine cu cine se comasează <small class="nota">— clic pentru dosarul unității</small></h4>
             <ol class="lista-grupuri pp-unitati">${comasate.map(g => `

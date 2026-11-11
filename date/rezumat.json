@@ -1,5 +1,5 @@
 {
- "generat": "2026-11-11T08:25:22.037Z",
+ "generat": "2026-11-11T09:37:54.463Z",
  "secunde": 0.9,
  "status": null,
  "date": {
@@ -41,7 +41,7 @@
   },
   "unitati": {
    "inainte": 3181,
-   "dupa": 1455
+   "dupa": 1441
   },
   "subPrag": {
    "inainte": 1697,
@@ -49,7 +49,7 @@
   },
   "mediana": {
    "inainte": 2858,
-   "dupa": 7461
+   "dupa": 7409
   },
   "timpMediu": {
    "inainte": 2.141092502027619,
@@ -60,7 +60,7 @@
    "dupa": 290
   },
   "sate": 13747,
-  "birouri": 769,
+  "birouri": 783,
   "plasi": 168,
   "plasiSubRegula": 11
  },

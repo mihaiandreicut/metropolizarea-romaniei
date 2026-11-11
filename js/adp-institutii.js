@@ -290,7 +290,7 @@ window.AdpInstitutii = function() {
         const judet = date.judete.find(j => j.c === cod) || { c: cod, n: "" };
         const pop = i => date.uat[i].pop || 0;
         const toate = date.uat.map((u, i) => i).filter(i => date.uat[i].j === cod);
-        const grupuri = r.grupuri.filter(g => date.uat[g.sediu].j === cod);
+        const grupuri = r.grupuri.filter(g => R.judetulUnitatii(date, g) === cod);
         const membri = new Map(r.grupuri.map(g => [g.sediu, g.membri]));
         const districte = (r.districte || []).filter(d => date.uat[d.sediu].j === cod);
         const indexSiruta = new Map(date.uat.map((u, i) => [u.s, i]));
@@ -308,7 +308,8 @@ window.AdpInstitutii = function() {
             // în model, fiecare sat își alege delegatul și are un fond al lui; azi delegatul există doar
             // în satele fără consilier (art. 142), fără buget — câți sunt nu se știe din date
             delegati: [null, sate.length],
-            secretari: [toate.length, grupuri.length],
+            // Capitala are secretarul ei general (primăria generală și sectoarele)
+            secretari: [toate.length, grupuri.filter(g => !g.capitala).length],
             consilieriJudeteni: [consilieriJudeteni(date).get(cod) || 0, locuriRegionale],
             conducereCJ: [1 + VICEPRESEDINTI_CJ, 0],
             sub1500: [toate.filter(i => pop(i) < 1500).length, grupuri.filter(g => g.populatie < 1500).length],

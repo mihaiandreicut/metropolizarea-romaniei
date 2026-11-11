@@ -80,16 +80,18 @@ const aparatAzi = Array.from(executie.values()).reduce((a, e) => a + (e.cheltuie
 const mld = v => Math.round(v / 1e8) / 10;
 
 function urbane(r) {
-    const cuComune = r.grupuri.filter(g => urban(g.sediu) && g.membri.some(i => !urban(i)));
+    // Capitala ține de regula ei (preia tot ce e lipit de București), nu de regula orașului de 10.000
+    const grupuri = r.grupuri.filter(g => !g.capitala);
+    const cuComune = grupuri.filter(g => urban(g.sediu) && g.membri.some(i => !urban(i)));
     return {
-        unitati: r.grupuri.filter(g => urban(g.sediu)).length,
-        subPragOras: r.grupuri.filter(g => urban(g.sediu) && g.populatie < r.parametri.pMinOras).length,
+        unitati: grupuri.filter(g => urban(g.sediu)).length,
+        subPragOras: grupuri.filter(g => urban(g.sediu) && g.populatie < r.parametri.pMinOras).length,
         oraseCarePreiau: cuComune.length,
         comunePreluate: cuComune.reduce((a, g) => a + g.membri.filter(i => !urban(i)).length, 0),
         pesteLeader: cuComune.filter(g => g.populatie > PRAG_LEADER).length,
         comuneInAfaraLeader: cuComune.filter(g => g.populatie > PRAG_LEADER)
             .reduce((a, g) => a + g.membri.filter(i => !urban(i)).length, 0),
-        oraseUnite: r.grupuri.filter(g => g.membri.filter(urban).length > 1)
+        oraseUnite: grupuri.filter(g => g.membri.filter(urban).length > 1)
             .map(g => g.membri.filter(urban).map(i => date.uat[i].n).join(" + "))
     };
 }

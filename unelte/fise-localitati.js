@@ -75,6 +75,7 @@ const unitati = r.grupuri.map((g, k) => {
         p: g.populatie,
         m: g.membri.map(i => date.uat[i].s),
         o: g.urban ? 1 : 0,                        // unitate cu oraș
+        k: g.capitala ? 1 : 0,                     // Capitala: Bucureștiul cu UAT-urile lipite de el
         a: [Math.round(c.acum), Math.round(c.dupa)],
         d: d ? [d.nume, d.tip === "metropolitan" ? 1 : 0, d.numeResedinta] : null,
         g: micro === undefined ? null : date.uat[micro].n,   // orașul-pol al microregiunii (grupul LEADER)
@@ -150,7 +151,7 @@ const iesire = {
     nota: "Fișa fiecărei localități, calculată cu regulile implicite (v2) de unelte/fise-localitati.js. " +
         "Câmpurile sunt poziționale, ca fișierul să rămână mic; ordinea lor e în `campuri`.",
     campuri: {
-        unitati: "s: SIRUTA reședinței · p: locuitori · m: SIRUTA membrilor · o: unitate cu oraș · a: [aparat azi, după] lei/an · " +
+        unitati: "s: SIRUTA reședinței · p: locuitori · m: SIRUTA membrilor · o: unitate cu oraș · k: Capitala · a: [aparat azi, după] lei/an · " +
             "d: [district, e zonă metropolitană, reședința districtului] · g: orașul-pol al microregiunii · c: consilieri [azi, propus] · " +
             "v: viceprimari [azi, propus] · b: foste reședințe cu birou permanent · fc / fa: locuitori în UAT-uri fără canalizare / fără apă · " +
             "t: drum mediu până la reședință, min · x: derogări · f: aparatul, % din veniturile proprii",

@@ -180,8 +180,9 @@ window.AdpRaport = function() {
         const popJudet = new Map();
         uatAcum.forEach(u => popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.pop || 0)));
         // Aleșii se numără după Codul administrativ (js/adp-institutii.js): consilierii pe populația după
-        // domiciliu din anul alegerilor (art. 112 și 171), fără București, care are regulile lui și
-        // rămâne cum e. La consiliul județean, consilierii și președintele.
+        // domiciliu din anul alegerilor (art. 112 și 171), fără București, care are regulile lui (primar
+        // general, sectoare); UAT-urile pe care le preia își pierd primarii și consiliile. La consiliul
+        // județean, consilierii și președintele.
         const al = INST.alesiLocali(date, uatAcum.map((u, i) => i), r.grupuri);
         const consilieriAcum = al.consilieriLocali[0], consilieriDupa = al.consilieriLocali[1];
         let judeteni = 0;
@@ -349,7 +350,8 @@ window.AdpRaport = function() {
                 </tr>`).join("")}</tbody>
             </table></div>
             <p class="nota">Aleșii sunt numărați fără București, care are regulile lui (primar general, sectoare,
-                Consiliul General) și rămâne cum e. Consilierii se numără, cum cere legea, pe populația după domiciliu
+                Consiliul General). Cele 14 UAT-uri pe care Capitala le preia își pierd primarii și consiliile locale;
+                locuitorii lor votează primarul general și Consiliul General. Consilierii se numără, cum cere legea, pe populația după domiciliu
                 de la 1 ianuarie ${INST.AN_ALEGERI}, anul alegerilor; în model, pe aceeași scară, la dublul populației.
                 Numărul de consilieri regionali vine din scara consiliilor județene de azi (Codul administrativ,
                 art. 171), aplicată la dublul populației. Fiecare județ e o circumscripție; locurile se împart
@@ -661,8 +663,9 @@ window.AdpRaport = function() {
             prioritati: prioritare.slice(0, 3).map(a => ({ text: a.text, fond: a.fond, populatie: a.populatie })),
             maiMulte: Math.max(0, prioritare.length - 3),
             fonduri: fonduri,
-            instrument: d.praguriUE.instrument === "mixt"
-                ? "LEADER pentru comune și orașele mici, strategia urbană pentru oraș" : "LEADER",
+            instrument: d.praguriUE.instrument === "urban" ? "strategia urbană integrată a Capitalei"
+                : d.praguriUE.instrument === "mixt"
+                    ? "LEADER pentru comune și orașele mici, strategia urbană pentru oraș" : "LEADER",
             microregiuni: micro.length,
             microInBanda: micro.filter(m => m.inBanda).length
         };
@@ -722,7 +725,8 @@ window.AdpRaport = function() {
         cont.innerHTML = `
             <div class="carduri">
                 <div class="card-cifra"><span class="card-eticheta">Fișe de district</span>
-                    <strong>${NF.format(districte.length)}</strong><small>în ${NF.format(regiuni.length)} regiuni</small></div>
+                    <strong>${NF.format(districte.filter(d => !d.capitala).length)}</strong>
+                    <small>în ${NF.format(regiuni.length)} regiuni${districte.some(d => d.capitala) ? ", plus fișa Capitalei" : ""}</small></div>
                 <div class="card-cifra"><span class="card-eticheta">Acțiuni în plan</span>
                     <strong>${NF.format(suma(districte, d => d.actiuni.length))}</strong><small>deduse din golurile de infrastructură</small></div>
                 <div class="card-cifra"><span class="card-eticheta">Apă și canalizare noi, cost estimat</span>
@@ -779,7 +783,19 @@ window.AdpRaport = function() {
         const numeUat = i => date.uat[i].n;
         const agrega = lista => infra && I ? I.agrega(date, infra, finante, lista) : null;
         const retea = (x, cheie) => x ? [x[cheie].uat, x.uat] : null;
-        const districte = (r.districte || []).map(d => {
+        // Capitala nu e într-un district: e Metropola. Are fișa ei, ca să intre în totaluri (populația,
+        // UAT-urile preluate, economia din primăriile lor, rețelele care lipsesc acolo).
+        const capitala = r.grupuri.find(g => g.capitala);
+        const ca = capitala ? [{
+            sediu: capitala.sediu, nume: date.uat[capitala.sediu].n + " (Capitala)", numeResedinta: date.uat[capitala.sediu].n,
+            tip: "metropolitan", capitala: true, populatie: capitala.populatie, unitati: [capitala.sediu],
+            respectaRegula: true, manual: false, microregiuni: [],
+            criterii: [{ nume: "Capitala", valoare: `${NF.format(capitala.membri.length - 1)} UAT-uri preluate`,
+                prag: "Bucureștiul și toate UAT-urile lipite de el", stare: "ok" }],
+            praguriUE: { instrument: "urban", potrivit: true, popLeader: 0, popUrban: capitala.populatie,
+                nota: "Capitala: strategia urbană integrată, fără LEADER" }
+        }] : [];
+        const districte = (r.districte || []).concat(ca).map(d => {
             const unitati = d.unitati.map(u => dupaSediu.get(u)).filter(Boolean);
             const indecsi = unitati.flatMap(g => g.membri);
             const a = agrega(indecsi);
@@ -791,7 +807,7 @@ window.AdpRaport = function() {
                 if (g !== undefined) galuri.set(g, (galuri.get(g) || 0) + 1);
             });
             return {
-                id: d.sediu, nume: d.nume, resedinta: d.numeResedinta, tip: d.tip,
+                id: d.sediu, nume: d.nume, resedinta: d.numeResedinta, tip: d.tip, capitala: !!d.capitala,
                 judet: date.uat[d.sediu].j, adr: date.uat[d.sediu].adr,
                 populatie: d.populatie,
                 suprafata: indecsi.reduce((x, i) => x + (date.uat[i].a || 0), 0),
@@ -1005,8 +1021,8 @@ window.AdpRaport = function() {
         return date.judete.map(j => {
             const p = personal.judete[j.c];
             const indecsi = date.uat.map((u, i) => i).filter(i => date.uat[i].j === j.c);
-            const grupuri = r.grupuri.filter(g => date.uat[g.sediu].j === j.c);
-            // Bucureștiul nu intră în comasare și nu are execuția potrivită pe sectoare
+            // Capitala se raportează la Ilfov, de unde preia UAT-urile; Bucureștiul nu are execuția pe sectoare
+            const grupuri = r.grupuri.filter(g => window.AdpReorganizare.judetulUnitatii(date, g) === j.c);
             if (!p || !p.salariati || !p.castigBrut || !grupuri.length) return null;
             const cost = p.castigBrut.O * 12 * COST_ANGAJATOR;
             const leiPrimarii = indecsi.reduce((a, i) => a + ((executieUat[date.uat[i].s] || {}).personalAparat || 0), 0);
@@ -1299,9 +1315,9 @@ window.AdpRaport = function() {
             return i !== undefined && date.uat[i].j === cod;
         });
         const fise = date.judete.map(j => {
-            const grupuri = r.grupuri.filter(g => date.uat[g.sediu].j === j.c);
+            // Capitala intră în fișa Ilfovului, de unde preia UAT-urile
+            const grupuri = r.grupuri.filter(g => window.AdpReorganizare.judetulUnitatii(date, g) === j.c);
             const ind = r.judete.find(x => x.judet === j.c);
-            // Bucureștiul nu intră în comasare
             if (!grupuri.length || !ind) return null;
             const uat = date.uat.map((u, i) => i).filter(i => date.uat[i].j === j.c);
             const derogari = [];
@@ -1361,6 +1377,15 @@ window.AdpRaport = function() {
                             ${randTabel("Districte", "—", NF.format(f.districte))}
                         </tbody>
                     </table></div>
+                    ${(() => {
+                        const c = f.grupuri.find(g => g.capitala);
+                        if (!c) return "";
+                        const preluate = c.membri.filter(i => i !== c.sediu);
+                        return `<p class="nota"><b>Capitala.</b> Una dintre unități e Bucureștiul, care preia
+                            ${NF.format(preluate.length)} UAT-uri ale județului, lipite de el
+                            (${NF.format(preluate.reduce((a, i) => a + (date.uat[i].pop || 0), 0))} loc.):
+                            ${esc(preluate.map(i => date.uat[i].n).join(", "))}. Primăriile lor devin ghișee ale sectoarelor.</p>`;
+                    })()}
                     <p class="nota"><a href="index.html#judet=${f.j.c}">Pe hartă, pas cu pas</a>: același județ,
                         cu regulile tale, și harta de azi lângă cea propusă. Ceva nu se potrivește cu ce știi despre
                         județ? <a href="${esc(sesizareJudet(f))}" target="_blank" rel="noopener">Semnalează o greșeală</a>.</p>
@@ -1402,7 +1427,7 @@ window.AdpRaport = function() {
                     <th>Sate la peste ${r.parametri.tMax} min, azi → după</th><th>Peste ${regula.prag}%, cu termen</th>
                     <th>Alegeri de mână</th></tr></thead>
                 <tbody>${tabel}
-                    <tr class="rand-total"><th scope="row">Total, fără București</th>${celule(total)}</tr>
+                    <tr class="rand-total"><th scope="row">Total <small>(Capitala, la Ilfov)</small></th>${celule(total)}</tr>
                 </tbody>
             </table></div>
             <p class="nota"><b>Cum se citește.</b> „Derogări” numără derogările, nu unitățile: o unitate cu două motive apare

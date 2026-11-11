@@ -135,7 +135,8 @@ window.AdpExplorator = function() {
         $("#carduri").innerHTML =
             card("Populație", NF.format(populatie), `${NF.format(Math.round(suma(lista, "suprafata")))} km²`) +
             card("Zone metropolitane și districte", NF.format(lista.length),
-                `${NF.format(metropolitane)} zone metropolitane, ${NF.format(lista.length - metropolitane)} districte`) +
+                `${NF.format(metropolitane)} zone metropolitane${lista.some(d => d.capitala) ? " (una e Capitala)" : ""}, ` +
+                `${NF.format(lista.length - metropolitane)} districte`) +
             card("Comune și orașe", `${NF.format(suma(lista, "nrUat"))} → ${NF.format(suma(lista, "nrUnitati"))}`,
                 `${NF.format(suma(lista, "subPrag"))} rămân sub pragul lor (${NF.format(D.praguri.comuna)} comuna, ${NF.format(D.praguri.oras)} cu oraș)`) +
             card("Economie pe an", lei(economie),
@@ -275,7 +276,8 @@ window.AdpExplorator = function() {
             return `<tr class="rand-explorator ${deschis ? "deschis" : ""}">
                 <th scope="row"><button type="button" class="legatura" data-deschide="${d.id}" aria-expanded="${deschis}">
                     <span aria-hidden="true">${deschis ? "▾" : "▸"}</span> ${esc(d.nume)}</button>
-                    ${d.tip === "metropolitan" ? `<span class="eticheta-stare plin">zonă metropolitană</span>` : ""}
+                    ${d.capitala ? `<span class="eticheta-stare plin">Metropola</span>`
+                        : d.tip === "metropolitan" ? `<span class="eticheta-stare plin">zonă metropolitană</span>` : ""}
                     ${d.manual ? `<span class="eticheta-stare">alegere voluntară</span>` : ""}
                     ${d.resedinta !== d.nume ? `<br><small>reședința: ${esc(d.resedinta)}</small>` : ""}</th>
                 <td>${esc(d.judetNume)}</td>
