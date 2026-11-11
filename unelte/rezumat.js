@@ -31,8 +31,10 @@ function scenariuNational(date, vecini) {
         ? json("date/corectii-districte.json") : {};
     const alegeri = fisierAlegeri.corectii || [];
     const judecatorii = fs.existsSync(cale("date/judecatorii-uat.json")) ? json("date/judecatorii-uat.json") : null;
+    // farmaciile și oficiile poștale din registrele oficiale intră în scorul de centralitate, ca pe hartă
+    const dotari = fs.existsSync(cale("date/dotari-uat.json")) ? json("date/dotari-uat.json").localitati : null;
     const r = AdpReorganizare.calculeazaNational(date, vecini, exemple, {
-        districte: true, corectii: AdpReorganizare.alegeriCuCircumscriptii(judecatorii, alegeri),
+        districte: true, dotari: dotari, corectii: AdpReorganizare.alegeriCuCircumscriptii(judecatorii, alegeri),
         comasari: fisierAlegeri.comasari || [],
         transferuri: fisierAlegeri.transferuri || []
     });

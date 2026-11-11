@@ -40,6 +40,8 @@ const exemple = json("date/judete/index.json").judete.map(j => json("date/" + j.
 const alegeri = json("date/corectii-districte.json");
 const judecatorii = json("date/judecatorii-uat.json");
 const finante = json("date/finante-uat.json");
+// farmaciile și oficiile poștale din registrele oficiale: intră în scorul de centralitate, ca pe hartă
+const dotari = json("date/dotari-uat.json").localitati;
 
 /** Execuția bugetară pe UAT, potrivită după nume, ca în raport (adp-raport.js). */
 function indexeazaExecutia() {
@@ -55,7 +57,7 @@ const executie = indexeazaExecutia();
 const baza = process.argv.includes("--v1") ? V1 : {};
 function ruleaza(extra) {
     return AdpReorganizare.calculeazaNational(date, vecini, exemple, Object.assign({
-        districte: true, executie: executie,
+        districte: true, executie: executie, dotari: dotari,
         corectii: AdpReorganizare.alegeriCuCircumscriptii(judecatorii, alegeri.corectii || []),
         comasari: alegeri.comasari || [],
         transferuri: alegeri.transferuri || []

@@ -70,6 +70,12 @@ window.AdpReorganizare = function() {
         // cel mai mic drum mediu, cu dotări (regulile v1). În ambele, orașul și limita de drum au întâietate.
         resedinta: "populatie",
         tAccesibil: 15,        // raza (minute) pentru populația accesibilă din scorul de centralitate
+        // ponderile scorului de centralitate al unei reședințe de azi: câte puncte aduce fiecare mie de
+        // locuitori la sub tAccesibil minute, nivelul școlii (0–3: grădiniță … liceu), fiecare tip de
+        // serviciu (cel mult 8 tipuri) și statutul de oraș. Scorul hotărăște ordinea în care se nasc
+        // nucleele rurale noi (și reședința, cu resedinta = "centralitate"). Sensibilitatea rezultatului
+        // la ele e măsurată în unelte/ponderi-centralitate.js.
+        ponderiCentralitate: { accesibil: 1, scoala: 1, servicii: 0.25, urban: 3 },
         pragMinoritate: 20,    // % — Codul administrativ: folosirea limbii materne în administrație
         // ce se întâmplă când o comasare ar coborî o minoritate de peste 20% sub prag:
         //   "blocheaza"  — comasarea nu se face (litera art. 94 de azi, aplicat la nivel de UAT);
@@ -315,12 +321,21 @@ window.AdpReorganizare = function() {
             let accesibil = 0;
             ex.sate.forEach((s, k) => { if (timp(k, c) <= P.tAccesibil) accesibil += s.p || 0; });
             const satR = ex.sate[satResedinta.get(i)];
-            const servicii = Object.keys(satR.serv || {}).length;
+            // tipurile de servicii din reședință: OpenStreetMap, completat cu registrele oficiale
+            // (farmaciile — Ministerul Sănătății, oficiile poștale — Poșta Română), unde OSM le ratează
+            const tipuri = new Set(Object.keys(satR.serv || {}));
+            const oficial = (P.dotari && P.dotari[satR.s]) || {};
+            if (oficial.farmacii) tipuri.add("farmacie");
+            if (oficial.posta) tipuri.add("posta");
+            const w = P.ponderiCentralitate;
             scor.set(i, {
-                total: accesibil / 1000 + nivelScoala(satR.sc) + Math.min(servicii, 8) / 4 + (urban(i) ? 3 : 0),
+                total: w.accesibil * accesibil / 1000 + w.scoala * nivelScoala(satR.sc) +
+                    w.servicii * Math.min(tipuri.size, 8) + (urban(i) ? w.urban : 0),
                 accesibil: accesibil,
                 scoala: nivelScoala(satR.sc),
-                servicii: servicii
+                servicii: tipuri.size,
+                farmacii: tipuri.has("farmacie"),
+                posta: tipuri.has("posta")
             });
         });
 

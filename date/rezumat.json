@@ -1,6 +1,6 @@
 {
- "generat": "2026-11-10T08:04:24.911Z",
- "secunde": 1.4,
+ "generat": "2026-11-11T08:25:22.037Z",
+ "secunde": 0.9,
  "status": null,
  "date": {
   "harta UAT": {
@@ -49,11 +49,11 @@
   },
   "mediana": {
    "inainte": 2858,
-   "dupa": 7463
+   "dupa": 7461
   },
   "timpMediu": {
    "inainte": 2.141092502027619,
-   "dupa": 4.910726152280655
+   "dupa": 4.913075326985687
   },
   "pesteTMax": {
    "inainte": 85,

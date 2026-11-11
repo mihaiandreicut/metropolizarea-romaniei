@@ -1,0 +1,1300 @@
+{
+ "versiune": 1,
+ "generat": "2026-11-11",
+ "nota": "Sensibilitatea scenariului național la ponderile scorului de centralitate: fiecare pondere la 0,5×, 1× și 2× din valoarea de bază (81 de combinații), plus fiecare componentă scoasă de tot. „uatDiferite” = câte UAT-uri ajung în altă unitate decât cu ponderile de bază.",
+ "ponderiBaza": {
+  "accesibil": 1,
+  "scoala": 1,
+  "servicii": 0.25,
+  "urban": 3
+ },
+ "baza": {
+  "unitati": 1455,
+  "subPrag": 26,
+  "timpMediu": 4.91,
+  "pesteTMax": 290,
+  "derogari": 290,
+  "economie": 3299
+ },
+ "plaja": {
+  "unitati": [
+   1455,
+   1458
+  ],
+  "timpMediu": [
+   4.91,
+   4.92
+  ],
+  "pesteTMax": [
+   284,
+   298
+  ],
+  "derogari": [
+   289,
+   293
+  ],
+  "economie": [
+   3292,
+   3299
+  ],
+  "uatDiferite": [
+   0,
+   132
+  ]
+ },
+ "fara": [
+  {
+   "fara": "accesibil",
+   "unitati": 1456,
+   "timpMediu": 4.93,
+   "pesteTMax": 304,
+   "derogari": 294,
+   "economie": 3291,
+   "uatDiferite": 215
+  },
+  {
+   "fara": "scoala",
+   "unitati": 1457,
+   "timpMediu": 4.91,
+   "pesteTMax": 283,
+   "derogari": 291,
+   "economie": 3294,
+   "uatDiferite": 35
+  },
+  {
+   "fara": "servicii",
+   "unitati": 1455,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3296,
+   "uatDiferite": 40
+  },
+  {
+   "fara": "urban",
+   "unitati": 1455,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  }
+ ],
+ "variante": [
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 21
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 21
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 21
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1458,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 293,
+   "derogari": 293,
+   "economie": 3295,
+   "uatDiferite": 79
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1458,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 293,
+   "derogari": 293,
+   "economie": 3295,
+   "uatDiferite": 79
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1458,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 293,
+   "derogari": 293,
+   "economie": 3295,
+   "uatDiferite": 79
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 10
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 10
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 10
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 26
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 26
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 26
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1458,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 296,
+   "derogari": 292,
+   "economie": 3296,
+   "uatDiferite": 81
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1458,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 296,
+   "derogari": 292,
+   "economie": 3296,
+   "uatDiferite": 81
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1458,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 296,
+   "derogari": 292,
+   "economie": 3296,
+   "uatDiferite": 81
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.92,
+   "pesteTMax": 291,
+   "derogari": 291,
+   "economie": 3294,
+   "uatDiferite": 86
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.92,
+   "pesteTMax": 291,
+   "derogari": 291,
+   "economie": 3294,
+   "uatDiferite": 86
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.92,
+   "pesteTMax": 291,
+   "derogari": 291,
+   "economie": 3294,
+   "uatDiferite": 86
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 291,
+   "derogari": 291,
+   "economie": 3292,
+   "uatDiferite": 96
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 291,
+   "derogari": 291,
+   "economie": 3292,
+   "uatDiferite": 96
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 291,
+   "derogari": 291,
+   "economie": 3292,
+   "uatDiferite": 96
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 298,
+   "derogari": 293,
+   "economie": 3296,
+   "uatDiferite": 132
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 298,
+   "derogari": 293,
+   "economie": 3296,
+   "uatDiferite": 132
+  },
+  {
+   "factori": {
+    "accesibil": 0.5,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 298,
+   "derogari": 293,
+   "economie": 3296,
+   "uatDiferite": 132
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 9
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 9
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 9
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 289,
+   "derogari": 292,
+   "economie": 3294,
+   "uatDiferite": 29
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 289,
+   "derogari": 292,
+   "economie": 3294,
+   "uatDiferite": 29
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1457,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 289,
+   "derogari": 292,
+   "economie": 3294,
+   "uatDiferite": 29
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 21
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 21
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 21
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3295,
+   "uatDiferite": 19
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3295,
+   "uatDiferite": 19
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3295,
+   "uatDiferite": 19
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 10
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 10
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 292,
+   "derogari": 291,
+   "economie": 3297,
+   "uatDiferite": 10
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 26
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 26
+  },
+  {
+   "factori": {
+    "accesibil": 1,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 26
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 284,
+   "derogari": 289,
+   "economie": 3297,
+   "uatDiferite": 37
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 284,
+   "derogari": 289,
+   "economie": 3297,
+   "uatDiferite": 37
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 284,
+   "derogari": 289,
+   "economie": 3297,
+   "uatDiferite": 37
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 284,
+   "derogari": 289,
+   "economie": 3296,
+   "uatDiferite": 25
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 284,
+   "derogari": 289,
+   "economie": 3296,
+   "uatDiferite": 25
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 284,
+   "derogari": 289,
+   "economie": 3296,
+   "uatDiferite": 25
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 286,
+   "derogari": 290,
+   "economie": 3298,
+   "uatDiferite": 27
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 286,
+   "derogari": 290,
+   "economie": 3298,
+   "uatDiferite": 27
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 0.5,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1456,
+   "subPrag": 27,
+   "timpMediu": 4.91,
+   "pesteTMax": 286,
+   "derogari": 290,
+   "economie": 3298,
+   "uatDiferite": 27
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 30
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 30
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 30
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 9
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 9
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 1,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 9
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 30
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 30
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 0.5,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 30
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 1,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3297,
+   "uatDiferite": 18
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 0.5
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 1
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  },
+  {
+   "factori": {
+    "accesibil": 2,
+    "scoala": 2,
+    "servicii": 2,
+    "urban": 2
+   },
+   "unitati": 1455,
+   "subPrag": 26,
+   "timpMediu": 4.91,
+   "pesteTMax": 290,
+   "derogari": 290,
+   "economie": 3299,
+   "uatDiferite": 0
+  }
+ ]
+}

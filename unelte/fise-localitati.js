@@ -49,12 +49,13 @@ const judecatorii = json("date/judecatorii-uat.json");
 const finante = json("date/finante-uat.json");
 const personal = json("date/personal-judete.json");
 const infra = json("date/infrastructura-uat.json");
+const dotari = json("date/dotari-uat.json").localitati;
 
 const executie = new Map();
 date.uat.forEach((u, i) => { if (finante.executieUat[u.s]) executie.set(i, finante.executieUat[u.s]); });
 
 const r = AdpReorganizare.calculeazaNational(date, vecini, exemple, {
-    districte: true, executie: executie,
+    districte: true, executie: executie, dotari: dotari,
     corectii: AdpReorganizare.alegeriCuCircumscriptii(judecatorii, alegeri.corectii || []),
     comasari: alegeri.comasari || [],
     transferuri: alegeri.transferuri || []
