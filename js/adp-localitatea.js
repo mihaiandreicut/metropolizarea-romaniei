@@ -276,8 +276,13 @@
         $("#loc-imagine").addEventListener("click", () => descarcaImaginea(f));
         if (PE_HARTA) {
             $("#loc-inchide").addEventListener("click", inchideFisa);
-            // harta merge la localitate și îi conturează comuna (js/adp-aplicatie.js)
-            document.dispatchEvent(new CustomEvent("ro-adp:localitate", { detail: { uat: sel.uat } }));
+            // pe hartă rămân doar comunele care se unesc, cu satele lor (js/adp-aplicatie.js)
+            const membri = g ? g.m : [u.s];
+            const inUnitate = new Set(membri);
+            document.dispatchEvent(new CustomEvent("ro-adp:localitate", { detail: {
+                uat: sel.uat, membri: membri, resedinta: g ? g.s : u.s,
+                sate: D.sate.filter(x => inUnitate.has(x[2])), sat: sel.sat ? sel.sat[0] : null
+            } }));
         } else {
             if (location.hash.slice(1) !== ancora) history.replaceState(null, "", "#" + ancora);
             document.title = `${f.titlu} — ce se schimbă`;

@@ -306,6 +306,85 @@ window.AdpAplicatie = function() {
         arataSate(idx);
     }
 
+    // ------------------------------------------------------------ localitatea căutată
+    let stratLocalitate = null;
+    let vedereInainte = null;    // vederea hărții dinainte de căutare, refăcută la închiderea fișei
+    /**
+     * Pe hartă rămân doar UAT-urile care formează unitatea nouă a localității căutate: colorate,
+     * cu conturul unității, granițele dintre ele, numele lor, satele (cu drumul până la noua
+     * primărie) și primăria. Restul hărții se ascunde până se închide fișa sau până când un mod
+     * ori scenariul colorează iar harta. `d` = { uat, membri: [SIRUTA], resedinta, sate, sat }.
+     */
+    function arataLocalitatea(d) {
+        if (!d.uat) {
+            Harta.izoleaza(null);
+            return;
+        }
+        if (!Harta.izolata()) {
+            const h = Harta.harta();
+            vedereInainte = { centru: h.getCenter(), zoom: h.getZoom() };
+        }
+        const dupaSiruta = new Map(date.uat.map((u, i) => [u.s, i]));
+        const membri = (d.membri && d.membri.length ? d.membri : [d.uat]).map(s => dupaSiruta.get(s)).filter(i => i !== undefined);
+        if (!membri.length) return;
+        const set = new Set(membri);
+        const ales = dupaSiruta.get(d.uat);
+        const resedinta = dupaSiruta.get(d.resedinta);
+        if (!stratLocalitate) {
+            stratLocalitate = Harta.stratNou("evidentiere");
+        }
+        stratLocalitate.clearLayers();
+        // granițele dintre comunele unite (arcele cu membri de ambele părți), apoi conturul unității noi, gros
+        const interioare = [];
+        topo.folosire.forEach((pe, a) => {
+            if (pe && pe.length === 2 && set.has(pe[0]) && set.has(pe[1])) interioare.push(topo.arce[a]);
+        });
+        if (interioare.length) {
+            stratLocalitate.addLayer(Harta.linii(interioare, { pane: "evidentiere", token: "--suprafata", weight: 2, opacity: 0.95 }));
+        }
+        stratLocalitate.addLayer(Harta.linii(Topologie.contur(topo, i => set.has(i)),
+            { pane: "evidentiere", token: "--evidentiere", weight: 3.5 }));
+        // satele: punctul crește cu populația; cel căutat și reședința au nume
+        const sate = d.sate || [];
+        const max = Math.max(1, ...sate.map(x => x[3] || 0));
+        sate.forEach(x => {
+            if (x[4] === null) return;
+            const eAles = d.sat && x[0] === d.sat;
+            Harta.punct([x[4], x[5]], {
+                pane: "evidentiere",
+                radius: eAles ? 8 : 3 + 6 * Math.sqrt((x[3] || 0) / max),
+                tokenContur: "--suprafata", weight: 1.5,
+                tokenUmplere: eAles ? "--accent" : "--text",
+                fillOpacity: eAles ? 1 : 0.7
+            }).bindTooltip(`<strong>${esc(x[1])}</strong><br>${NF.format(x[3] || 0)} loc. · până la primărie: ` +
+                `${x[6] < 0.5 ? "în localitate" : Math.round(x[6]) + " min"} → <b>${x[7] < 0.5 ? "în localitate" : Math.round(x[7]) + " min"}</b>`,
+                { direction: "top" }).addTo(stratLocalitate);
+            if (eAles) stratLocalitate.addLayer(Harta.eticheta([x[4], x[5]], esc(x[1]), "e-localitate e-sat-ales"));
+        });
+        // numele comunelor și primăria unității noi
+        membri.forEach(i => {
+            const u = date.uat[i];
+            const ePrimarie = i === resedinta && membri.length > 1;
+            stratLocalitate.addLayer(Harta.eticheta(u.e, `${esc(u.n)}${ePrimarie ? "<small>primăria</small>" : ""}`,
+                "e-localitate" + (i === ales ? " e-ales" : "") + (ePrimarie ? " e-primarie" : "")));
+        });
+        if (resedinta !== undefined && membri.length > 1) {
+            stratLocalitate.addLayer(Harta.punct(date.uat[resedinta].e, {
+                pane: "evidentiere", radius: 9, tokenContur: "--evidentiere", weight: 3,
+                tokenUmplere: "--suprafata", fillOpacity: 1
+            }));
+        }
+        Harta.selecteaza(null);
+        document.body.classList.add("harta-izolata");
+        Harta.izoleaza(membri, i => i === ales ? "--secv-4" : "--secv-2", [stratLocalitate], refacuta => {
+            document.body.classList.remove("harta-izolata");
+            // închiderea fișei: harta revine unde era; dacă a preluat-o simularea, rămâne a ei
+            if (refacuta && vedereInainte) Harta.harta().setView(vedereInainte.centru, vedereInainte.zoom);
+            vedereInainte = null;
+        });
+        Harta.zoomLa(membri, 12);
+    }
+
     // ------------------------------------------------------------ localități componente
     function arataSate(idx) {
         if (stratSate) stratSate.clearLayers();
@@ -492,13 +571,8 @@ window.AdpAplicatie = function() {
             (dependente.extensii || []).forEach(x => x.initializeaza(context));
             initControale();
             initCautare();
-            // caseta „Caută-ți localitatea” (js/adp-localitatea.js): harta merge la UAT-ul ales și îl conturează
-            document.addEventListener("ro-adp:localitate", e => {
-                const cod = e.detail && e.detail.uat;
-                const idx = cod ? date.uat.findIndex(u => u.s === cod) : -1;
-                Harta.selecteaza(idx >= 0 ? idx : null);
-                if (idx >= 0) Harta.zoomLa(idx, 12);
-            });
+            // caseta „Caută-ți localitatea” (js/adp-localitatea.js): pe hartă rămân doar ei
+            document.addEventListener("ro-adp:localitate", e => arataLocalitatea(e.detail || {}));
             aplicaMod(mod);
             $("#incarcare").remove();
             incarcaLocalitati();

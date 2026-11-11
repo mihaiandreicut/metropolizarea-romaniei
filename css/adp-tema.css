@@ -2834,3 +2834,39 @@ body.se-recalculeaza #tabel-teritorii {
     background: var(--accent-fundal);
     color: var(--text);
 }
+
+/* stratul localității căutate (prima pagină): numele comunelor care se unesc și primăria */
+.eticheta-harta.e-localitate span {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.eticheta-harta.e-localitate.e-ales span {
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.eticheta-harta.e-localitate small {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-2);
+}
+
+.eticheta-harta.e-localitate.e-primarie span {
+    transform: translate(-50%, 14px);
+}
+
+.eticheta-harta.e-sat-ales span {
+    transform: translate(-50%, -170%);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-text);
+}
+
+/* cât timp pe hartă e doar localitatea căutată, legenda simulării nu se mai potrivește */
+body.harta-izolata .legenda-harta {
+    display: none !important;
+}

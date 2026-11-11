@@ -220,9 +220,15 @@ window.AdpHarta = function() {
 
     /**
      * Colorează UAT-urile. `fn(idx)` întoarce numele unui token CSS
-     * (ex. "--serie-3") sau null pentru „fără umplere”.
+     * (ex. "--serie-3") sau null pentru „fără umplere”. Un mod sau o extensie care
+     * colorează harta încheie izolarea (vezi `izoleaza`): harta e iar a lor.
      */
     function coloreaza(fn) {
+        if (izolare) incheieIzolarea();
+        picteaza(fn);
+    }
+
+    function picteaza(fn) {
         functieStil = fn;
         const cache = {};
         poligoane.forEach(p => {
@@ -238,7 +244,52 @@ window.AdpHarta = function() {
 
     function seteazaOpacitate(valoare) {
         opacitate = valoare;
-        if (functieStil) coloreaza(functieStil);
+        if (functieStil) picteaza(functieStil);
+    }
+
+    // ------------------------------------------------------------ izolarea: doar câteva UAT-uri pe hartă
+    let izolare = null;          // { stil, ascunse, proprii }: ce se pune la loc când se încheie
+    const straturiLibere = [];   // straturile făcute cu stratNou (scenariul, satele), ca să poată fi ascunse
+
+    /**
+     * Arată pe hartă doar UAT-urile `indecsi`, umplute după `culoare(idx)` (un token CSS); celelalte
+     * rămân fără umplere, iar etichetele, limitele interioare și straturile suplimentare se ascund.
+     * `proprii` = straturile izolării (contur, sate, nume), care rămân și dispar odată cu ea.
+     * `izoleaza(null)` pune harta la loc, așa cum era; la fel orice `coloreaza` venit din altă parte.
+     * `laSfarsit(refacuta)` se cheamă când izolarea se încheie: `refacuta` = true dacă harta a revenit
+     * la ce era (închiderea), false dacă a preluat-o altcineva (un mod, scenariul).
+     */
+    function izoleaza(indecsi, culoare, proprii, laSfarsit) {
+        if (!indecsi) {
+            if (izolare) incheieIzolarea(true);
+            return;
+        }
+        if (izolare) incheieIzolarea(true);
+        const pastrate = proprii || [];
+        const ascunse = [stratEtichete, stratEticheteUat, straturiLimite.uat, straturiLimite.judet,
+            straturiLimite.adr, straturiLimite.istoric].concat(straturiLibere)
+            .filter(s => s && harta.hasLayer(s) && !pastrate.includes(s));
+        ascunse.forEach(s => harta.removeLayer(s));
+        pastrate.forEach(s => { if (!harta.hasLayer(s)) s.addTo(harta); });
+        izolare = { stil: functieStil, ascunse: ascunse, proprii: pastrate, laSfarsit: laSfarsit };
+        const membri = new Set(indecsi);
+        const stil = izolare.stil;
+        picteaza(idx => membri.has(idx) ? culoare(idx) : null);
+        izolare.stil = stil;
+    }
+
+    /** Harta revine la ce era înainte de izolare; `refaStilul` = și culorile de dinainte. */
+    function incheieIzolarea(refaStilul) {
+        const iz = izolare;
+        izolare = null;
+        iz.proprii.forEach(s => { if (harta.hasLayer(s)) harta.removeLayer(s); });
+        iz.ascunse.forEach(s => { if (!harta.hasLayer(s)) s.addTo(harta); });
+        if (refaStilul) {
+            if (iz.stil) picteaza(iz.stil);
+            else poligoane.forEach(p => p.setStyle({ fillOpacity: 0 }));
+        }
+        actualizeazaEticheteUat();
+        if (iz.laSfarsit) iz.laSfarsit(!!refaStilul);
     }
 
     function arataLimite(stare) {
@@ -325,7 +376,9 @@ window.AdpHarta = function() {
 
     /** Strat liber pentru straturi suplimentare (localități, scenarii). */
     function stratNou(pane) {
-        return L.layerGroup([], { pane: pane || "puncte" }).addTo(harta);
+        const s = L.layerGroup([], { pane: pane || "puncte" }).addTo(harta);
+        straturiLibere.push(s);
+        return s;
     }
 
     /** Linii (plase de arce) pe un pane al hărții, în culoarea unui token CSS. */
@@ -358,6 +411,8 @@ window.AdpHarta = function() {
         initializeaza: initializeaza,
         coloreaza: coloreaza,
         seteazaOpacitate: seteazaOpacitate,
+        izoleaza: izoleaza,
+        izolata: () => !!izolare,
         seteazaFundal: seteazaFundal,
         arataLimite: arataLimite,
         evidentiaza: evidentiaza,
