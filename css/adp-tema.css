@@ -2874,3 +2874,50 @@ body.se-recalculeaza #tabel-teritorii {
 body.harta-izolata .legenda-harta {
     display: none !important;
 }
+
+/* ------------------------------------------------------------------ pagina de simulări */
+.simulari-intro {
+    font-size: 17px;
+    color: var(--text-2);
+    margin: 8px 0 0;
+}
+
+.simulari {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin: 12px 0 8px;
+}
+
+.simulare {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px 16px;
+    border: 1px solid var(--linie);
+    border-top: 4px solid var(--accent);
+    border-radius: 8px;
+    background: var(--suprafata);
+}
+
+.continut-document .simulare h3 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.continut-document .simulare p {
+    margin: 0;
+}
+
+.continut-document .simulare .simulare-cifra {
+    font-size: 15px;
+    color: var(--text);
+}
+
+.continut-document .simulare .simulare-legaturi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 8px;
+}

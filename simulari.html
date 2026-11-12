@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulări — Metropolizarea României</title>
+    <meta name="description" content="Toate simulările proiectului într-un loc: comasarea comunelor pe un județ, pe o regiune sau pe toată țara, ipotezele de cost, regiunile (8 de dezvoltare, 15 curți de apel, variante calculate) și fișa fiecărei localități.">
+    <meta name="theme-color" content="#2a78d6">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="ro-adp">
+    <meta property="og:locale" content="ro_RO">
+    <meta property="og:title" content="Simulări — Metropolizarea României">
+    <meta property="og:description" content="Comasarea comunelor, ipotezele de cost și variantele de regiuni, fiecare cu legătura ei directă pe hartă.">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Simulări — Metropolizarea României">
+    <meta name="twitter:description" content="Comasarea comunelor, ipotezele de cost și variantele de regiuni, pe hartă.">
+
+    <link rel="stylesheet" href="css/adp-tema.css">
+</head>
+
+<body>
+    <a class="sari-la-continut" href="#comune">Sari la conținut</a>
+
+    <header class="antet">
+        <h1>Simulări</h1>
+        <span class="subtitlu">toate variantele, fiecare cu legătura ei pe hartă</span>
+        <nav aria-label="Pagini">
+            <a href="localitatea.html">Localitatea mea</a>
+            <a href="index.html">Harta</a>
+            <a href="simulari.html" aria-current="page">Simulări</a>
+            <a href="metodologie.html">Reorganizare: metodologie</a>
+            <a href="raport.html">Raport</a>
+            <a href="principii.html">Principii</a>
+        </nav>
+    </header>
+
+    <main class="raport-pagina">
+        <div class="document">
+        <nav class="cuprins" aria-label="Cuprins">
+            <h2>Cuprins</h2>
+            <ol>
+                <li><a href="#comune">Comasarea comunelor</a></li>
+                <li><a href="#bani">Ipotezele de cost</a></li>
+                <li><a href="#regiuni">Regiunile</a></li>
+                <li><a href="#localitate">Localitatea ta</a></li>
+                <li><a href="#sensibilitate">Cât de sigure sunt cifrele</a></li>
+            </ol>
+        </nav>
+
+        <div class="continut-document">
+
+        <p class="simulari-intro">Fiecare simulare pornește cu regulile propuse (setul v2) și le poți schimba pe loc.
+            Legăturile de mai jos deschid harta direct pe varianta descrisă; le poți trimite mai departe.</p>
+
+        <section id="comune">
+            <h2>Comasarea comunelor</h2>
+            <p>Regulile propuse: comuna are cel puțin 3.000 de locuitori, orașul 10.000, iar primăria rămâne la cel mult
+                30 de minute de orice sat. Pe hartă le poți schimba și vezi ce iese.</p>
+            <div class="simulari">
+                <article class="simulare">
+                    <h3>Pe un județ, pas cu pas</h3>
+                    <p class="simulare-cifra"><b>Brașov:</b> 58 de UAT-uri → 34 de unități</p>
+                    <p>Harta de azi lângă cea propusă, cine cu cine se unește și dosarul fiecărei unități. Poți schimba
+                        pragurile, poți uni comune și muta sate de mână.</p>
+                    <p class="simulare-legaturi">
+                        <a class="buton principal" href="index.html#judet=8">Brașov</a>
+                        <a class="buton" href="index.html#judet=32">Sibiu</a>
+                        <a class="buton" href="index.html#judet=12">Cluj</a>
+                        <a class="buton" href="index.html#judet=37">Vaslui</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Pe o regiune</h3>
+                    <p class="simulare-cifra"><b>Centru:</b> 6 județe, cu districtele lor</p>
+                    <p>Aceeași simulare pe toată regiunea, cu raportul înainte și după defalcat pe județe.</p>
+                    <p class="simulare-legaturi">
+                        <a class="buton principal" href="index.html#regiune=7">Centru</a>
+                        <a class="buton" href="index.html#regiune=1">Nord-Est</a>
+                        <a class="buton" href="index.html#regiune=4">Sud-Vest Oltenia</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Toată țara</h3>
+                    <p class="simulare-cifra"><b>3.181</b> de comune și orașe → <b>1.441</b> de unități</p>
+                    <p>Cele 41 de județe deodată, cu economia pe regiuni și pe județe. Durează câteva secunde.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="index.html#tara">Simulează țara</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Harta finală</h3>
+                    <p class="simulare-cifra"><b>1.441</b> de unități · <b>168</b> de districte · <b>8</b> regiuni</p>
+                    <p>Proiectul întreg pe aceeași hartă: unitățile de bază, districtele și zonele metropolitane,
+                        regiunile.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="index.html#final">Deschide harta finală</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Capitala</h3>
+                    <p class="simulare-cifra"><b>14</b> UAT-uri din Ilfov trec la București · <b>396.714</b> de locuitori</p>
+                    <p>Bucureștiul preia tot ce e lipit de el, de la Voluntari la Chiajna; restul Ilfovului se comasează
+                        după regulile obișnuite.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="index.html#judet=23">Ilfov și Capitala</a></p>
+                </article>
+            </div>
+        </section>
+
+        <section id="bani">
+            <h2>Ipotezele de cost</h2>
+            <p>Economia de la primării, consiliile județene și instituțiile statului atârnă de trei ipoteze. Toate se
+                văd și se pot schimba.</p>
+            <div class="simulari">
+                <article class="simulare">
+                    <h3>Cât lasă în urmă primăria desființată</h3>
+                    <p class="simulare-cifra">economia la primării: <b>4,0</b> / <b>3,5</b> / <b>3,0</b> mld. lei pe an,
+                        dacă biroul din sat păstrează 15% / 25% / 35%</p>
+                    <p>Un cursor de la 0 la 50%, care reface toate cifrele din raport și din simularea de pe hartă.</p>
+                    <p class="simulare-legaturi">
+                        <a class="buton principal" href="raport.html#tablou">În raport</a>
+                        <a class="buton" href="index.html#tara">Pe hartă</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Toate trei ipotezele la capete</h3>
+                    <p class="simulare-cifra">între <b>5,0</b> și <b>9,5</b> mld. lei pe an; <b>7,2</b> în calculul de bază</p>
+                    <p>Biroul din sat (15–35%), cât dispare din aparatul consiliului județean (30–70%), cât scade personalul
+                        statului (10–30%).</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="sinteza.html#decizii">Plaja, în sinteză</a></p>
+                </article>
+            </div>
+        </section>
+
+        <section id="regiuni">
+            <h2>Regiunile</h2>
+            <p>Propunerea păstrează cele 8 regiuni de dezvoltare, cu București–Ilfov ca Metropolă. Pe hartă se pot
+                încerca și alte desene, cu aceiași indicatori.</p>
+            <div class="simulari">
+                <article class="simulare">
+                    <h3>Cele 15 curți de apel</h3>
+                    <p class="simulare-cifra">drumul la capitală: <b>44 de minute</b>, dar regiuni inegale (<b>4,5×</b>)</p>
+                    <p>Circumscripțiile curților de apel (Legea 304/2022), cea mai veche rețea regională a statului.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="index.html#regiuni=curte-apel">Pe hartă</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Cele 8 regiuni de dezvoltare</h3>
+                    <p class="simulare-cifra">varianta propunerii: <b>296</b> de consilieri și președinți regionali</p>
+                    <p>Regiunile de azi (Legea 315/2004), care primesc consiliu ales, buget și instituțiile statului.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="index.html#regiuni=adr">Pe hartă</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Regiuni calculate</h3>
+                    <p class="simulare-cifra">între <b>4</b> și <b>20</b> de regiuni</p>
+                    <p>Județele grupate de algoritm în jurul orașelor cu funcții regionale, cu echilibru de populație și de
+                        nivel economic reglabil.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="index.html#regiuni=calculata">Pe hartă</a></p>
+                </article>
+            </div>
+            <h3>Variantele, una lângă alta</h3>
+            <div class="tabel-derulant"><table class="tabel-doc tabel-numeric">
+                <thead><tr><th>Varianta</th><th>Populația medie</th><th>Mare / mică</th><th>PIB/loc., max / min</th>
+                    <th>Drum la capitală</th><th>Consilieri și președinți</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row"><a href="index.html#regiuni=adr">8 regiuni de dezvoltare</a> (propunerea)</th><td>2.380.164</td><td>1,9×</td><td>4,0×</td><td>97 min</td><td>296</td></tr>
+                    <tr><th scope="row"><a href="index.html#regiuni=curte-apel">15 curți de apel</a></th><td>1.269.421</td><td>4,5×</td><td>3,6×</td><td>44 min</td><td>529</td></tr>
+                    <tr><th scope="row">8 regiuni calculate</th><td>2.380.164</td><td>2,0×</td><td>3,9×</td><td>84 min</td><td>296</td></tr>
+                    <tr><th scope="row">12 regiuni calculate</th><td>1.586.776</td><td>2,0×</td><td>4,2×</td><td>61 min</td><td>444</td></tr>
+                    <tr><th scope="row">16 regiuni calculate</th><td>1.190.082</td><td>3,0×</td><td>4,8×</td><td>45 min</td><td>570</td></tr>
+                </tbody>
+            </table></div>
+            <p class="nota">Drumul e estimat (linie dreaptă × 1,3, la 70 km/h), pentru locuitorii din afara Bucureștiului
+                și a Ilfovului. Consilierii, pe scara consiliilor județene (Codul administrativ, art. 171), la dublul
+                populației; azi sunt 1.379 de consilieri și președinți de consiliu județean. Variantele calculate, cu
+                parametrii impliciți; pe hartă, butonul „Compară variantele” le reface cu ce ai ales.</p>
+        </section>
+
+        <section id="localitate">
+            <h2>Localitatea ta</h2>
+            <div class="simulari">
+                <article class="simulare">
+                    <h3>Ce se schimbă pentru satul tău</h3>
+                    <p class="simulare-cifra"><b>13.747</b> de sate, fiecare cu fișa lui</p>
+                    <p>Cu cine se unește comuna, cât de departe ajunge primăria, câți bani se eliberează și ce se poate face
+                        cu ei: apă, canalizare, drumuri. Caută după nume sau după locul în care ești.</p>
+                    <p class="simulare-legaturi">
+                        <a class="buton principal" href="localitatea.html">Localitatea mea</a>
+                        <a class="buton" href="localitatea.html#sat=40759">Exemplu: Viscri</a></p>
+                </article>
+            </div>
+        </section>
+
+        <section id="sensibilitate">
+            <h2>Cât de sigure sunt cifrele</h2>
+            <p>Simulările făcute ca să vedem dacă rezultatul atârnă de o alegere anume.</p>
+            <div class="simulari">
+                <article class="simulare">
+                    <h3>Ponderile scorului de centralitate</h3>
+                    <p class="simulare-cifra"><b>81</b> de combinații: <b>1.441–1.444</b> de unități</p>
+                    <p>Fiecare pondere la jumătate, la fel sau dublă. Economia rămâne între 3,48 și 3,49 mld. lei; cel mult
+                        4% din UAT-uri își schimbă unitatea.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="metodologie.html#plan">În metodologie</a></p>
+                </article>
+                <article class="simulare">
+                    <h3>Regulile v1 față de v2</h3>
+                    <p class="simulare-cifra">pragul de <b>5.000</b> față de <b>3.000</b> de locuitori</p>
+                    <p>De ce s-a coborât pragul, ce costă fiecare regulă și ce ar da fără ea: populația după domiciliu,
+                        preluarea de către oraș, plafonul de 15.000.</p>
+                    <p class="simulare-legaturi"><a class="buton principal" href="sinteza.html#reguli">În sinteză</a></p>
+                </article>
+            </div>
+        </section>
+
+        </div>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -2196,8 +2196,14 @@ window.AdpScenariu = function() {
             radio.addEventListener("change", () => vedere(radio.value === "inainte")));
         arataPas(1);
         // legătura directă: index.html#tara, #regiune=N sau #judet=N (din fișele de județ ale
-        // raportului) — teritoriul ales și raportul calculat cu regulile implicite
+        // raportului) — teritoriul ales și raportul calculat cu regulile implicite; #final, harta finală
         const dinAdresa = () => {
+            if (location.hash === "#final") {
+                for (let d = $("#sc-final").closest("details"); d; d = d.parentElement && d.parentElement.closest("details")) d.open = true;
+                if (!final) hartaFinala();
+                requestAnimationFrame(() => ($("#sc-final").closest("details") || $("#sc-final")).scrollIntoView({ block: "start" }));
+                return;
+            }
             const m = location.hash.match(/^#(?:(tara)|regiune=(\d+)|judet=(\d+))$/);
             const cheie = !m ? null : m[1] ? TOATA_TARA : m[2] ? PREFIX_ADR + m[2] : m[3];
             if (cheie && cheieValida(cheie) && cheie !== pasCheie) {
