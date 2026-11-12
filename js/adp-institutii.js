@@ -66,7 +66,9 @@ window.AdpInstitutii = function() {
      * `factor` (mai puțini aleși), cu locurile împărțite pe județe după populație, cu regula celui
      * mai mare rest. Fiecare județ e o circumscripție.
      */
-    function consiliiRegionale(date, factor) {
+    function consiliiRegionale(date, factor, grupe) {
+        // `grupe`: altă împărțire în regiuni, [{ cod, nume, judete: [coduri] }] (de ex. curțile de apel)
+        if (grupe) return grupe.map(g => consiliuPeJudete(date, factor, g));
         const popJudet = new Map(), adrJudet = new Map(), popAdr = new Map(), legalJudet = new Map();
         date.uat.forEach(u => {
             popJudet.set(u.j, (popJudet.get(u.j) || 0) + (u.pop || 0));
@@ -121,6 +123,30 @@ window.AdpInstitutii = function() {
         const legal = new Map();
         date.uat.forEach(u => { if (!esteBucuresti(u)) legal.set(u.j, (legal.get(u.j) || 0) + popAlegeri(u)); });
         return new Map(Array.from(legal.entries()).map(([cod, p]) => [cod, dupaScara(CONSILIERI_JUDETENI, p)]));
+    }
+
+    /** Consiliul regional al unei grupe oarecare de județe: aceeași scară, aceeași împărțire pe județe. */
+    function consiliuPeJudete(date, factor, g) {
+        const membre = new Set(g.judete);
+        const pop = new Map(), legal = new Map();
+        date.uat.forEach(u => {
+            if (!membre.has(u.j)) return;
+            pop.set(u.j, (pop.get(u.j) || 0) + (u.pop || 0));
+            legal.set(u.j, (legal.get(u.j) || 0) + popAlegeri(u));
+        });
+        const judete = date.judete.filter(j => membre.has(j.c))
+            .map(j => ({ c: j.c, nume: j.n, populatie: pop.get(j.c) || 0, legal: legal.get(j.c) || 0 }));
+        const total = judete.reduce((s, j) => s + j.legal, 0);
+        const locuri = dupaScara(scaraLargita(CONSILIERI_JUDETENI, factor || 1), total);
+        const cote = judete.map(j => locuri * j.legal / (total || 1));
+        const impartite = cote.map(Math.floor);
+        cote.map((c, k) => ({ k: k, rest: c - Math.floor(c) })).sort((x, y) => y.rest - x.rest)
+            .slice(0, locuri - impartite.reduce((s, v) => s + v, 0)).forEach(x => { impartite[x.k]++; });
+        return {
+            cod: g.cod, nume: g.nume, locuri: locuri,
+            populatie: judete.reduce((s, j) => s + j.populatie, 0),
+            judete: judete.map((j, k) => Object.assign(j, { locuri: impartite[k] })).sort((x, y) => y.locuri - x.locuri)
+        };
     }
 
     /**

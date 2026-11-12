@@ -713,6 +713,10 @@ a {
     accent-color: var(--accent);
 }
 
+#rg-parametri[hidden] {
+    display: none;
+}
+
 .formular-scenariu .bifa {
     display: flex;
     gap: 6px;

@@ -48,13 +48,22 @@ window.AdpRegionalizare = function() {
     }
 
     /** Scorul instituțional al fiecărui județ: funcțiile regionale găzduite azi de reședința lui. */
+    /**
+     * Județul în care stă sediul unei instituții: cel al cărui oraș-reședință e sediul (toate sediile
+     * regionale sunt reședințe de județ); altfel, primul din circumscripție. La agențiile de dezvoltare,
+     * județele sunt în ordinea codurilor, deci primul nu e gazda (Piatra Neamț nu e în Bacău).
+     */
+    function judetulSediului(judete, sediu) {
+        const gazda = judete.find(j => j.oras && j.oras.s === sediu.siruta && sediu.judete.includes(j.c));
+        return gazda ? gazda.c : sediu.judete[0];
+    }
+
     function scoruriInstitutionale(judete, sisteme) {
         const scor = new Map(judete.map(j => [j.c, { total: 0, functii: [] }]));
         (sisteme || []).forEach(s => {
             const pondere = PONDERI_INSTITUTII[s.cod] || 1;
             s.sedii.forEach(sediu => {
-                // sediul e în județul lui: primul din circumscripție, prin convenția datelor
-                const gazda = sediu.judete[0];
+                const gazda = judetulSediului(judete, sediu);
                 const sc = scor.get(gazda);
                 if (!sc) return;
                 sc.total += pondere;
@@ -70,6 +79,63 @@ window.AdpRegionalizare = function() {
      * @param sisteme    rețelele de instituții din date/regiuni-institutii.json
      * @param optiuni    parametri (vezi PARAMETRI_IMPLICITI)
      */
+    /** O regiune, cu indicatorii ei, din județele membre și capitală. */
+    function regiuneaDin(m, cap, nume, scorInst, km, P) {
+        const pop = m.reduce((a, j) => a + j.populatie, 0);
+        const pib = m.reduce((a, j) => a + (j.pibTotal || 0), 0);
+        const distante = m.map(j => ({ j: j, km: km(j, cap) }));
+        const maxim = distante.reduce((a, x) => !a || x.km > a.km ? x : a, null);
+        const salariu = pop ? m.reduce((a, j) => a + (j.euroPeOra || 0) * j.populatie, 0) / pop : null;
+        const institutii = [];
+        m.forEach(j => scorInst.get(j.c).functii.forEach(f => institutii.push(Object.assign({ judet: j.c }, f))));
+        const auto = new Set(m.map(j => j.auto));
+        return {
+            capitala: cap,
+            nume: nume,
+            judete: m.map(j => j.c),
+            populatie: pop,
+            pibTotal: pib,
+            pibLoc: pop ? Math.round(1e6 * pib / pop) : null,
+            euroPeOra: salariu || null,
+            suprafata: m.reduce((a, j) => a + (j.suprafata || 0), 0),
+            kmMediu: pop ? distante.reduce((a, x) => a + x.j.populatie * x.km, 0) / pop : 0,
+            kmMax: maxim ? maxim.km : 0,
+            judetCelMaiDepartat: maxim ? maxim.j.c : null,
+            minuteMax: maxim ? 60 * maxim.km / P.vitezaMedie : 0,
+            // un singur oficiu în fiecare județ al regiunii; Bucureștiul și Ilfovul, împreună, unul
+            oficiiJudetene: m.length - (auto.has("B") && auto.has("IF") ? 1 : 0),
+            institutii: institutii,
+            scorCapitala: scorInst.get(cap).total,
+            istorice: Array.from(new Set(m.map(j => j.ist))),
+            adr: Array.from(new Set(m.map(j => j.adr)))
+        };
+    }
+
+    /**
+     * Indicatorii unei împărțiri. Drumul mediu până la capitală se socotește pentru locuitorii din
+     * afara Bucureștiului și a Ilfovului, la fel în toate variantele (în cele calculate, ei formează
+     * Metropola, cu capitala la ei acasă).
+     */
+    function indicatoriRegiuni(regiuni, judete, judetRegiune, km, P) {
+        const pop = regiuni.map(r => r.populatie);
+        const pibLoc = regiuni.map(r => r.pibLoc).filter(x => x);
+        const afara = judete.filter(j => j.auto !== "B" && j.auto !== "IF" && judetRegiune.has(j.c));
+        const popAfara = afara.reduce((a, j) => a + j.populatie, 0);
+        const kmMediu = popAfara ? afara.reduce((a, j) => a + j.populatie * km(j, judetRegiune.get(j.c)), 0) / popAfara : 0;
+        return {
+            nrRegiuni: regiuni.length,
+            populatieMedie: regiuni.reduce((a, r) => a + r.populatie, 0) / regiuni.length,
+            raportPopulatie: Math.max(...pop) / Math.min(...pop),
+            raportPibLoc: pibLoc.length ? Math.max(...pibLoc) / Math.min(...pibLoc) : null,
+            kmMediu: kmMediu,
+            minuteMediu: 60 * kmMediu / P.vitezaMedie,
+            kmMax: Math.max(...regiuni.map(r => r.kmMax)),
+            capitaleCuCurteDeApel: regiuni.filter(r =>
+                r.institutii.some(i => i.sistem === "curte-apel" && i.judet === r.capitala)).length,
+            oficiiJudetene: regiuni.reduce((a, r) => a + r.oficiiJudetene, 0)
+        };
+    }
+
     function calculeaza(judete, vecini, sisteme, optiuni) {
         const P = Object.assign({}, PARAMETRI_IMPLICITI, optiuni || {});
         // Metropola: Bucureștiul împreună cu Ilfovul sunt scoși din calcul și adăugați la
@@ -259,36 +325,8 @@ window.AdpRegionalizare = function() {
         }
 
         // --- 4. rezultatul, cu indicatorii fiecărei regiuni
-        const regiuni = capitale.map(cap => {
-            const m = membri(regiune, cap);
-            const pop = m.reduce((a, j) => a + j.populatie, 0);
-            const pib = m.reduce((a, j) => a + (j.pibTotal || 0), 0);
-            const capitalaJud = dupaCod.get(cap);
-            const distante = m.map(j => ({ j: j, km: km(j, cap) }));
-            const maxim = distante.reduce((a, x) => !a || x.km > a.km ? x : a, null);
-            const salariu = pop ? m.reduce((a, j) => a + (j.euroPeOra || 0) * j.populatie, 0) / pop : null;
-            const institutii = [];
-            m.forEach(j => scorInst.get(j.c).functii.forEach(f => institutii.push(Object.assign({ judet: j.c }, f))));
-            return {
-                capitala: cap,
-                nume: capitalaJud.oras.n,
-                judete: m.map(j => j.c),
-                populatie: pop,
-                pibTotal: pib,
-                pibLoc: pop ? Math.round(1e6 * pib / pop) : null,
-                euroPeOra: salariu || null,
-                suprafata: m.reduce((a, j) => a + (j.suprafata || 0), 0),
-                kmMediu: pop ? distante.reduce((a, x) => a + x.j.populatie * x.km, 0) / pop : 0,
-                kmMax: maxim ? maxim.km : 0,
-                judetCelMaiDepartat: maxim ? maxim.j.c : null,
-                minuteMax: maxim ? 60 * maxim.km / P.vitezaMedie : 0,
-                oficiiJudetene: m.length,            // un singur oficiu în fiecare județ al regiunii
-                institutii: institutii,
-                scorCapitala: scorInst.get(cap).total,
-                istorice: Array.from(new Set(m.map(j => j.ist))),
-                adr: Array.from(new Set(m.map(j => j.adr)))
-            };
-        }).sort((a, b) => b.populatie - a.populatie);
+        const regiuni = capitale.map(cap => regiuneaDin(membri(regiune, cap), cap, dupaCod.get(cap).oras.n, scorInst, km, P))
+            .sort((a, b) => b.populatie - a.populatie);
 
         if (metropola) {
             const m = metropola.judete;
@@ -315,21 +353,8 @@ window.AdpRegionalizare = function() {
             m.forEach(j => regiune.set(j.c, metropola.capitala.c));
         }
 
-        const pop = regiuni.map(r => r.populatie);
-        const pibLoc = regiuni.map(r => r.pibLoc).filter(x => x);
-        const indicatori = {
-            nrRegiuni: regiuni.length,
-            populatieMedie: regiuni.reduce((a, r) => a + r.populatie, 0) / regiuni.length,
-            raportPopulatie: Math.max(...pop) / Math.min(...pop),
-            raportPibLoc: pibLoc.length ? Math.max(...pibLoc) / Math.min(...pibLoc) : null,
-            kmMediu: popTotala ? regiuni.reduce((a, r) => a + r.kmMediu * r.populatie, 0) / popTotala : 0,
-            minuteMediu: popTotala ? 60 * regiuni.reduce((a, r) => a + r.kmMediu * r.populatie, 0) / popTotala / P.vitezaMedie : 0,
-            kmMax: Math.max(...regiuni.map(r => r.kmMax)),
-            capitaleCuCurteDeApel: regiuni.filter(r =>
-                r.institutii.some(i => i.sistem === "curte-apel" && i.judet === r.capitala)).length,
-            oficiiJudetene: regiuni.reduce((a, r) => a + r.oficiiJudetene, 0),
-            obiectiv: obiectiv(regiune, capitale)
-        };
+        const indicatori = Object.assign(indicatoriRegiuni(regiuni, judete, regiune, km, P),
+            { obiectiv: obiectiv(regiune, capitale) });
 
         return { parametri: P, regiuni: regiuni, judetRegiune: regiune, indicatori: indicatori };
     }
@@ -376,6 +401,42 @@ window.AdpRegionalizare = function() {
         return { judete: judete, vecini: new Map(Array.from(seturi, ([k, v]) => [k, Array.from(v)])) };
     }
 
+    /**
+     * Regiunile unei rețele de circumscripții care există deja (date/regiuni-institutii.json):
+     * „curte-apel” — cele 15 circumscripții ale curților de apel; „adr” — cele 8 regiuni de
+     * dezvoltare de azi. Nu se calculează nimic: județele stau unde le-a pus legea, capitala e
+     * sediul instituției, iar indicatorii sunt aceiași ca la variantele calculate, ca să se compare.
+     */
+    function dinCircumscriptii(judete, vecini, sisteme, cod, optiuni) {
+        const P = Object.assign({}, PARAMETRI_IMPLICITI, optiuni || {});
+        const sistem = (sisteme || []).find(s => s.cod === cod);
+        if (!sistem) return null;
+        const dupaCod = new Map(judete.map(j => [j.c, j]));
+        const scorInst = scoruriInstitutionale(judete, sisteme);
+        const km = (j, cap) => P.ocol * distanta(j.centru, dupaCod.get(cap).oras.e);
+        const regiune = new Map();
+        const capitale = [];
+        sistem.sedii.forEach(s => {
+            const cap = judetulSediului(judete, s);
+            if (!dupaCod.has(cap)) return;
+            capitale.push({ cap: cap, nume: s.nume });
+            s.judete.forEach(c => { if (dupaCod.has(c)) regiune.set(c, cap); });
+        });
+        const regiuni = capitale.map(x => {
+            const m = judete.filter(j => regiune.get(j.c) === x.cap);
+            const doarCapitala = m.length === 2 && m.every(j => j.auto === "B" || j.auto === "IF");
+            return Object.assign(regiuneaDin(m, x.cap, doarCapitala ? "București–Ilfov (Metropola)" : x.nume, scorInst, km, P),
+                doarCapitala ? { metropola: true } : {});
+        }).sort((a, b) => b.populatie - a.populatie);
+        return {
+            parametri: P,
+            regiuni: regiuni,
+            judetRegiune: regiune,
+            indicatori: indicatoriRegiuni(regiuni, judete, regiune, km, P),
+            circumscriptii: { cod: sistem.cod, nume: sistem.nume, temei: sistem.temei, nota: sistem.nota }
+        };
+    }
+
     /** Compară mai multe variante (numere de regiuni) cu aceleași criterii. */
     function compara(judete, vecini, sisteme, numere, optiuni) {
         return numere.map(n => calculeaza(judete, vecini, sisteme, Object.assign({}, optiuni, { nrRegiuni: n })));
@@ -387,6 +448,7 @@ window.AdpRegionalizare = function() {
         distanta: distanta,
         pregatesteJudete: pregatesteJudete,
         calculeaza: calculeaza,
+        dinCircumscriptii: dinCircumscriptii,
         compara: compara
     };
 }();

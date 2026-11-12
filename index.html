@@ -289,6 +289,13 @@
                     ar schimba el echilibrul: județele grupate în regiuni, cu capitalele alese dintre orașele
                     care au deja funcții regionale.</p>
                 <div class="formular-scenariu">
+                    <label for="rg-varianta">Varianta</label>
+                    <select id="rg-varianta">
+                        <option value="calculata">Calculată: județele grupate de algoritm</option>
+                        <option value="curte-apel">Cele 15 circumscripții ale curților de apel</option>
+                        <option value="adr">Cele 8 regiuni de dezvoltare de azi</option>
+                    </select>
+                    <div id="rg-parametri" class="formular-scenariu">
                     <label for="rg-nr">Câte regiuni: <b id="rg-nr-val"></b></label>
                     <input id="rg-nr" type="range" min="4" max="20" step="1" value="8">
                     <label for="rg-pop">Echilibru de populație: <b id="rg-pop-val"></b></label>
@@ -297,8 +304,9 @@
                     <input id="rg-eco" type="range" min="0" max="300" step="15" value="60">
                     <label class="bifa"><input id="rg-institutii" type="checkbox" checked> Capitala = orașul cu cele mai multe funcții regionale</label>
                     <label class="bifa"><input id="rg-istorice" type="checkbox"> Regiunile nu amestecă regiuni istorice</label>
+                    </div>
                     <div class="butoane">
-                        <button id="rg-compara" class="buton" type="button">Compară 8 / 12 / 16</button>
+                        <button id="rg-compara" class="buton" type="button">Compară variantele</button>
                     </div>
                 </div>
                 <h3 class="subtitlu-sectiune">Instituțiile de arătat pe hartă</h3>

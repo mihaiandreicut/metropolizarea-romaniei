@@ -21,6 +21,11 @@ window.AdpRegiuni = function() {
 
     const CALE = "date/regiuni-institutii.json";
     const VARIANTE = [8, 12, 16];
+    // variantele fixe: rețele de circumscripții care există deja, nu calculate
+    const FIXE = [
+        { cod: "curte-apel", eticheta: "15 curți de apel" },
+        { cod: "adr", eticheta: "8 regiuni de dezvoltare (azi)" }
+    ];
     const NF = new Intl.NumberFormat("ro-RO");
     const NF1 = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 1 });
     const SIMBOL = {
@@ -70,8 +75,36 @@ window.AdpRegiuni = function() {
         };
     }
 
+    const varianta = () => $("#rg-varianta").value;
+
+    /** O variantă: calculată de algoritm sau una fixă (curțile de apel, regiunile de dezvoltare). */
+    function variantaRezultat(cod) {
+        if (cod === "calculata") return D.regionalizare.calculeaza(judete, veciniJudet, institutii.sisteme, parametri());
+        const r = D.regionalizare.dinCircumscriptii(judete, veciniJudet, institutii.sisteme, cod, parametri());
+        if (r && cod === "adr") {
+            // regiunile de dezvoltare se cunosc după nume, nu după orașul agenției
+            r.regiuni.forEach(x => {
+                if (x.metropola) return;
+                const a = D.date.adr.find(z => z.c === (judete.find(j => j.c === x.capitala) || {}).adr);
+                if (a) x.nume = `${a.n} (${x.nume})`;
+            });
+        }
+        return r;
+    }
+
+    /** Consilierii regionali ai unei variante: scara art. 171, la dublul populației, plus un președinte pe regiune. */
+    function consilieri(r) {
+        const INST = window.AdpInstitutii, R = window.AdpReorganizare;
+        if (!INST || !R) return null;
+        const c = INST.consiliiRegionale(D.date, R.FACTOR_CONSILIERI,
+            r.regiuni.map(x => ({ cod: x.capitala, nume: x.nume, judete: x.judete })));
+        return { locuri: c.reduce((a, x) => a + x.locuri, 0), presedinti: c.length, peRegiune: new Map(c.map(x => [x.cod, x.locuri])) };
+    }
+
     function ruleaza() {
-        rezultat = D.regionalizare.calculeaza(judete, veciniJudet, institutii.sisteme, parametri());
+        const fixa = varianta() !== "calculata";
+        $("#rg-parametri").hidden = fixa;
+        rezultat = variantaRezultat(varianta());
         const vecineleRegiunii = cap => {
             const set = new Set();
             rezultat.regiuni.find(r => r.capitala === cap).judete.forEach(c =>
@@ -146,6 +179,7 @@ window.AdpRegiuni = function() {
     function randeazaPanou() {
         const I = rezultat.indicatori;
         const P = rezultat.parametri;
+        const cons = consilieri(rezultat);
         const acum = institutii.sisteme.find(s => s.cod === "adr");
         const tabel = `<table class="tabel-atribute">
                 ${randIndicator("Regiuni", NF.format(I.nrRegiuni), `față de ${acum.sedii.length} regiuni de dezvoltare azi`)}
@@ -155,7 +189,20 @@ window.AdpRegiuni = function() {
                 ${randIndicator("Drum până la capitala regiunii", NF.format(Math.round(I.minuteMediu)) + " min", `în medie · maxim ${NF.format(Math.round(I.kmMax))} km`)}
                 ${randIndicator("Capitale care sunt deja curți de apel", `${I.capitaleCuCurteDeApel} din ${I.nrRegiuni}`)}
                 ${randIndicator("Oficii județene (unul pe județ)", NF.format(I.oficiiJudetene), "consiliul județean și prefectura trec la regiune")}
+                ${cons ? randIndicator("Consilieri regionali", `${NF.format(cons.locuri)} + ${NF.format(cons.presedinti)} președinți`,
+                    "art. 171, la dublul populației; azi, 1.379 de consilieri și președinți de consiliu județean") : ""}
             </table>`;
+        const fixa = rezultat.circumscriptii;
+        const nota = fixa
+            ? `<p class="nota"><b>${D.esc(fixa.nume)}</b> (${D.esc(fixa.temei)}): ${D.esc(fixa.nota)} Nimic nu e calculat:
+                județele stau unde le-a pus legea, iar capitala fiecărei regiuni e sediul instituției. Indicatorii sunt
+                aceiași ca la varianta calculată, ca să se poată compara. Distanțele sunt estimate (linie dreaptă ×
+                ${NF1.format(P.ocol)}, la ${P.vitezaMedie} km/h); drumul mediu e al locuitorilor din afara Bucureștiului și a Ilfovului.</p>`
+            : `<p class="nota">Capitalele se aleg dintre orașele cu funcții regionale de azi (curte de apel 3 puncte,
+                direcție regională a finanțelor și agenție de dezvoltare câte 2, cameră a notarilor 1), iar regiunile
+                cresc pe vecinătăți, echilibrând populația și nivelul economic. Distanțele sunt estimate
+                (linie dreaptă × ${NF1.format(P.ocol)}, la ${P.vitezaMedie} km/h), nu rutate — timpii reali vin doar
+                pentru localități, în scenariile de comasare.</p>`;
 
         const lista = rezultat.regiuni.map(r => {
             const dep = judete.find(j => j.c === r.judetCelMaiDepartat);
@@ -167,6 +214,7 @@ window.AdpRegiuni = function() {
                     ${r.pibLoc ? `${NF.format(r.pibLoc)} EUR/loc.` : "—"} ·
                     ${r.euroPeOra ? `${NF1.format(r.euroPeOra)} EUR/oră` : "—"} ·
                     ${cate(r.judete.length, "județ", "județe")} ·
+                    ${cons && cons.peRegiune.has(r.capitala) ? `${NF.format(cons.peRegiune.get(r.capitala))} consilieri · ` : ""}
                     ${dep ? `cel mai departe: ${D.esc(dep.nume)}, ${NF.format(Math.round(r.kmMax))} km` : ""}
                     ${r.istorice.length > 1 ? `<span class="eticheta-stare" title="${D.esc(r.istorice.join(" + "))}">regiuni istorice diferite</span>` : ""}
                     <br><small>${r.judete.map(c => D.esc((judete.find(j => j.c === c) || {}).auto || "")).join(" ")}</small>
@@ -175,12 +223,8 @@ window.AdpRegiuni = function() {
         }).join("");
 
         $("#rg-rezultat").innerHTML = `${tabel}
-            <p class="nota">Capitalele se aleg dintre orașele cu funcții regionale de azi (curte de apel 3 puncte,
-                direcție regională a finanțelor și agenție de dezvoltare câte 2, cameră a notarilor 1), iar regiunile
-                cresc pe vecinătăți, echilibrând populația și nivelul economic. Distanțele sunt estimate
-                (linie dreaptă × ${NF1.format(P.ocol)}, la ${P.vitezaMedie} km/h), nu rutate — timpii reali vin doar
-                pentru localități, în scenariile de comasare.</p>
-            <h3 class="subtitlu-sectiune">Regiunile propuse (${rezultat.regiuni.length}) <small class="nota">— clic pentru detalii</small></h3>
+            ${nota}
+            <h3 class="subtitlu-sectiune">${fixa ? "Regiunile" : "Regiunile propuse"} (${rezultat.regiuni.length}) <small class="nota">— clic pentru detalii</small></h3>
             <ol class="lista-grupuri">${lista}</ol>`;
 
         document.querySelectorAll("#rg-rezultat li[data-capitala]").forEach(li => {
@@ -218,7 +262,7 @@ window.AdpRegiuni = function() {
         }).join("");
         cont.innerHTML = `
             <h3>${D.esc(r.nume)}</h3>
-            <div class="tip">capitală de regiune · ${cate(r.judete.length, "județ", "județe")} ·
+            <div class="tip">${rezultat.circumscriptii ? "sediu de " + D.esc(rezultat.circumscriptii.nume.toLowerCase().replace(/^curți de apel$/, "curte de apel").replace(/^agenții pentru dezvoltare regională$/, "agenție de dezvoltare")) : "capitală de regiune"} · ${cate(r.judete.length, "județ", "județe")} ·
                 ${NF.format(r.populatie)} loc. · ${NF.format(Math.round(r.suprafata))} km²</div>
             <table class="tabel-atribute">
                 ${randIndicator("PIB pe locuitor", r.pibLoc ? NF.format(r.pibLoc) + " EUR" : "—", institutii.anEconomie.judete)}
@@ -238,29 +282,33 @@ window.AdpRegiuni = function() {
         cont.hidden = false;
     }
 
-    /** Compară variantele cu același set de criterii: 8, 12 și 16 regiuni. */
+    /** Compară variantele fixe (curțile de apel, regiunile de dezvoltare) cu cele calculate: 8, 12 și 16 regiuni. */
     function compara() {
-        const rezultate = D.regionalizare.compara(judete, veciniJudet, institutii.sisteme, VARIANTE, parametri());
-        const randuri = rezultate.map(r => {
-            const I = r.indicatori;
-            return `<tr data-nr="${I.nrRegiuni}" tabindex="0">
-                <th scope="row">${I.nrRegiuni} regiuni</th>
+        const fixe = FIXE.map(f => ({ r: variantaRezultat(f.cod), eticheta: f.eticheta, cod: f.cod })).filter(x => x.r);
+        const calculate = D.regionalizare.compara(judete, veciniJudet, institutii.sisteme, VARIANTE, parametri())
+            .map(r => ({ r: r, eticheta: `${r.indicatori.nrRegiuni} regiuni, calculate`, cod: "calculata" }));
+        const randuri = fixe.concat(calculate).map(x => {
+            const r = x.r, I = r.indicatori, cons = consilieri(r);
+            return `<tr data-nr="${I.nrRegiuni}" data-varianta="${x.cod}" tabindex="0">
+                <th scope="row">${D.esc(x.eticheta)}</th>
                 <td>${NF.format(Math.round(I.populatieMedie))}</td>
                 <td>${NF1.format(I.raportPopulatie)}×</td>
                 <td>${I.raportPibLoc ? NF1.format(I.raportPibLoc) + "×" : "—"}</td>
                 <td>${NF.format(Math.round(I.minuteMediu))}</td>
                 <td>${I.capitaleCuCurteDeApel}/${I.nrRegiuni}</td>
+                <td>${cons ? NF.format(cons.locuri + cons.presedinti) : "—"}</td>
             </tr>`;
         }).join("");
         $("#rg-comparatie").innerHTML = `
             <h3 class="subtitlu-sectiune">Variante comparate <small class="nota">— clic pe un rând ca să-l vezi pe hartă</small></h3>
             <div class="tabel-derulant"><table class="tabel-atribute tabel-comparatie tabel-judete">
-                <thead><tr><th>Variantă</th><th>pop. medie</th><th>max/min pop.</th><th>max/min PIB</th><th>min. la capitală</th><th>capitale cu C.A.</th></tr></thead>
+                <thead><tr><th>Variantă</th><th>pop. medie</th><th>max/min pop.</th><th>max/min PIB</th><th>min. la capitală</th><th>capitale cu C.A.</th><th>consilieri + președinți</th></tr></thead>
                 <tbody>${randuri}</tbody>
             </table></div>`;
         document.querySelectorAll("#rg-comparatie tr[data-nr]").forEach(tr => {
             const alege = () => {
-                $("#rg-nr").value = tr.dataset.nr;
+                $("#rg-varianta").value = tr.dataset.varianta;
+                if (tr.dataset.varianta === "calculata") $("#rg-nr").value = tr.dataset.nr;
                 actualizeazaEtichete();
                 ruleaza();
             };
@@ -292,6 +340,10 @@ window.AdpRegiuni = function() {
         ["#rg-institutii", "#rg-istorice"].forEach(id =>
             $(id).addEventListener("change", () => { if (activ) ruleaza(); }));
         $("#rg-compara").addEventListener("click", compara);
+        $("#rg-varianta").addEventListener("change", () => {
+            selectata = null;
+            if (activ) ruleaza();
+        });
         actualizeazaEtichete();
     }
 
@@ -351,6 +403,19 @@ window.AdpRegiuni = function() {
             institutii = j;
             pregateste();
             initControale();
+            const adresa = /^#regiuni(?:=([a-z-]+))?$/.exec(location.hash);
+            if (adresa) {
+                if (adresa[1] && $(`#rg-varianta option[value="${adresa[1]}"]`)) $("#rg-varianta").value = adresa[1];
+                const radio = document.querySelector("input[name=mod][value=regiuni]");
+                // secțiunile pliate în care stau comutatorul și panoul se deschid
+                [radio, $("#rg-sectiune")].forEach(el => {
+                    for (let d = el && el.closest("details"); d; d = d.parentElement && d.parentElement.closest("details")) d.open = true;
+                });
+                if (radio && !radio.checked) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event("change", { bubbles: true }));
+                }
+            }
             if (document.querySelector("input[name=mod]:checked").value === "regiuni") intra();
         }).catch(e => {
             console.warn(`[e-ro-adp] "${CALE}" nu a putut fi încărcat (${e.message}). Rulează unelte/regiuni_date.py.`);
