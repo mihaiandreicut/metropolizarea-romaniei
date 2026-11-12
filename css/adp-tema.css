@@ -2921,3 +2921,198 @@ body.harta-izolata .legenda-harta {
     margin-top: auto;
     padding-top: 8px;
 }
+
+/* ------------------------------------------------------------------ meniul (js/adp-meniu.js) */
+.antet {
+    position: relative;
+    z-index: 1100;            /* meniul derulant trece peste hartă (Leaflet folosește până la 1000) */
+}
+
+.meniu-grup {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.meniu-sageata {
+    border: 0;
+    background: transparent;
+    color: var(--text-2);
+    padding: 6px 6px 6px 0;
+    margin-left: -6px;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.meniu-sageata:hover {
+    color: var(--accent-text);
+}
+
+.meniu-sub {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 290px;
+    padding: 8px;
+    margin-top: 6px;
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.meniu-grup.deschis .meniu-sub {
+    display: grid;
+}
+
+@media (hover: hover) and (min-width: 861px) {
+    /* puntea invizibilă ține meniul deschis cât mouse-ul coboară spre el */
+    .meniu-grup::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 8px;
+    }
+
+    .meniu-grup:not(.fara-hover):hover .meniu-sub {
+        display: grid;
+    }
+}
+
+.antet nav .meniu-sub a {
+    padding: 6px 10px;
+    white-space: nowrap;
+}
+
+.antet nav .meniu-sub a:hover {
+    background: var(--accent-fundal);
+    color: var(--accent-text);
+}
+
+.meniu-titlu {
+    margin: 8px 10px 2px;
+    font-size: 11px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-2);
+}
+
+.meniu-titlu:first-child {
+    margin-top: 2px;
+}
+
+.antet nav .meniu-sub a.meniu-toate {
+    margin-top: 6px;
+    border-top: 1px solid var(--linie);
+    border-radius: 0 0 6px 6px;
+    color: var(--accent-text);
+    font-weight: 600;
+}
+
+.meniu-buton {
+    display: none;
+}
+
+@media (max-width: 860px) {
+    .cu-meniu .meniu-buton {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+        padding: 6px 12px;
+        border: 1px solid var(--margine);
+        border-radius: 6px;
+        background: var(--panou);
+        color: var(--text);
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .meniu-icon,
+    .meniu-icon::before,
+    .meniu-icon::after {
+        display: block;
+        width: 16px;
+        height: 2px;
+        background: currentColor;
+        border-radius: 1px;
+    }
+
+    .meniu-icon {
+        position: relative;
+    }
+
+    .meniu-icon::before,
+    .meniu-icon::after {
+        content: "";
+        position: absolute;
+        left: 0;
+    }
+
+    .meniu-icon::before { top: -5px; }
+    .meniu-icon::after { top: 5px; }
+
+    /* titlul și butonul pe același rând: titlul se strânge, butonul nu */
+    .cu-meniu .antet h1 {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .cu-meniu .meniu-buton {
+        flex: none;
+    }
+
+    /* cu JavaScript, meniul stă strâns sub buton și se deschide pe verticală */
+    .cu-meniu .antet nav {
+        display: none;
+    }
+
+    .cu-meniu .antet.meniu-deschis nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+        overflow: visible;
+        padding: 4px 0 8px;
+    }
+
+    .cu-meniu .antet nav a {
+        padding: 10px 12px;
+        font-size: 15px;
+    }
+
+    .meniu-grup {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .meniu-sageata {
+        display: none;
+    }
+
+    .meniu-sub,
+    .meniu-grup.deschis .meniu-sub {
+        display: grid;
+        position: static;
+        min-width: 0;
+        margin: 0 0 0 12px;
+        padding: 0 0 4px;
+        border: 0;
+        border-left: 2px solid var(--linie);
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .antet nav .meniu-sub a {
+        white-space: normal;
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+}

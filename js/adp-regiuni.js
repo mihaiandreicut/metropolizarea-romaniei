@@ -23,8 +23,9 @@ window.AdpRegiuni = function() {
     const VARIANTE = [8, 12, 16];
     // variantele fixe: rețele de circumscripții care există deja, nu calculate
     const FIXE = [
-        { cod: "curte-apel", eticheta: "15 curți de apel" },
-        { cod: "adr", eticheta: "8 regiuni de dezvoltare (azi)" }
+        { cod: "judete", eticheta: "Azi: 41 de județe și București" },
+        { cod: "adr", eticheta: "8 regiuni de dezvoltare (propunerea)" },
+        { cod: "curte-apel", eticheta: "Curțile de apel, cu Metropola" }
     ];
     const NF = new Intl.NumberFormat("ro-RO");
     const NF1 = new Intl.NumberFormat("ro-RO", { maximumFractionDigits: 1 });
@@ -80,6 +81,7 @@ window.AdpRegiuni = function() {
     /** O variantă: calculată de algoritm sau una fixă (curțile de apel, regiunile de dezvoltare). */
     function variantaRezultat(cod) {
         if (cod === "calculata") return D.regionalizare.calculeaza(judete, veciniJudet, institutii.sisteme, parametri());
+        if (cod === "judete") return D.regionalizare.judeteAzi(judete, institutii.sisteme, parametri());
         const r = D.regionalizare.dinCircumscriptii(judete, veciniJudet, institutii.sisteme, cod, parametri());
         if (r && cod === "adr") {
             // regiunile de dezvoltare se cunosc după nume, nu după orașul agenției
@@ -96,6 +98,11 @@ window.AdpRegiuni = function() {
     function consilieri(r) {
         const INST = window.AdpInstitutii, R = window.AdpReorganizare;
         if (!INST || !R) return null;
+        if (r.azi) {
+            // azi: consilierii județeni (art. 171) și președinții consiliilor județene; Bucureștiul are regulile lui
+            const azi = INST.consilieriJudeteni(D.date);
+            return { locuri: Array.from(azi.values()).reduce((a, n) => a + n, 0), presedinti: azi.size, peRegiune: azi };
+        }
         const c = INST.consiliiRegionale(D.date, R.FACTOR_CONSILIERI,
             r.regiuni.map(x => ({ cod: x.capitala, nume: x.nume, judete: x.judete })));
         return { locuri: c.reduce((a, x) => a + x.locuri, 0), presedinti: c.length, peRegiune: new Map(c.map(x => [x.cod, x.locuri])) };
@@ -182,20 +189,30 @@ window.AdpRegiuni = function() {
         const cons = consilieri(rezultat);
         const acum = institutii.sisteme.find(s => s.cod === "adr");
         const tabel = `<table class="tabel-atribute">
-                ${randIndicator("Regiuni", NF.format(I.nrRegiuni), `față de ${acum.sedii.length} regiuni de dezvoltare azi`)}
+                ${rezultat.azi ? randIndicator("Județe", NF.format(I.nrRegiuni), "41 de județe și municipiul București")
+                    : randIndicator("Regiuni", NF.format(I.nrRegiuni), `față de 42 de județe azi (cu Bucureștiul) și ${acum.sedii.length} regiuni de dezvoltare`)}
                 ${randIndicator("Populația medie a unei regiuni", NF.format(Math.round(I.populatieMedie)))}
                 ${randIndicator("Cea mai mare / cea mai mică", NF1.format(I.raportPopulatie) + "×", "ca populație")}
                 ${randIndicator("PIB pe locuitor: max / min", I.raportPibLoc ? NF1.format(I.raportPibLoc) + "×" : "—", "între regiuni")}
                 ${randIndicator("Drum până la capitala regiunii", NF.format(Math.round(I.minuteMediu)) + " min", `în medie · maxim ${NF.format(Math.round(I.kmMax))} km`)}
                 ${randIndicator("Capitale care sunt deja curți de apel", `${I.capitaleCuCurteDeApel} din ${I.nrRegiuni}`)}
-                ${randIndicator("Oficii județene (unul pe județ)", NF.format(I.oficiiJudetene), "consiliul județean și prefectura trec la regiune")}
-                ${cons ? randIndicator("Consilieri regionali", `${NF.format(cons.locuri)} + ${NF.format(cons.presedinti)} președinți`,
-                    "art. 171, la dublul populației; azi, 1.379 de consilieri și președinți de consiliu județean") : ""}
+                ${rezultat.azi ? randIndicator("Consilii județene și prefecturi", NF.format(I.nrRegiuni), "câte unul în fiecare județ")
+                    : randIndicator("Oficii județene (unul pe județ)", NF.format(I.oficiiJudetene), "consiliul județean și prefectura trec la regiune")}
+                ${cons ? randIndicator(rezultat.azi ? "Consilieri județeni" : "Consilieri regionali", `${NF.format(cons.locuri)} + ${NF.format(cons.presedinti)} președinți`,
+                    rezultat.azi ? "art. 171; fără București, care are Consiliul General"
+                        : "art. 171, la dublul populației; azi, 1.379 de consilieri și președinți de consiliu județean") : ""}
             </table>`;
         const fixa = rezultat.circumscriptii;
         const nota = fixa
-            ? `<p class="nota"><b>${D.esc(fixa.nume)}</b> (${D.esc(fixa.temei)}): ${D.esc(fixa.nota)} Nimic nu e calculat:
-                județele stau unde le-a pus legea, iar capitala fiecărei regiuni e sediul instituției. Indicatorii sunt
+            ? rezultat.azi ? `<p class="nota"><b>Situația de azi</b> (${D.esc(fixa.temei)}): ${D.esc(fixa.nota)} E punctul de
+                plecare al comparației: fiecare județ e o „regiune”, cu reședința lui drept capitală, iar indicatorii se
+                socotesc la fel ca pentru celelalte variante. Drumul mediu e cel de la centrul județului la reședință
+                (linie dreaptă × ${NF1.format(P.ocol)}, la ${P.vitezaMedie} km/h), pentru locuitorii din afara Bucureștiului și a Ilfovului.</p>`
+            : `<p class="nota"><b>${D.esc(fixa.nume)}</b> (${D.esc(fixa.temei)}): ${D.esc(fixa.nota)} Nimic nu e calculat:
+                județele stau unde le-a pus legea, iar capitala fiecărei regiuni e sediul instituției.
+                ${fixa.separare ? `O singură abatere: Bucureștiul și Ilfovul formează Metropola, separat, ca în toate variantele;
+                celelalte județe ale circumscripției București (${D.esc(fixa.separare.judete.join(", "))}) formează o regiune
+                a lor, cu capitala la ${D.esc(fixa.separare.capitala)}, aleasă ca la varianta calculată.` : ""} Indicatorii sunt
                 aceiași ca la varianta calculată, ca să se poată compara. Distanțele sunt estimate (linie dreaptă ×
                 ${NF1.format(P.ocol)}, la ${P.vitezaMedie} km/h); drumul mediu e al locuitorilor din afara Bucureștiului și a Ilfovului.</p>`
             : `<p class="nota">Capitalele se aleg dintre orașele cu funcții regionale de azi (curte de apel 3 puncte,
@@ -224,7 +241,7 @@ window.AdpRegiuni = function() {
 
         $("#rg-rezultat").innerHTML = `${tabel}
             ${nota}
-            <h3 class="subtitlu-sectiune">${fixa ? "Regiunile" : "Regiunile propuse"} (${rezultat.regiuni.length}) <small class="nota">— clic pentru detalii</small></h3>
+            <h3 class="subtitlu-sectiune">${rezultat.azi ? "Județele" : fixa ? "Regiunile" : "Regiunile propuse"} (${rezultat.regiuni.length}) <small class="nota">— clic pentru detalii</small></h3>
             <ol class="lista-grupuri">${lista}</ol>`;
 
         document.querySelectorAll("#rg-rezultat li[data-capitala]").forEach(li => {
@@ -262,7 +279,7 @@ window.AdpRegiuni = function() {
         }).join("");
         cont.innerHTML = `
             <h3>${D.esc(r.nume)}</h3>
-            <div class="tip">${rezultat.circumscriptii ? "sediu de " + D.esc(rezultat.circumscriptii.nume.toLowerCase().replace(/^curți de apel$/, "curte de apel").replace(/^agenții pentru dezvoltare regională$/, "agenție de dezvoltare")) : "capitală de regiune"} · ${cate(r.judete.length, "județ", "județe")} ·
+            <div class="tip">${rezultat.azi ? "reședință de județ" : rezultat.circumscriptii ? "sediu de " + D.esc(rezultat.circumscriptii.nume.toLowerCase().replace(/^curți de apel$/, "curte de apel").replace(/^agenții pentru dezvoltare regională$/, "agenție de dezvoltare")) : "capitală de regiune"} · ${cate(r.judete.length, "județ", "județe")} ·
                 ${NF.format(r.populatie)} loc. · ${NF.format(Math.round(r.suprafata))} km²</div>
             <table class="tabel-atribute">
                 ${randIndicator("PIB pe locuitor", r.pibLoc ? NF.format(r.pibLoc) + " EUR" : "—", institutii.anEconomie.judete)}
@@ -403,22 +420,28 @@ window.AdpRegiuni = function() {
             institutii = j;
             pregateste();
             initControale();
-            const adresa = /^#regiuni(?:=([a-z-]+))?$/.exec(location.hash);
-            if (adresa) {
-                if (adresa[1] && $(`#rg-varianta option[value="${adresa[1]}"]`)) $("#rg-varianta").value = adresa[1];
-                const radio = document.querySelector("input[name=mod][value=regiuni]");
-                // secțiunile pliate în care stau comutatorul și panoul se deschid
-                [radio, $("#rg-sectiune")].forEach(el => {
-                    for (let d = el && el.closest("details"); d; d = d.parentElement && d.parentElement.closest("details")) d.open = true;
-                });
-                if (radio && !radio.checked) {
-                    radio.checked = true;
-                    radio.dispatchEvent(new Event("change", { bubbles: true }));
+            const dinAdresa = laPornire => {
+                const adresa = /^#regiuni(?:=([a-z-]+))?$/.exec(location.hash);
+                if (adresa) {
+                    const alta = adresa[1] && $(`#rg-varianta option[value="${adresa[1]}"]`) && $("#rg-varianta").value !== adresa[1];
+                    if (alta) { $("#rg-varianta").value = adresa[1]; selectata = null; }
+                    const radio = document.querySelector("input[name=mod][value=regiuni]");
+                    // secțiunile pliate în care stau comutatorul și panoul se deschid
+                    [radio, $("#rg-sectiune")].forEach(el => {
+                        for (let d = el && el.closest("details"); d; d = d.parentElement && d.parentElement.closest("details")) d.open = true;
+                    });
+                    if (radio && !radio.checked) {
+                        radio.checked = true;
+                        radio.dispatchEvent(new Event("change", { bubbles: true }));
+                    } else if (alta && activ) ruleaza();
                 }
-            }
-            if (document.querySelector("input[name=mod]:checked").value === "regiuni") intra();
-            // venit printr-o legătură directă: panoul se derulează la regiuni
-            if (adresa) requestAnimationFrame(() => $("#rg-sectiune").scrollIntoView({ block: "start" }));
+                if (laPornire && document.querySelector("input[name=mod]:checked").value === "regiuni") intra();
+                // venit printr-o legătură directă: panoul se derulează la regiuni
+                if (adresa) requestAnimationFrame(() => $("#rg-sectiune").scrollIntoView({ block: "start" }));
+            };
+            dinAdresa(true);
+            // și când ancora se schimbă în pagină (meniul „Simulări”)
+            window.addEventListener("hashchange", () => dinAdresa(false));
         }).catch(e => {
             console.warn(`[e-ro-adp] "${CALE}" nu a putut fi încărcat (${e.message}). Rulează unelte/regiuni_date.py.`);
             const radio = document.querySelector("input[name=mod][value=regiuni]");

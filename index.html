@@ -4,21 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harta administrativă a României — regiuni ADR, județe, regiuni istorice, UAT-uri</title>
-    <meta name="description" content="Hartă interactivă a României cu cele 8 regiuni de dezvoltare, 41 de județe și București, regiunile istorice și cele 3.181 de UAT-uri, cu atribute demografice pentru studiul reorganizării administrative.">
+    <title>Metropolizarea României — harta reorganizării administrative: comune, districte, regiuni</title>
+    <meta name="description" content="Simulare publică a reorganizării administrative a României: 3.181 de comune și orașe devin 1.441 de unități, după reguli verificabile pe date. Caută-ți localitatea, simulează un județ, o regiune sau toată țara.">
     <meta name="theme-color" content="#2a78d6">
+    <link rel="canonical" href="https://mihaiandreicut.github.io/metropolizarea-romaniei/">
+    <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 
-    <!-- Open Graph (fără og:url / og:image până nu există un domeniu public) -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="e-ro-adp">
+    <meta property="og:site_name" content="Metropolizarea României">
     <meta property="og:locale" content="ro_RO">
-    <meta property="og:title" content="Harta administrativă a României">
-    <meta property="og:description" content="Regiuni ADR, județe, regiuni istorice și UAT-uri, cu atribute pentru reorganizarea administrativ-teritorială.">
+    <meta property="og:title" content="Metropolizarea României — harta reorganizării administrative">
+    <meta property="og:description" content="3.181 de comune și orașe devin 1.441, după reguli publice. Caută-ți localitatea și vezi ce se schimbă: primăria, drumul, banii eliberați.">
+    <meta property="og:url" content="https://mihaiandreicut.github.io/metropolizarea-romaniei/">
+    <meta property="og:image" content="https://mihaiandreicut.github.io/metropolizarea-romaniei/img/previzualizare.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Harta României: costul primăriei pe locuitor, azi (3.181 de comune și orașe) și după comasare (1.441 de unități)">
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Harta administrativă a României">
-    <meta name="twitter:description" content="Regiuni ADR, județe, regiuni istorice și UAT-uri, cu atribute pentru reorganizarea administrativ-teritorială.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Metropolizarea României — harta reorganizării administrative">
+    <meta name="twitter:description" content="3.181 de comune și orașe devin 1.441, după reguli publice. Caută-ți localitatea și vezi ce se schimbă.">
+    <meta name="twitter:image" content="https://mihaiandreicut.github.io/metropolizarea-romaniei/img/previzualizare.jpg">
+    <meta name="twitter:image:alt" content="Harta României: costul primăriei pe locuitor, azi (3.181 de comune și orașe) și după comasare (1.441 de unități)">
 
     <!-- Date structurate -->
     <script type="application/ld+json">
@@ -40,7 +49,18 @@
 
     <!-- Leaflet 1.9.4, servit local (fără CDN) -->
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Metropolizarea României",
+        "url": "https://mihaiandreicut.github.io/metropolizarea-romaniei/",
+        "inLanguage": "ro",
+        "description": "Simulare publică a reorganizării administrative a României: comasarea comunelor, districtele și regiunile, pe date publice."
+    }
+    </script>
     <link rel="stylesheet" href="css/adp-tema.css">
+    <script src="js/adp-meniu.js" defer></script>
 </head>
 
 <body>
@@ -293,8 +313,9 @@
                     <label for="rg-varianta">Varianta</label>
                     <select id="rg-varianta">
                         <option value="calculata">Calculată: județele grupate de algoritm</option>
-                        <option value="curte-apel">Cele 15 circumscripții ale curților de apel</option>
-                        <option value="adr">Cele 8 regiuni de dezvoltare de azi</option>
+                        <option value="judete">Azi: 41 de județe și București</option>
+                        <option value="adr">Cele 8 regiuni de dezvoltare (propunerea)</option>
+                        <option value="curte-apel">Curțile de apel (15), cu București–Ilfov separat</option>
                     </select>
                     <div id="rg-parametri" class="formular-scenariu">
                     <label for="rg-nr">Câte regiuni: <b id="rg-nr-val"></b></label>

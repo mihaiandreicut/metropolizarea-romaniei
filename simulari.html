@@ -5,20 +5,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulări — Metropolizarea României</title>
-    <meta name="description" content="Toate simulările proiectului într-un loc: comasarea comunelor pe un județ, pe o regiune sau pe toată țara, ipotezele de cost, regiunile (8 de dezvoltare, 15 curți de apel, variante calculate) și fișa fiecărei localități.">
+    <meta name="description" content="Toate simulările proiectului într-un loc: comasarea comunelor pe un județ, pe o regiune sau pe toată țara, ipotezele de cost, regiunile (8 de dezvoltare, curțile de apel cu Metropola, variante calculate) și fișa fiecărei localități.">
     <meta name="theme-color" content="#2a78d6">
+    <link rel="canonical" href="https://mihaiandreicut.github.io/metropolizarea-romaniei/simulari.html">
+    <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="ro-adp">
+    <meta property="og:site_name" content="Metropolizarea României">
     <meta property="og:locale" content="ro_RO">
     <meta property="og:title" content="Simulări — Metropolizarea României">
     <meta property="og:description" content="Comasarea comunelor, ipotezele de cost și variantele de regiuni, fiecare cu legătura ei directă pe hartă.">
+    <meta property="og:url" content="https://mihaiandreicut.github.io/metropolizarea-romaniei/simulari.html">
+    <meta property="og:image" content="https://mihaiandreicut.github.io/metropolizarea-romaniei/img/previzualizare.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Harta României: costul primăriei pe locuitor, azi (3.181 de comune și orașe) și după comasare (1.441 de unități)">
 
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Simulări — Metropolizarea României">
     <meta name="twitter:description" content="Comasarea comunelor, ipotezele de cost și variantele de regiuni, pe hartă.">
+    <meta name="twitter:image" content="https://mihaiandreicut.github.io/metropolizarea-romaniei/img/previzualizare.jpg">
+    <meta name="twitter:image:alt" content="Harta României: costul primăriei pe locuitor, azi (3.181 de comune și orașe) și după comasare (1.441 de unități)">
 
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": "Simulări — Metropolizarea României",
+        "url": "https://mihaiandreicut.github.io/metropolizarea-romaniei/simulari.html",
+        "inLanguage": "ro",
+        "image": "https://mihaiandreicut.github.io/metropolizarea-romaniei/img/previzualizare.jpg",
+        "dateModified": "2026-11-12",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "Metropolizarea României",
+            "url": "https://mihaiandreicut.github.io/metropolizarea-romaniei/",
+            "inLanguage": "ro"
+        }
+    }
+    </script>
     <link rel="stylesheet" href="css/adp-tema.css">
+    <script src="js/adp-meniu.js" defer></script>
 </head>
 
 <body>
@@ -133,9 +160,10 @@
                 încerca și alte desene, cu aceiași indicatori.</p>
             <div class="simulari">
                 <article class="simulare">
-                    <h3>Cele 15 curți de apel</h3>
-                    <p class="simulare-cifra">drumul la capitală: <b>44 de minute</b>, dar regiuni inegale (<b>4,5×</b>)</p>
-                    <p>Circumscripțiile curților de apel (Legea 304/2022), cea mai veche rețea regională a statului.</p>
+                    <h3>Curțile de apel, cu Metropola</h3>
+                    <p class="simulare-cifra"><b>16</b> regiuni · drumul la capitală: <b>46 de minute</b></p>
+                    <p>Cele 15 circumscripții ale curților de apel (Legea 304/2022), cu București–Ilfov separat, ca
+                        Metropolă; restul circumscripției București devine o regiune cu capitala la Călărași.</p>
                     <p class="simulare-legaturi"><a class="buton principal" href="index.html#regiuni=curte-apel">Pe hartă</a></p>
                 </article>
                 <article class="simulare">
@@ -157,8 +185,9 @@
                 <thead><tr><th>Varianta</th><th>Populația medie</th><th>Mare / mică</th><th>PIB/loc., max / min</th>
                     <th>Drum la capitală</th><th>Consilieri și președinți</th></tr></thead>
                 <tbody>
+                    <tr><th scope="row"><a href="index.html#regiuni=judete">Azi: 41 de județe și București</a></th><td>453.364</td><td>9,2×</td><td>6,9×</td><td>14 min</td><td>1.379</td></tr>
                     <tr><th scope="row"><a href="index.html#regiuni=adr">8 regiuni de dezvoltare</a> (propunerea)</th><td>2.380.164</td><td>1,9×</td><td>4,0×</td><td>97 min</td><td>296</td></tr>
-                    <tr><th scope="row"><a href="index.html#regiuni=curte-apel">15 curți de apel</a></th><td>1.269.421</td><td>4,5×</td><td>3,6×</td><td>44 min</td><td>529</td></tr>
+                    <tr><th scope="row"><a href="index.html#regiuni=curte-apel">Curțile de apel, cu Metropola (16)</a></th><td>1.190.082</td><td>3,1×</td><td>4,8×</td><td>46 min</td><td>564</td></tr>
                     <tr><th scope="row">8 regiuni calculate</th><td>2.380.164</td><td>2,0×</td><td>3,9×</td><td>84 min</td><td>296</td></tr>
                     <tr><th scope="row">12 regiuni calculate</th><td>1.586.776</td><td>2,0×</td><td>4,2×</td><td>61 min</td><td>444</td></tr>
                     <tr><th scope="row">16 regiuni calculate</th><td>1.190.082</td><td>3,0×</td><td>4,8×</td><td>45 min</td><td>570</td></tr>

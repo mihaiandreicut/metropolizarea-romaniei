@@ -422,6 +422,28 @@ window.AdpRegionalizare = function() {
             capitale.push({ cap: cap, nume: s.nume });
             s.judete.forEach(c => { if (dupaCod.has(c)) regiune.set(c, cap); });
         });
+        // Metropola: când Bucureștiul și Ilfovul stau într-o circumscripție mai mare (curtea de apel
+        // București mai are Călărașiul, Giurgiul, Ialomița și Teleormanul), ei ies separat, iar județele
+        // rămase formează o regiune a lor, cu capitala aleasă ca la varianta calculată
+        const capB = judete.find(j => j.auto === "B"), capIF = judete.find(j => j.auto === "IF");
+        let separare = null;
+        if (P.metropola && capB && capIF && regiune.get(capB.c) === regiune.get(capIF.c)) {
+            const veche = regiune.get(capB.c);
+            const rest = judete.filter(j => regiune.get(j.c) === veche && j !== capB && j !== capIF);
+            const i = capitale.findIndex(x => x.cap === veche);
+            capitale[i] = { cap: capB.c, nume: "București–Ilfov (Metropola)" };
+            regiune.set(capB.c, capB.c);
+            regiune.set(capIF.c, capB.c);
+            if (rest.length) {
+                const popRest = rest.reduce((a, j) => a + j.populatie, 0);
+                const cost = j => rest.reduce((a, x) => a + x.populatie * P.ocol * distanta(x.centru, j.oras.e), 0) / popRest /
+                    (1 + 0.15 * scorInst.get(j.c).total);
+                const nouaCap = rest.reduce((a, j) => cost(j) < cost(a) ? j : a);
+                rest.forEach(j => regiune.set(j.c, nouaCap.c));
+                capitale.push({ cap: nouaCap.c, nume: nouaCap.oras.n });
+                separare = { judete: rest.map(j => j.nume), capitala: nouaCap.oras.n };
+            }
+        }
         const regiuni = capitale.map(x => {
             const m = judete.filter(j => regiune.get(j.c) === x.cap);
             const doarCapitala = m.length === 2 && m.every(j => j.auto === "B" || j.auto === "IF");
@@ -433,7 +455,30 @@ window.AdpRegionalizare = function() {
             regiuni: regiuni,
             judetRegiune: regiune,
             indicatori: indicatoriRegiuni(regiuni, judete, regiune, km, P),
-            circumscriptii: { cod: sistem.cod, nume: sistem.nume, temei: sistem.temei, nota: sistem.nota }
+            circumscriptii: { cod: sistem.cod, nume: sistem.nume, temei: sistem.temei, nota: sistem.nota, separare: separare }
+        };
+    }
+
+    /**
+     * Situația de azi, ca punct de comparație: fiecare județ e nivelul de deasupra comunelor, cu
+     * reședința lui drept capitală; Bucureștiul și Ilfovul rămân separate, ca acum.
+     */
+    function judeteAzi(judete, sisteme, optiuni) {
+        const P = Object.assign({}, PARAMETRI_IMPLICITI, optiuni || {});
+        const dupaCod = new Map(judete.map(j => [j.c, j]));
+        const scorInst = scoruriInstitutionale(judete, sisteme);
+        const km = (j, cap) => P.ocol * distanta(j.centru, dupaCod.get(cap).oras.e);
+        const regiune = new Map(judete.map(j => [j.c, j.c]));
+        const regiuni = judete.map(j => regiuneaDin([j], j.c, j.nume, scorInst, km, P))
+            .sort((a, b) => b.populatie - a.populatie);
+        return {
+            parametri: P,
+            regiuni: regiuni,
+            judetRegiune: regiune,
+            indicatori: indicatoriRegiuni(regiuni, judete, regiune, km, P),
+            azi: true,
+            circumscriptii: { cod: "judete", nume: "Județele de azi", temei: "Legea 2/1968",
+                nota: "41 de județe și municipiul București, fiecare cu consiliu ales (la București, Consiliul General) și prefectură." }
         };
     }
 
@@ -449,6 +494,7 @@ window.AdpRegionalizare = function() {
         pregatesteJudete: pregatesteJudete,
         calculeaza: calculeaza,
         dinCircumscriptii: dinCircumscriptii,
+        judeteAzi: judeteAzi,
         compara: compara
     };
 }();
