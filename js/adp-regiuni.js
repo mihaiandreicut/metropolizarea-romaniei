@@ -417,6 +417,8 @@ window.AdpRegiuni = function() {
                 }
             }
             if (document.querySelector("input[name=mod]:checked").value === "regiuni") intra();
+            // venit printr-o legătură directă: panoul se derulează la regiuni
+            if (adresa) requestAnimationFrame(() => $("#rg-sectiune").scrollIntoView({ block: "start" }));
         }).catch(e => {
             console.warn(`[e-ro-adp] "${CALE}" nu a putut fi încărcat (${e.message}). Rulează unelte/regiuni_date.py.`);
             const radio = document.querySelector("input[name=mod][value=regiuni]");
