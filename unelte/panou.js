@@ -188,6 +188,40 @@ const variante = [
     consilieri: consilieriVarianta(v)
 }));
 
+// --- variantele de comasare: aceleași date, alte reguli (fiecare rulează toată țara)
+const optiuniBaza = {
+    executie: executie, dotari: dotari,
+    corectii: R.alegeriCuCircumscriptii(judecatorii, alegeri.corectii || []),
+    comasari: alegeri.comasari || [],
+    transferuri: alegeri.transferuri || []
+};
+const sate30 = rez => rez.sate.filter(s => s.tNou > 30 && (s.p || 0) >= rez.parametri.pSatMin).length;
+const scenarii = [
+    ["p2000", "Prag 2.000", { pMin: 2000, pTinta: 3000 }],
+    ["propus", "Propunerea: 3.000", {}],
+    ["p5000", "Prag 5.000", { pMin: 5000, pTinta: 7000 }],
+    ["t45", "3.000, până la 45 de minute", { tMax: 45 }],
+    ["faraOras", "3.000, fără preluarea de către oraș", { absorbtieUrbana: false }],
+    ["faraCapitala", "3.000, fără regula Capitalei", { capitala: false }]
+].map(([cod, nume, opt]) => {
+    const x = cod === "propus" ? r : R.calculeazaNational(date, vecini, exemple, Object.assign({}, optiuniBaza, opt));
+    const ap = aparatUnitati(x.grupuri, COTA);
+    return {
+        cod: cod, nume: nume,
+        unitati: x.dupa.unitati,
+        sub3000: x.grupuri.filter(g => g.populatie < 3000).length,
+        economie: Math.round(ap.acum - ap.dupa),
+        timp: rot(x.dupa.timpMediu, 2),
+        sate30: sate30(x)
+    };
+});
+scenarii.unshift({ cod: "azi", nume: "Azi, fără comasare", unitati: date.uat.length,
+    sub3000: date.uat.filter(u => (u.pop || 0) < 3000).length, economie: 0,
+    timp: rot(r.inainte.timpMediu, 2), sate30: r.sate.filter(s => s.tAcum > 30 && (s.p || 0) >= r.parametri.pSatMin).length });
+
+// --- ipoteza biroului din sat: economia la primării pentru fiecare cotă, de la 0 la 50%
+const cote = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5].map(c => [c, Math.round(economiePrimarii(c))]);
+
 const iesire = {
     versiune: 1,
     generat: new Date().toISOString().slice(0, 10),
@@ -211,7 +245,9 @@ const iesire = {
     curba: curba,
     judete: judete,
     regiuni: regiuni,
-    variante: variante
+    variante: variante,
+    scenarii: scenarii,
+    cote: cote
 };
 const cale = path.join(RADACINA, "date", "panou.json");
 fs.writeFileSync(cale, JSON.stringify(iesire));

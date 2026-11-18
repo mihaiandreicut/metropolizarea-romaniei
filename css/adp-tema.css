@@ -3971,3 +3971,191 @@ body.harta-izolata .legenda-harta {
         font-size: 22px;
     }
 }
+
+/* panoul: graficele comparative (variantele de comasare, ipoteza biroului, regiunile) */
+.pn-comp {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.pn-punct circle:first-child {
+    fill: var(--secv-3);
+    stroke: var(--panou);
+    stroke-width: 2;
+}
+
+.pn-punct.pn-m-propus circle:first-child {
+    fill: var(--serie-1);
+    stroke: var(--text);
+    stroke-width: 2.5;
+}
+
+.pn-punct.pn-m-azi circle:first-child {
+    fill: var(--axa);
+}
+
+.pn-punct text {
+    fill: var(--text);
+    font-size: 12.5px;
+    font-weight: 600;
+    paint-order: stroke;
+    stroke: var(--panou);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+}
+
+.pn-punct.pn-m-propus text {
+    font-weight: 750;
+    fill: var(--accent-text);
+}
+
+.pn-traseu {
+    fill: none;
+    stroke: var(--text-3);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 5;
+}
+
+.pn-traseu-text,
+.pn-axa-titlu-svg {
+    fill: var(--text-3);
+    font-size: 11.5px;
+}
+
+.pn-linie {
+    fill: none;
+    stroke: var(--serie-1);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+}
+
+.pn-linie-punct {
+    fill: var(--panou);
+    stroke: var(--serie-1);
+    stroke-width: 2;
+}
+
+.pn-linie-punct.baza {
+    fill: var(--serie-1);
+    stroke: var(--text);
+}
+
+.pn-multipli {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 22px;
+}
+
+.pn-multipli-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.pn-multiplu {
+    margin: 0;
+}
+
+.pn-multiplu figcaption {
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-2);
+}
+
+.pn-multiplu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 5px;
+}
+
+.pn-multiplu li {
+    display: grid;
+    grid-template-columns: minmax(96px, 42%) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.pn-m-eticheta {
+    color: var(--text-2);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pn-m-eticheta:hover {
+    color: var(--accent-text);
+    text-decoration: underline;
+}
+
+.pn-m-bara {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--plan);
+}
+
+.pn-m-bara span {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+    background: var(--secv-3);
+}
+
+.pn-m-propus .pn-m-bara span {
+    background: var(--serie-1);
+}
+
+.pn-m-azi .pn-m-bara span {
+    background: var(--axa);
+}
+
+.pn-m-propus .pn-m-eticheta,
+.pn-m-propus .pn-m-valoare {
+    color: var(--accent-text);
+    font-weight: 700;
+}
+
+.pn-m-valoare {
+    min-width: 42px;
+    text-align: right;
+    color: var(--text);
+}
+
+.pn-tabel-ascuns {
+    margin-top: 14px;
+}
+
+.pn-tabel-ascuns summary {
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--accent-text);
+}
+
+.pn-tabel-ascuns[open] summary {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 1100px) {
+    .pn-comp {
+        grid-template-columns: 1fr;
+    }
+
+    .pn-multipli-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .pn-multipli,
+    .pn-multipli-4 {
+        grid-template-columns: 1fr;
+    }
+}

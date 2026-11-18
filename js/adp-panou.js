@@ -279,6 +279,122 @@
         $("#pn-sim-comasare").innerHTML = comasare.map(card).join("");
     }
 
+    // ------------------------------------------------------------ simulările, comparate
+    const SCURT = { azi: "Azi", p2000: "Prag 2.000", propus: "Propunerea: 3.000", p5000: "Prag 5.000",
+        t45: "Limita de 45 min", faraOras: "Fără preluare de oraș", faraCapitala: "Fără regula Capitalei" };
+    const SCURT_REG = v => v.cod === "judete" ? "Azi: județele" : v.cod === "adr" ? "Propunerea: 8" :
+        v.cod === "curte-apel" ? "Curțile de apel" : v.nume.replace(" regiuni calculate", " calculate");
+    const legReg = v => v.cod === "calculata" ? "harta.html#regiuni=calculata" : `harta.html#regiuni=${v.cod}`;
+
+    /**
+     * Grafice mici, unul lângă altul: aceleași rânduri (variantele), câte o măsură pe grafic.
+     * `randuri`: [{ nume, clasa, href, tip }], `panouri`: [{ titlu, valori, format }]
+     */
+    function multipli(cont, randuri, panouri) {
+        cont.innerHTML = panouri.map(pn => {
+            const max = Math.max(...pn.valori.map(v => Math.abs(v))) || 1;
+            return `<figure class="pn-multiplu"><figcaption>${pn.titlu}</figcaption><ul>${randuri.map((r, k) => `
+                <li class="${r.clasa || ""}" data-tip="<b>${esc(r.nume)}</b><br>${r.tip}">
+                    <a class="pn-m-eticheta" href="${r.href}">${esc(r.nume)}</a>
+                    <span class="pn-m-bara"><span style="width:${(100 * Math.abs(pn.valori[k]) / max).toFixed(1)}%"></span></span>
+                    <span class="pn-m-valoare">${pn.format(pn.valori[k])}</span>
+                </li>`).join("")}</ul></figure>`;
+        }).join("");
+        legaTooltip(cont);
+    }
+
+    function comparatieComasare() {
+        const S = D.scenarii;
+        const tip = s => `${NF.format(s.unitati)} de unități · ${s.economie ? NF1.format(s.economie / 1e9) + " mld. lei pe an" : "fără economie"}` +
+            `<br>drum mediu ${NF1.format(s.timp)} min · ${NF.format(s.sate30)} sate la peste 30 min`;
+        const clasa = s => s.cod === "propus" ? "pn-m-propus" : s.cod === "azi" ? "pn-m-azi" : "";
+        // --- graficul de compromis: ce câștigi (economia) și ce plătești (satele departe de primărie)
+        const L = 600, H = 400, st = 58, dr = 24, sus = 22, jos = 52;
+        const maxX = Math.ceil(Math.max(...S.map(s => s.sate30)) / 200) * 200, maxY = Math.ceil(Math.max(...S.map(s => s.economie)) / 1e9);
+        const x = v => st + (L - st - dr) * v / maxX, y = v => sus + (H - sus - jos) * (1 - v / (maxY * 1e9));
+        const grila = [];
+        for (let v = 0; v <= maxY; v++) grila.push(`<line class="pn-grila-linie" x1="${st}" x2="${L - dr}" y1="${y(v * 1e9)}" y2="${y(v * 1e9)}"/>
+            <text class="pn-axa-text" x="${st - 8}" y="${y(v * 1e9) + 4}" text-anchor="end">${v}</text>`);
+        for (let v = 0; v <= maxX; v += 200) grila.push(`<text class="pn-axa-text" x="${x(v)}" y="${H - jos + 18}" text-anchor="middle">${NF.format(v)}</text>`);
+        // eticheta fiecărui punct, așezată de mână ca să nu se calce
+        const POZ = { azi: [12, 4, "start"], p2000: [-12, 4, "end"], propus: [-12, -14, "end"], p5000: [12, 4, "start"],
+            t45: [-12, -12, "end"], faraOras: [-12, 18, "end"], faraCapitala: [12, 20, "start"] };
+        const prag = ["p2000", "propus", "p5000"].map(c => S.find(s => s.cod === c)).filter(Boolean);
+        const linie = prag.length > 1 ? `<polyline class="pn-traseu" points="${prag.map(s => `${x(s.sate30)},${y(s.economie)}`).join(" ")}"/>
+            <text class="pn-traseu-text" x="${x(prag[prag.length - 1].sate30) - 6}" y="${y(prag[prag.length - 1].economie) - 14}" text-anchor="end">pragul de locuitori crește</text>` : "";
+        const puncte = S.map(s => {
+            const [dx, dy, anc] = POZ[s.cod] || [12, 4, "start"];
+            const cx = x(s.sate30), cy = y(s.economie);
+            return `<g class="pn-punct ${clasa(s)}" data-tip="<b>${esc(SCURT[s.cod] || s.nume)}</b><br>${tip(s)}">
+                <circle cx="${cx}" cy="${cy}" r="${s.cod === "propus" ? 9 : 7}"/>
+                <circle cx="${cx}" cy="${cy}" r="16" fill="transparent"/>
+                <text x="${cx + dx}" y="${cy + dy}" text-anchor="${anc}">${esc(SCURT[s.cod] || s.nume)}</text></g>`;
+        }).join("");
+        $("#pn-comp-punct").innerHTML = `
+            <svg viewBox="0 0 ${L} ${H}" role="img" aria-label="Variantele de comasare: economia pe an față de numărul de sate la peste 30 de minute de primărie">
+                ${grila.join("")}${linie}${puncte}
+                <text class="pn-axa-titlu-svg" x="${(st + L - dr) / 2}" y="${H - 8}" text-anchor="middle">sate (peste 50 de locuitori) la peste 30 de minute de primărie →</text>
+                <text class="pn-axa-titlu-svg" transform="translate(14 ${(sus + H - jos) / 2}) rotate(-90)" text-anchor="middle">economie la primării, mld. lei pe an →</text>
+            </svg>
+            <p class="pn-nota">Sus e mai bine (mai mulți bani), la stânga e mai bine (mai puține sate departe). Propunerea stă la cotul curbei:
+                pragul de 5.000 mai aduce 0,8 mld. lei, dar trimite încă ${NF.format(S.find(s => s.cod === "p5000").sate30 - S.find(s => s.cod === "propus").sate30)} de sate dincolo de 30 de minute.</p>`;
+        legaTooltip($("#pn-comp-punct"));
+        // --- graficele mici: toate cifrele fiecărei variante
+        multipli($("#pn-comp-multipli"), S.map(s => ({ nume: SCURT[s.cod] || s.nume, clasa: clasa(s),
+            href: s.cod === "propus" || s.cod === "azi" ? "harta.html#tara" : "harta.html#tara", tip: tip(s) })), [
+            { titlu: "Comune și orașe", valori: S.map(s => s.unitati), format: v => NF.format(v) },
+            { titlu: "Economie la primării, mld. lei pe an", valori: S.map(s => s.economie), format: v => v ? NF1.format(v / 1e9) : "0" },
+            { titlu: "Drum mediu până la primărie, min", valori: S.map(s => s.timp), format: v => NF1.format(v) },
+            { titlu: "Sate la peste 30 de minute", valori: S.map(s => s.sate30), format: v => NF.format(v) }
+        ]);
+        $("#pn-comp-tabel").innerHTML = `<div class="tabel-derulant"><table class="pn-tabel">
+            <thead><tr><th scope="col">Varianta</th><th scope="col" class="num">Comune și orașe</th><th scope="col" class="num">Sub 3.000 loc.</th>
+                <th scope="col" class="num">Economie pe an</th><th scope="col" class="num">Drum mediu</th><th scope="col" class="num">Sate &gt; 30 min</th></tr></thead>
+            <tbody>${S.map(s => `<tr class="${s.cod === "propus" ? "pn-propunere" : s.cod === "azi" ? "pn-azi" : ""}"><th scope="row">${esc(s.nume)}</th>
+                <td class="num">${NF.format(s.unitati)}</td><td class="num">${NF.format(s.sub3000)}</td>
+                <td class="num">${s.economie ? mld(s.economie) : "—"}</td><td class="num">${NF1.format(s.timp)} min</td><td class="num">${NF.format(s.sate30)}</td></tr>`).join("")}</tbody>
+            </table></div>
+            <p class="pn-nota">Economia e cea de la primării, cu ipoteza de bază (biroul din sat păstrează un sfert). Pe hartă poți încerca orice altă
+                combinație de praguri, la pasul „Regulile”.</p>`;
+    }
+
+    function graficCota() {
+        const C = D.cote, L = 900, H = 230, st = 58, dr = 24, sus = 26, jos = 40;
+        const maxY = Math.ceil(Math.max(...C.map(c => c[1])) / 1e9);
+        const x = c => st + (L - st - dr) * c / 0.5, y = v => sus + (H - sus - jos) * (1 - v / (maxY * 1e9));
+        const grila = [];
+        for (let v = 0; v <= maxY; v++) grila.push(`<line class="pn-grila-linie" x1="${st}" x2="${L - dr}" y1="${y(v * 1e9)}" y2="${y(v * 1e9)}"/>
+            <text class="pn-axa-text" x="${st - 8}" y="${y(v * 1e9) + 4}" text-anchor="end">${v}</text>`);
+        C.forEach(([c]) => grila.push(`<text class="pn-axa-text" x="${x(c)}" y="${H - jos + 18}" text-anchor="middle">${Math.round(c * 100)}%</text>`));
+        const marcate = C.filter(([c]) => [0.15, 0.25, 0.35].some(m => Math.abs(m - c) < 1e-9));
+        $("#pn-cota").innerHTML = `
+            <svg viewBox="0 0 ${L} ${H}" role="img" aria-label="Economia la primării scade de la ${NF1.format(C[0][1] / 1e9)} mld. lei, dacă primăriile unite nu lasă nimic în urmă, la ${NF1.format(C[C.length - 1][1] / 1e9)} mld., dacă păstrează jumătate">
+                ${grila.join("")}
+                <polyline class="pn-linie" points="${C.map(([c, v]) => `${x(c)},${y(v)}`).join(" ")}"/>
+                ${C.map(([c, v]) => `<circle class="pn-linie-punct ${Math.abs(c - 0.25) < 1e-9 ? "baza" : ""}" cx="${x(c)}" cy="${y(v)}" r="${Math.abs(c - 0.25) < 1e-9 ? 7 : 4}"
+                    data-tip="<b>Biroul din sat păstrează ${Math.round(c * 100)}%</b><br>economie la primării: ${mld(v)} pe an"/><circle cx="${x(c)}" cy="${y(v)}" r="14" fill="transparent"
+                    data-tip="<b>Biroul din sat păstrează ${Math.round(c * 100)}%</b><br>economie la primării: ${mld(v)} pe an"/>`).join("")}
+                ${marcate.map(([c, v]) => `<text class="pn-valoare" x="${x(c)}" y="${y(v) - 14}" text-anchor="middle">${NF1.format(v / 1e9)}${Math.abs(c - 0.25) < 1e-9 ? " · calculul de bază" : ""}</text>`).join("")}
+                <text class="pn-axa-titlu-svg" x="${(st + L - dr) / 2}" y="${H - 6}" text-anchor="middle">cât păstrează unitatea nouă din aparatul fiecărei primării care se unește cu ea, pentru biroul din sat</text>
+            </svg>
+            <p class="pn-axa-titlu">miliarde de lei pe an, la primării</p>
+            <p class="pn-nota">Fiecare zece puncte mută cam 0,5 mld. lei. Ipoteza de bază, un sfert, e de verificat pe două–trei comasări reale.
+                <a href="raport.html#tablou">Cursorul, în raport →</a></p>`;
+        legaTooltip($("#pn-cota"));
+    }
+
+    function multipliRegiuni() {
+        const V = D.variante;
+        const clasa = v => v.cod === "adr" ? "pn-m-propus" : v.cod === "judete" ? "pn-m-azi" : "";
+        const tip = v => `${NF.format(v.regiuni)} unități · drum la capitală ${NF.format(v.minute)} min<br>cea mai mare / cea mai mică: ${NF1.format(v.raportPopulatie)}× · ${NF.format(v.consilieri)} de consilieri și președinți`;
+        multipli($("#pn-reg-multipli"), V.map(v => ({ nume: SCURT_REG(v), clasa: clasa(v), href: legReg(v), tip: tip(v) })), [
+            { titlu: "Regiuni (azi, județe)", valori: V.map(v => v.regiuni), format: v => NF.format(v) },
+            { titlu: "Drum mediu la capitală, min", valori: V.map(v => v.minute), format: v => NF.format(v) },
+            { titlu: "Cea mai mare / cea mai mică", valori: V.map(v => v.raportPopulatie), format: v => NF1.format(v) + "×" },
+            { titlu: "Consilieri și președinți", valori: V.map(v => v.consilieri), format: v => NF.format(v) }
+        ]);
+    }
+
     // ------------------------------------------------------------ tabelul județelor
     const COLOANE = [
         { cheie: "n", titlu: "Județul", val: j => j.n },
@@ -350,6 +466,9 @@
         structura();
         regiuni();
         simulari();
+        comparatieComasare();
+        graficCota();
+        multipliRegiuni();
         variante();
         filtre();
         judete();
