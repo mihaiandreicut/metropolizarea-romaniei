@@ -1,5 +1,5 @@
 /* ============================================================================
-   e-ro-adp — stratul „Regiuni tematice” (index.html): țări, zone etnografice,
+   e-ro-adp — stratul „Regiuni tematice” (harta.html): țări, zone etnografice,
    regiuni etno-culturale și funcționale (date/regiuni-tematice.json).
 
    Apartenența e mulți-la-mulți: un UAT poate ține de mai multe regiuni, iar o

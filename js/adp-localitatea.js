@@ -7,7 +7,7 @@
    cifrele sunt precalculate de unelte/fise-localitati.js, cu aceleași module ca
    harta și raportul; pagina doar le caută și le așază.
    Modul independent: nu are nevoie de hartă și nici de algoritm. Rulează pe două
-   pagini: pe localitatea.html, de sine stătător, și pe prima pagină (index.html),
+   pagini: pe localitatea.html, de sine stătător, și pe prima pagină (harta.html),
    unde caseta de căutare stă peste hartă, fișa apare în panou, iar harta e
    anunțată prin evenimentul „ro-adp:localitate” ca să meargă la localitatea aleasă.
    ========================================================================== */
@@ -324,7 +324,7 @@
                     <button type="button" class="buton principal" id="loc-distribuie">Distribuie</button>
                     <button type="button" class="buton" id="loc-imagine">Descarcă imaginea</button>
                     ${!g ? "" : PE_HARTA ? `<a class="buton" href="#judet=${jr.c}">Simulează județul ${esc(jr.n)}</a>`
-                        : `<a class="buton" href="index.html#judet=${u.j}">Vezi pe hartă</a>`}
+                        : `<a class="buton" href="harta.html#judet=${u.j}">Vezi pe hartă</a>`}
                     ${g ? `<a class="buton" href="raport.html#judet-${esc(jr.auto)}">Fișa județului ${esc(jr.n)}</a>` : ""}
                     <a class="buton" href="${esc(sesizare(f))}" target="_blank" rel="noopener">Semnalează o greșeală</a>
                 </div>

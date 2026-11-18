@@ -1,7 +1,7 @@
 /* ============================================================================
    ro-adp — instituțiile unui județ, azi și în model.
 
-   O singură fișă, folosită de pasul 3 de pe hartă (index.html) și de fișele de
+   O singură fișă, folosită de pasul 3 de pe hartă (harta.html) și de fișele de
    județ din raport.html, ca amândouă să arate aceleași cifre:
      * aleșii și funcțiile, după Codul administrativ (OUG 57/2019): primari și
        viceprimari (art. 148), consilieri locali (art. 112), delegați sătești

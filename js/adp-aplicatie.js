@@ -1,11 +1,11 @@
 /* ============================================================================
-   e-ro-adp — pagina hărții (index.html): moduri de colorare, legendă,
+   e-ro-adp — pagina hărții (harta.html): moduri de colorare, legendă,
    căutare, detalii UAT, localitățile componente ale UAT-ului selectat.
 
    Modul independent: nu citește globalele altor module. Primește prin
    porneste(dependente) biblioteca Leaflet, topologia, harta și extensiile de
    pagină (scenarii, regiuni tematice); legătura se face o singură dată, în
-   index.html. Extensiile primesc un „context” cu datele și funcțiile de care
+   harta.html. Extensiile primesc un „context” cu datele și funcțiile de care
    au nevoie și își pot adăuga propriul mod de colorare.
 
    Date: date/romania-uat.json (UAT-uri + atribute) și date/localitati.json

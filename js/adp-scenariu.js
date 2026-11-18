@@ -1,5 +1,5 @@
 /* ============================================================================
-   e-ro-adp — scenariile de reorganizare pe hartă (index.html, secțiunea
+   e-ro-adp — scenariile de reorganizare pe hartă (harta.html, secțiunea
    „Reorganizare — scenarii”)
 
    Încarcă date/judete/<judet>.json (accesibilitatea localităților), rulează
@@ -2195,7 +2195,7 @@ window.AdpScenariu = function() {
         document.querySelectorAll("input[name=pp-harta]").forEach(radio =>
             radio.addEventListener("change", () => vedere(radio.value === "inainte")));
         arataPas(1);
-        // legătura directă: index.html#tara, #regiune=N sau #judet=N (din fișele de județ ale
+        // legătura directă: harta.html#tara, #regiune=N sau #judet=N (din fișele de județ ale
         // raportului) — teritoriul ales și raportul calculat cu regulile implicite; #final, harta finală
         const dinAdresa = () => {
             if (location.hash === "#final") {

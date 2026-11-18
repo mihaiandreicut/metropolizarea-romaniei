@@ -15,17 +15,17 @@
 
     const SIMULARI = [
         { grup: "Comasarea comunelor", legaturi: [
-            ["Pe un județ, pas cu pas", "index.html#judet=8"],
-            ["Pe o regiune", "index.html#regiune=7"],
-            ["Toată țara", "index.html#tara"],
-            ["Harta finală", "index.html#final"],
-            ["Capitala și Ilfovul", "index.html#judet=23"]
+            ["Pe un județ, pas cu pas", "harta.html#judet=8"],
+            ["Pe o regiune", "harta.html#regiune=7"],
+            ["Toată țara", "harta.html#tara"],
+            ["Harta finală", "harta.html#final"],
+            ["Capitala și Ilfovul", "harta.html#judet=23"]
         ] },
         { grup: "Regiunile", legaturi: [
-            ["Azi: 41 de județe și București", "index.html#regiuni=judete"],
-            ["8 regiuni de dezvoltare (propunerea)", "index.html#regiuni=adr"],
-            ["Curțile de apel, cu Metropola", "index.html#regiuni=curte-apel"],
-            ["Regiuni calculate", "index.html#regiuni=calculata"]
+            ["Azi: 41 de județe și București", "harta.html#regiuni=judete"],
+            ["8 regiuni de dezvoltare (propunerea)", "harta.html#regiuni=adr"],
+            ["Curțile de apel, cu Metropola", "harta.html#regiuni=curte-apel"],
+            ["Regiuni calculate", "harta.html#regiuni=calculata"]
         ] },
         { grup: "Banii și localitatea", legaturi: [
             ["Cât lasă în urmă primăria desființată", "raport.html#tablou"],

@@ -1,5 +1,5 @@
 /* ============================================================================
-   e-ro-adp — stratul „Regiuni — simulare” (index.html): nivelul al doilea al
+   e-ro-adp — stratul „Regiuni — simulare” (harta.html): nivelul al doilea al
    reorganizării, județele grupate în regiuni.
 
    Pe hartă: regiunile generate, capitalele lor și rețelele de instituții cu

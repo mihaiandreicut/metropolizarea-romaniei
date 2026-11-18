@@ -1386,7 +1386,7 @@ window.AdpRaport = function() {
                             (${NF.format(preluate.reduce((a, i) => a + (date.uat[i].pop || 0), 0))} loc.):
                             ${esc(preluate.map(i => date.uat[i].n).join(", "))}. Primăriile lor devin ghișee ale sectoarelor.</p>`;
                     })()}
-                    <p class="nota"><a href="index.html#judet=${f.j.c}">Pe hartă, pas cu pas</a>: același județ,
+                    <p class="nota"><a href="harta.html#judet=${f.j.c}">Pe hartă, pas cu pas</a>: același județ,
                         cu regulile tale, și harta de azi lângă cea propusă. Ceva nu se potrivește cu ce știi despre
                         județ? <a href="${esc(sesizareJudet(f))}" target="_blank" rel="noopener">Semnalează o greșeală</a>.</p>
                     <div class="fisa-inst" data-judet="${f.j.c}"><p class="nota">Aleșii și instituțiile județului apar la deschiderea fișei.</p></div>

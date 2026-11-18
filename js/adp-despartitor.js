@@ -1,5 +1,5 @@
 /* ============================================================================
-   e-ro-adp — despărțitorul dintre hartă și panou (index.html), cu Split.js
+   e-ro-adp — despărțitorul dintre hartă și panou (harta.html), cu Split.js
    (vendor/split, licență MIT).
 
    Lățimea panoului se trage cu mouse-ul sau se mută cu săgețile, cu
