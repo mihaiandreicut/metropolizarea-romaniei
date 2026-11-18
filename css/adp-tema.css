@@ -3804,3 +3804,170 @@ body.harta-izolata .legenda-harta {
         font-size: 15px;
     }
 }
+
+/* panoul: zonele (sinteza, simulările, județele) și cardurile de simulare */
+.pn-zona {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 18px 0 -4px;
+}
+
+.pn-zona-numar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1c5cab, #2a78d6);
+    color: #fff;
+    font-weight: 750;
+    font-size: 18px;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.pn-zona h2 {
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+}
+
+.pn-zona p {
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: var(--text-2);
+}
+
+.pn-card-cap h3 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+}
+
+.pn-subzona {
+    margin: 4px 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-2);
+}
+
+.pn-sim-grila {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.pn-sim-grila-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.pn-sim-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--panou);
+    border: 1px solid var(--margine);
+    border-radius: 16px;
+    box-shadow: var(--umbra);
+    overflow: hidden;
+    color: var(--text);
+    text-decoration: none;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+}
+
+.pn-sim-card:hover,
+.pn-sim-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.pn-sim-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 480 / 340;
+    background: #fcfcfb;
+    border-bottom: 1px solid var(--linie);
+}
+
+.pn-sim-corp {
+    display: grid;
+    gap: 8px;
+    padding: 14px 16px 16px;
+    flex: 1;
+    align-content: start;
+}
+
+.pn-sim-corp .pn-eticheta {
+    justify-self: start;
+}
+
+.pn-eticheta.neutru {
+    background: var(--plan);
+    color: var(--text-2);
+}
+
+.pn-sim-corp h4 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+}
+
+.pn-sim-cifre {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    margin: 0;
+}
+
+.pn-sim-cifre div {
+    display: grid;
+    gap: 1px;
+}
+
+.pn-sim-cifre dt {
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-3);
+}
+
+.pn-sim-cifre dd {
+    margin: 0;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.pn-sim-deschide {
+    margin-top: 4px;
+    font-size: 13.5px;
+    font-weight: 650;
+    color: var(--accent-text);
+}
+
+.pn-tabel-structura td {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+@media (max-width: 1100px) {
+    .pn-sim-grila,
+    .pn-sim-grila-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .pn-sim-grila,
+    .pn-sim-grila-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .pn-zona h2 {
+        font-size: 22px;
+    }
+}

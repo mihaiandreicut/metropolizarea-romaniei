@@ -214,6 +214,71 @@
         });
     }
 
+    // ------------------------------------------------------------ administrația, azi și propus
+    function structura() {
+        const N = D.national, A = D.alesi;
+        const rand = (nivel, azi, propus) => `<tr><th scope="row">${nivel}</th><td>${azi}</td><td>${propus}</td></tr>`;
+        $("#pn-structura").innerHTML = `<div class="tabel-derulant"><table class="pn-tabel pn-tabel-structura">
+            <thead><tr><th scope="col">Nivelul</th><th scope="col">Azi</th><th scope="col">Propus</th></tr></thead>
+            <tbody>
+                ${rand("Satele", `${NF.format(N.sate)}, cu delegat doar unde n-au consilier`, `<b>${NF.format(N.sate)}</b>, fiecare cu delegat și fond propriu`)}
+                ${rand("Comunele și orașele", `${NF.format(N.uat[0])}, fiecare cu primar și consiliu`, `<b>${NF.format(N.uat[1])}</b>, cu un birou în fiecare fostă primărie`)}
+                ${rand("Districtele", "—", `<b>${NF.format(N.districte)}</b>, conduse de primari, fără alegeri noi`)}
+                ${rand("Județele", "41 și Bucureștiul, cu consiliu ales și prefectură", "<b>41</b>, ca identitate și circumscripție; un oficiu")}
+                ${rand("Regiunile", `${NF.format(N.regiuni)} de dezvoltare, fără conducere aleasă`, `<b>${NF.format(N.regiuni)}</b>, cu consiliu ales (${NF.format(A.judeteni[1])} de mandate)`)}
+                ${rand("Aleși locali și județeni", NF.format(A.total[0]), `<b>${NF.format(A.total[1])}</b>`)}
+            </tbody></table></div>`;
+    }
+
+    // ------------------------------------------------------------ simulările, cu hărțile lor
+    function card(s) {
+        return `<a class="pn-sim-card" href="${s.href}">
+            <img src="img/panou/${s.img}.jpg" width="480" height="340" loading="lazy" alt="${esc(s.alt)}">
+            <div class="pn-sim-corp">
+                ${s.eticheta ? `<span class="pn-eticheta ${s.etichetaClasa || "sigur"}">${esc(s.eticheta)}</span>` : ""}
+                <h4>${esc(s.titlu)}</h4>
+                <dl class="pn-sim-cifre">${s.cifre.map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join("")}</dl>
+                <span class="pn-sim-deschide">Deschide pe hartă →</span>
+            </div>
+        </a>`;
+    }
+
+    function simulari() {
+        const v = (cod, nume) => D.variante.find(x => x.cod === cod && (!nume || x.nume === nume)) || {};
+        const cifreReg = x => [["unități", NF.format(x.regiuni)], ["drum la capitală", `${NF.format(x.minute)} min`],
+            ["mare / mică", `${NF1.format(x.raportPopulatie)}×`], ["consilieri", NF.format(x.consilieri)]];
+        const regiuni = [
+            { x: v("judete"), img: "regiuni-judete", href: "harta.html#regiuni=judete", titlu: "Azi: 41 de județe și București",
+                eticheta: "situația de azi", etichetaClasa: "neutru", alt: "Harta celor 41 de județe și a Bucureștiului" },
+            { x: v("adr"), img: "regiuni-adr", href: "harta.html#regiuni=adr", titlu: "8 regiuni de dezvoltare",
+                eticheta: "propunerea", alt: "Harta celor 8 regiuni de dezvoltare, cu București–Ilfov ca Metropolă" },
+            { x: v("curte-apel"), img: "regiuni-curti-apel", href: "harta.html#regiuni=curte-apel", titlu: "Curțile de apel, cu Metropola",
+                eticheta: "alternativă", etichetaClasa: "ipoteza", alt: "Harta celor 16 regiuni ale curților de apel, cu București–Ilfov separat" },
+            { x: v("calculata", "12 regiuni calculate"), img: "regiuni-calculate", href: "harta.html#regiuni=calculata", titlu: "Regiuni calculate (aici, 12)",
+                eticheta: "alternativă", etichetaClasa: "ipoteza", alt: "Harta a 12 regiuni calculate de algoritm" }
+        ];
+        $("#pn-sim-regiuni").innerHTML = regiuni.map(s => card(Object.assign(s, { cifre: cifreReg(s.x) }))).join("");
+
+        const N = D.national, b = D.bani;
+        const brasov = D.judete.find(j => j.c === 8), ilfov = D.judete.find(j => j.c === 23);
+        const total = j => j.economie[0] + j.economie[1] + j.economie[2];
+        const comasare = [
+            { img: "comasare-tara", href: "harta.html#tara", titlu: "Toată țara", eticheta: "propunerea",
+                alt: "Harta celor 1.441 de unități propuse, fiecare cu culoarea ei",
+                cifre: [["unități", `${NF.format(N.uat[0])} → <b>${NF.format(N.uat[1])}</b>`], ["primării, pe an", `−${NF1.format(b.primarii / 1e9)} mld. lei`],
+                    ["drum mediu", `${NF1.format(N.timp[0])} → ${NF1.format(N.timp[1])} min`]] },
+            brasov && { img: "comasare-judet", href: "harta.html#judet=8", titlu: "Un județ, pas cu pas: Brașov",
+                alt: "Harta județului Brașov, cu unitățile propuse",
+                cifre: [["unități", `${NF.format(brasov.uat)} → <b>${NF.format(brasov.unitati)}</b>`], ["economie pe an", mil(total(brasov))],
+                    ["drum mediu", `${NF1.format(brasov.timp[0])} → ${NF1.format(brasov.timp[1])} min`]] },
+            N.capitala && ilfov && { img: "capitala", href: "harta.html#judet=23", titlu: "Capitala și Ilfovul",
+                alt: "Bucureștiul și cele 14 UAT-uri lipite de el, care trec la Capitală",
+                cifre: [["UAT-uri preluate", NF.format(N.capitala.preluate)], ["locuitori", `${NF1.format(N.capitala.populatie / 1e6)} mil.`],
+                    ["Ilfov", `${NF.format(ilfov.uat)} → <b>${NF.format(ilfov.unitati)}</b> unități`]] }
+        ].filter(Boolean);
+        $("#pn-sim-comasare").innerHTML = comasare.map(card).join("");
+    }
+
     // ------------------------------------------------------------ tabelul județelor
     const COLOANE = [
         { cheie: "n", titlu: "Județul", val: j => j.n },
@@ -282,7 +347,9 @@
         kpi();
         graficBani();
         graficCurba();
+        structura();
         regiuni();
+        simulari();
         variante();
         filtre();
         judete();

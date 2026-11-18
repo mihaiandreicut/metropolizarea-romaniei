@@ -107,19 +107,27 @@
             </div>
         </section>
 
+        <header class="pn-zona" id="sinteza">
+            <span class="pn-zona-numar">1</span>
+            <div>
+                <h2>Sinteza datelor</h2>
+                <p>Ce se schimbă, în cifre: unități, bani, aleși, drumul până la primărie, pe țară, pe regiuni și pe județe</p>
+            </div>
+        </header>
+
         <section class="pn-kpi" id="pn-kpi" aria-label="Cifrele de bază"></section>
 
         <div class="pn-grila">
             <section class="pn-card" aria-labelledby="pn-bani-titlu">
                 <header class="pn-card-cap">
-                    <h2 id="pn-bani-titlu">De unde vin banii</h2>
+                    <h3 id="pn-bani-titlu">De unde vin banii</h3>
                     <p>Economia pe an, pe surse; plaja arată ipotezele împinse la capete</p>
                 </header>
                 <div id="pn-bani" class="pn-grafic"></div>
             </section>
             <section class="pn-card" aria-labelledby="pn-curba-titlu">
                 <header class="pn-card-cap">
-                    <h2 id="pn-curba-titlu">Cât costă primăria, pe locuitor</h2>
+                    <h3 id="pn-curba-titlu">Cât costă primăria, pe locuitor</h3>
                     <p>Aparatul administrativ pe an, după mărimea localității (execuția bugetară 2025)</p>
                 </header>
                 <div id="pn-curba" class="pn-grafic"></div>
@@ -128,7 +136,7 @@
 
         <section class="pn-card pn-harta" aria-labelledby="pn-harta-titlu">
             <header class="pn-card-cap">
-                <h2 id="pn-harta-titlu">Harta costului: azi și după comasare</h2>
+                <h3 id="pn-harta-titlu">Harta costului: azi și după comasare</h3>
                 <p>Cât costă primăria pe fiecare locuitor, pe an: țara se luminează când primăriile mici se unesc</p>
             </header>
             <figure>
@@ -139,28 +147,59 @@
         </section>
 
         <div class="pn-grila">
+            <section class="pn-card" aria-labelledby="pn-structura-titlu">
+                <header class="pn-card-cap">
+                    <h3 id="pn-structura-titlu">Administrația, azi și propus</h3>
+                    <p>Fiecare nivel, cu ce rămâne și ce se schimbă</p>
+                </header>
+                <div id="pn-structura"></div>
+            </section>
             <section class="pn-card" aria-labelledby="pn-regiuni-titlu">
                 <header class="pn-card-cap">
-                    <h2 id="pn-regiuni-titlu">Pe regiuni</h2>
+                    <h3 id="pn-regiuni-titlu">Pe regiuni</h3>
                     <p>Comune și orașe azi → unități după, și economia pe an. Clic pe o regiune: simularea ei</p>
                 </header>
                 <div id="pn-regiuni"></div>
             </section>
-            <section class="pn-card" aria-labelledby="pn-variante-titlu">
-                <header class="pn-card-cap">
-                    <h2 id="pn-variante-titlu">Regiunile: variantele comparate</h2>
-                    <p>Situația de azi lângă propunere și alternative. Clic pe un rând: harta variantei</p>
-                </header>
-                <div id="pn-variante"></div>
-            </section>
         </div>
 
-        <section class="pn-card" aria-labelledby="pn-judete-titlu">
+        <header class="pn-zona" id="simulari">
+            <span class="pn-zona-numar">2</span>
+            <div>
+                <h2>Simulări</h2>
+                <p>Fiecare variantă, cu harta și cifrele ei. Clic pe una: se deschide pe hartă, unde poți schimba regulile</p>
+            </div>
+        </header>
+
+        <section aria-labelledby="pn-sim-regiuni-titlu">
+            <h3 class="pn-subzona" id="pn-sim-regiuni-titlu">Regiunile</h3>
+            <div class="pn-sim-grila" id="pn-sim-regiuni"></div>
+        </section>
+
+        <section class="pn-card" aria-labelledby="pn-variante-titlu">
+            <header class="pn-card-cap">
+                <h3 id="pn-variante-titlu">Variantele de regiuni, una lângă alta</h3>
+                <p>Situația de azi lângă propunere și alternative. Clic pe un rând: harta variantei</p>
+            </header>
+            <div id="pn-variante"></div>
+        </section>
+
+        <section aria-labelledby="pn-sim-comasare-titlu">
+            <h3 class="pn-subzona" id="pn-sim-comasare-titlu">Comasarea comunelor</h3>
+            <div class="pn-sim-grila pn-sim-grila-3" id="pn-sim-comasare"></div>
+        </section>
+
+        <header class="pn-zona" id="judete">
+            <span class="pn-zona-numar">3</span>
+            <div>
+                <h2>Datele pe județe</h2>
+                <p>Toate cele 41 de județe; Bucureștiul intră în unitatea Capitalei, la Ilfov</p>
+            </div>
+        </header>
+
+        <section class="pn-card" aria-label="Tabelul județelor">
             <header class="pn-card-cap pn-card-cap-rand">
-                <div>
-                    <h2 id="pn-judete-titlu">Pe județe</h2>
-                    <p>Toate cele 41 de județe; Bucureștiul intră în unitatea Capitalei, la Ilfov. Clic pe titlul unei coloane: sortare</p>
-                </div>
+                <p>Clic pe titlul unei coloane: sortare. Clic pe un județ: simularea lui, pas cu pas</p>
                 <div class="pn-filtre">
                     <input id="pn-cauta" type="search" placeholder="Caută județul" aria-label="Caută județul" autocomplete="off">
                     <select id="pn-regiune" aria-label="Regiunea"><option value="">Toate regiunile</option></select>
